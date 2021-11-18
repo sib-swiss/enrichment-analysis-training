@@ -1,7 +1,9 @@
 
+The course starts at 9am and ends around 5pm, with the following breaks: 
+
 | start 	| end   	| topic   	|
 |-------	|-------	|---------	|
-| 10:00 	| 10:30 	| coffee! 	|
-| 12:00 	| 13:00 	| lunch!  	|
+| 10am	 	| 10:30am 	| coffee! 	|
+| 12:30pm 	| 1:30pm 	| lunch!  	|
+| 3:30pm 	| 4:00pm 	| coffee!  	|
 
-Generate markdown tables at [tablesgenerator.com](https://www.tablesgenerator.com/markdown_tables)

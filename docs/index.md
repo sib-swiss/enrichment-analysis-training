@@ -2,31 +2,35 @@
 
 ## Material
 
-* This website
-* Zoom meeting (through mail)
-* Google doc (through mail)
-* [Slack channel](https://slack.com)
+Slides of lectures:
+[Download part 1](../assets/pdfs/EA_122021_TW.pdf){: .md-button }
+
+<!-- This is commented text -->
+<!-- [Download part 2](../assets/pdfs/EA_122021_TW.pdf){: .md-button } -->
+
+## Overview
+
+Experiments designed to quantify gene expression often yield hundreds of genes that show statistically significant differences between two classes (two biological states, two phenotype states, two experimental conditions, etc). 
+Once differentially expressed genes are identified, enrichment analysis (EA) methods can be conducted to identify groups of genes (e.g. particular pathways) that are differentially expressed, and offer insights into biological mechanisms. 
+One example of such a method is the Gene Set Enrichment Analysis (GSEA), which is frequently used for high-throughput gene expression data analysis.
+
+This course will cover GSEA and alternative enrichment tools. Because most of their implementations are directly linked to databases that annotate the function of genes in the cell, the course will also give an overview of functional annotation databases such as the Gene Ontology.
 
 ## Learning outcomes
 
-### General learning outcomes
+At the end of the course, the participants will be able to:
 
-After this course, you will be able to:
+1. Distinguish available enrichment analysis methods
+2. Apply GSEA and over-representation analysis using R
+3. Determine whether the genes of a GO term have a statistically significant difference in expression or not
+4. Learn where to find other gene sets in databases (e.g. KEGG, oncogenic gene sets) and use them in R
 
-### Learning outcomes explained
+## Exercises
 
-To reach the general learning outcomes above, we have set a number of smaller learning outcomes. Each chapter starts with these smaller learning outcomes. Use these at the start of a chapter to get an idea what you will learn. Use them also at the end of a chapter to evaluate whether you have learned what you were expected to learn.
+The course is divided into small blocks, each with a lecture and relevant practical exercices. We will comment the practical exercices at the end of each block.
 
-## Learning experiences
-
-To reach the learning outcomes we will use lectures, exercises, polls and group work. During exercises, you are free to discuss with other participants. During lectures, focus on the lecture only.
-
-### Exercises
-
-Each block has practical work involved. Some more than others. The practicals are subdivided into chapters, and we'll have a (short) discussion after each chapter. All answers to the practicals are incorporated, but they are hidden. Do the exercise first by yourself, before checking out the answer. If your answer is different from the answer in the practicals, try to figure out why they are different.
-
-### Asking questions
-During lectures, you are encouraged to raise your hand if you have questions (if in-person), or use the Zoom functionality (if online). Find the buttons in the participants list ('Participants' button):
+## Asking questions
+During lectures, you are encouraged to ask questions. Just unmute yourself and ask your questions or use the Zoom functionality. Find the buttons in the participants list ('Participants' button):
 
 <figure>
   <img src="assets/images/zoom_icons.png" width="300"/>
@@ -38,16 +42,4 @@ Alternatively, (depending on your zoom version or OS) use the 'Reactions' button
   <img src="assets/images/reactions_zoom.png" width="200"/>
 </figure>
 
-A main source of communication will be our [slack channel](https://www.slack.com). Ask background questions that interest you personally at **#background**. During the exercises, e.g. if you are stuck or don't understand what is going on, use the slack channel **#q-and-a**.  This channel is not only meant for asking questions but also for answering questions of other participants. If you are replying to a question, use the "reply in thread" option:
 
-<figure>
-  <img src="assets/images/reply_in_thread.png" width="350"/>
-</figure>
-
-The teacher will review the answers, and add/modify if necessary. If you're really stuck and need specific tutor support, write the teachers or helpers personally.
-
-**To summarise:**
-
-* During lectures: raise hand/zoom functionality
-* Personal interest questions: **#background**
-* During exercises: **\#q-and-a** on slack
