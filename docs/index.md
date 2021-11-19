@@ -3,7 +3,7 @@
 ## Material
 
 Slides of lectures:
-[Download part 1](../assets/pdfs/EA_122021_TW.pdf){: .md-button }
+[Download part 1](assets/pdf/EA_122021_TW.pdf){: .md-button }
 
 <!-- This is commented text -->
 <!-- [Download part 2](../assets/pdfs/EA_122021_TW.pdf){: .md-button } -->
@@ -27,7 +27,7 @@ At the end of the course, the participants will be able to:
 
 ## Exercises
 
-The course is divided into small blocks, each with a lecture and relevant practical exercices. We will comment the practical exercices at the end of each block.
+The course is divided into small blocks, each with a lecture and relevant practical exercises. We will comment the practical exercises at the end of each block.
 
 ## Asking questions
 During lectures, you are encouraged to ask questions. Just unmute yourself and ask your questions or use the Zoom functionality. Find the buttons in the participants list ('Participants' button):
