@@ -19,6 +19,10 @@
 
 [https://yulab-smu.github.io/clusterProfiler-book/](https://yulab-smu.github.io/clusterProfiler-book/)
 
+**fgsea** package with fgsea() function called by clusterProfiler
+
+[https://bioconductor.org/packages/release/bioc/html/fgsea.html](https://bioconductor.org/packages/release/bioc/html/fgsea.html)
+
 **GOsummaries**
 
 [https://www.bioconductor.org/packages/release/bioc/html/GOsummaries.html](https://www.bioconductor.org/packages/release/bioc/html/GOsummaries.html)

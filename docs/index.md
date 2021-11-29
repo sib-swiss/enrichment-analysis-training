@@ -1,13 +1,3 @@
-# Course website
-
-## Material
-
-Slides of lectures:
-[Download part 1](assets/pdf/EA_122021_TW.pdf){: .md-button }
-
-<!-- This is commented text -->
-<!-- [Download part 2](../assets/pdfs/EA_122021_TW.pdf){: .md-button } -->
-
 ## Overview
 
 Experiments designed to quantify gene expression often yield hundreds of genes that show statistically significant differences between two classes (two biological states, two phenotype states, two experimental conditions, etc). 
