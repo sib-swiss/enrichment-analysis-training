@@ -459,6 +459,22 @@ ridgeplot(GO_NK_Th_selection)
 Thanks for attending this course! Don't forget to give honest feedback via [this feedback form](https://edu.sib.swiss/course/view.php?id=550). 
 
 
+## Extra exercise for ECTS credits
+- Perform GSEA of the NK vs Th data using the Reactome gene sets downloaded from the 
+MSigDB website [here](http://www.gsea-msigdb.org/gsea/msigdb/download_file.jsp?filePath=/msigdb/release/7.4/c2.cp.reactome.v7.4.symbols.gmt).
+- How many gene sets are significantly enriched? Generate an ordered barplot of the NES of all genesets, and generate a barcode plot for the gene set with the lowest NES
+
+Steps
+
+- Import the reactome gene sets of the file c2.cp.reactome.v7.1.symbols.gmt using read.gmt()
+
+- Use GSEA providing a sorted named vector of t-statistics and the reactome gene sets, use minGSSize=30
+
+- Count the number of significant adjusted p-values
+
+- Use barplot() and gseaplot() for the visualization of the results
+
+
 
 
 

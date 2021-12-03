@@ -46,3 +46,14 @@
 [http://bioconductor.org/packages/release/bioc/html/rrvgo.html](http://bioconductor.org/packages/release/bioc/html/rrvgo.html)
 
 
+A [recent publication](https://academic.oup.com/nar/article/49/D1/D325/6027811) of the **Gene Ontology** consortium. They try to improve taxon constraints, i.e. to better define
+which terms are relevant for some species but not for others (such as leukocyte-related terms that should be constrained to vertebrates.
+
+
+**Tools for species other than human or mouse**.
+Bioconductor contains "org.db" packages with genome/gene annotation for many organisms, for example
+for [Drosophila](https://bioconductor.org/packages/release/data/annotation/html/org.Dm.eg.db.html) or [Arabidopsis](https://bioconductor.org/packages/release/data/annotation/html/org.At.tair.db.html).
+
+For fungi, [FungiDB](https://fungidb.org/fungidb/app/search/pathway/PathwaysByGeneList) provides identification of metabolic pathways based on list of genes
+
+Eventually this repository by [Zhang et al](https://bmcbioinformatics.biomedcentral.com/articles/10.1186/s12859-020-3408-y)
