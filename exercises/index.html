@@ -571,7 +571,7 @@ Therefore, first check whether the way the genes are labeled is supported by clu
 </code></pre></div></p>
 </p>
 </div>
-<p>Create the named and sorted vector of t-statistics (i.e. for the geneList argument of the gseGO() function. </p>
+<p>Create the named and sorted vector of t-statistics (i.e. for the geneList argument of the gseGO() function). </p>
 <div class="highlight"><pre><span></span><code><span class="n">gl</span><span class="o">&lt;-</span><span class="n">NK_vs_Th</span><span class="o">$</span><span class="n">t</span>
 <span class="nf">names</span><span class="p">(</span><span class="n">gl</span><span class="p">)</span><span class="o">&lt;-</span><span class="nf">make.names</span><span class="p">(</span><span class="n">NK_vs_Th</span><span class="o">$</span><span class="n">symbol</span><span class="p">,</span> <span class="n">unique</span> <span class="o">=</span> <span class="bp">T</span><span class="p">)</span>
 <span class="n">gl</span><span class="o">&lt;-</span><span class="n">gl</span><span class="p">[</span><span class="nf">order</span><span class="p">(</span><span class="n">gl</span><span class="p">,</span> <span class="n">decreasing</span> <span class="o">=</span> <span class="bp">T</span><span class="p">)]</span>
@@ -591,7 +591,7 @@ Therefore, first check whether the way the genes are labeled is supported by clu
     <span class="n">GO_NK_Th</span><span class="o">@</span><span class="n">result</span><span class="p">[</span><span class="n">GO_NK_Th</span><span class="o">@</span><span class="n">result</span><span class="o">$</span><span class="n">Description</span><span class="o">==</span><span class="s">&quot;adaptive immune response&quot;</span><span class="p">,]</span>
 </code></pre></div>
 </details>
-<p>Count the number of up- and down-regulated gene sets similarly to how we count the number of significant genes in exercise 1:</p>
+<p>Count the number of up- and down-regulated gene sets similarly to how we counted the number of significant genes in exercise 1:</p>
 <div class="highlight"><pre><span></span><code>summary(GO_NK_Th@result$p.adjust&lt;0.05&amp;GO_NK_Th@result$NES&lt;0)
 Mode   FALSE    TRUE 
 # logical    303      86 
@@ -698,7 +698,7 @@ vector of t-statistics we used above with gseGO(). Why do we use this one and no
 <span class="c1"># Number of significant gene sets:</span>
 <span class="nf">length</span><span class="p">(</span><span class="nf">which</span><span class="p">(</span><span class="n">h_NK_vs_Th</span><span class="o">@</span><span class="n">result</span><span class="o">$</span><span class="n">p.adjust</span><span class="o">&lt;=</span><span class="m">0.05</span><span class="p">))</span> 
 </code></pre></div>
-<p>In the last section of the exercise, we will see several visualzation methods of GSEA or over-representation results. As a teaser, create a dotplot of 
+<p>In the last section of the course, we will see several visualization methods of GSEA or over-representation analysis results. As a teaser, create a dotplot of 
 significant hallmark gene sets:</p>
 <div class="highlight"><pre><span></span><code><span class="nf">dotplot</span><span class="p">(</span><span class="n">h_NK_vs_Th</span><span class="p">,</span> <span class="n">orderBy</span><span class="o">=</span><span class="s">&quot;p.adjust&quot;</span><span class="p">)</span>
 </code></pre></div>
@@ -736,9 +736,9 @@ directly on objects of class &ldquo;gseaResult&rdquo; (i.e. output by clusterPro
          <span class="n">title</span><span class="o">=</span><span class="s">&quot;HALLMARK_MTORC1_SIGNALING&quot;</span><span class="p">)</span>
 </code></pre></div>
 <p>If you have performed a GSEA of the KEGG pathways, it is possible to overlay the fold change values of your genes on top of the
-KEGG pathway maps available online. For this, create a named vector of fold change values, where the non-significant genes will be grey, the up- and down-
-regulated genes will be colored in the KEGG pathway map. The functions come from the pathview package.</p>
-<p><div class="highlight"><pre><span></span><code><span class="c1"># pathview with non-significant genes in grey:</span>
+KEGG pathway maps available online. For this, create a named vector of fold change values, where the non-significant genes will be grey, while the up- and down-
+regulated genes will be colored in the KEGG pathway map. The pathview() function comes from the pathview package (surprisingly&hellip;)</p>
+<p><div class="highlight"><pre><span></span><code><span class="c1"># pathview map with non-significant genes in grey:</span>
 <span class="c1"># set log fold change of non-significant genes to 0:</span>
 <span class="n">NK_vs_Th</span><span class="o">$</span><span class="n">logFC_0</span><span class="o">&lt;-</span><span class="nf">ifelse</span><span class="p">(</span><span class="n">NK_vs_Th</span><span class="o">$</span><span class="n">p.adj</span><span class="o">&gt;</span><span class="m">0.05</span><span class="p">,</span> <span class="m">0</span><span class="p">,</span> <span class="n">NK_vs_Th</span><span class="o">$</span><span class="n">logFC</span><span class="p">)</span>
 
@@ -783,14 +783,14 @@ can be used on these objects, and you can either show the top significant gene s
 <span class="nf">emapplot</span><span class="p">(</span><span class="n">ego2</span><span class="p">)</span>
 <span class="nf">emapplot_cluster</span><span class="p">(</span><span class="n">ego2</span><span class="p">)</span>
 
-<span class="c1"># Distribution of t-statistic for genes included in significant gene sets:</span>
+<span class="c1"># Distribution of t-statistic for genes included in significant gene sets or in selected gene sets:</span>
 <span class="nf">ridgeplot</span><span class="p">(</span><span class="n">GO_NK_Th</span><span class="p">)</span>
 
-<span class="n">GO_NK_Th_selection</span> <span class="o">=</span> <span class="n">GO_NK_Th</span><span class="p">[</span><span class="n">GO_NK_Th</span><span class="o">$</span><span class="n">ID</span> <span class="o">==</span> <span class="s">&quot;GO:0000184&quot;</span><span class="p">,</span> <span class="n">asis</span><span class="o">=</span><span class="bp">T</span><span class="p">]</span>
+<span class="n">GO_NK_Th_selection</span> <span class="o">&lt;-</span> <span class="n">GO_NK_Th</span><span class="p">[</span><span class="n">GO_NK_Th</span><span class="o">$</span><span class="n">ID</span> <span class="o">==</span> <span class="s">&quot;GO:0000184&quot;</span><span class="p">,</span> <span class="n">asis</span><span class="o">=</span><span class="bp">T</span><span class="p">]</span>
 <span class="nf">ridgeplot</span><span class="p">(</span><span class="n">GO_NK_Th_selection</span><span class="p">)</span>
-<span class="n">GO_NK_Th_selection</span> <span class="o">=</span> <span class="n">GO_NK_Th</span><span class="p">[</span><span class="n">GO_NK_Th</span><span class="o">$</span><span class="n">ID</span> <span class="o">==</span> <span class="s">&quot;GO:0006613&quot;</span><span class="p">,</span> <span class="n">asis</span><span class="o">=</span><span class="bp">T</span><span class="p">]</span>
+<span class="n">GO_NK_Th_selection</span> <span class="o">&lt;-</span> <span class="n">GO_NK_Th</span><span class="p">[</span><span class="n">GO_NK_Th</span><span class="o">$</span><span class="n">ID</span> <span class="o">==</span> <span class="s">&quot;GO:0006613&quot;</span><span class="p">,</span> <span class="n">asis</span><span class="o">=</span><span class="bp">T</span><span class="p">]</span>
 <span class="nf">ridgeplot</span><span class="p">(</span><span class="n">GO_NK_Th_selection</span><span class="p">)</span>
-<span class="n">GO_NK_Th_selection</span> <span class="o">=</span> <span class="n">GO_NK_Th</span><span class="p">[</span><span class="nf">grep</span><span class="p">(</span><span class="s">&quot;membrane&quot;</span><span class="p">,</span><span class="n">GO_NK_Th</span><span class="o">@</span><span class="n">result</span><span class="o">$</span><span class="n">Description</span><span class="p">),</span> <span class="n">asis</span><span class="o">=</span><span class="bp">T</span><span class="p">]</span>
+<span class="n">GO_NK_Th_selection</span> <span class="o">&lt;-</span> <span class="n">GO_NK_Th</span><span class="p">[</span><span class="nf">grep</span><span class="p">(</span><span class="s">&quot;membrane&quot;</span><span class="p">,</span><span class="n">GO_NK_Th</span><span class="o">@</span><span class="n">result</span><span class="o">$</span><span class="n">Description</span><span class="p">),</span> <span class="n">asis</span><span class="o">=</span><span class="bp">T</span><span class="p">]</span>
 <span class="nf">ridgeplot</span><span class="p">(</span><span class="n">GO_NK_Th_selection</span><span class="p">)</span>
 </code></pre></div>
 <h2 id="feedback">Feedback <img alt="❇" class="twemoji" src="https://twemoji.maxcdn.com/v/latest/svg/2747.svg" title=":sparkle:" /></h2>
