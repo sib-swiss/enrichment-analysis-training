@@ -180,7 +180,7 @@ to create a vector with the t-statistic for each gene, assign the gene symbol to
 		```r
 		idType(OrgDb = "org.Hs.eg.db") # to determine allowed gene id type
 		```
-Create the named and sorted vector of t-statistics (i.e. for the geneList argument of the gseGO() function. 
+Create the named and sorted vector of t-statistics (i.e. for the geneList argument of the gseGO() function). 
 
 ```r
 gl<-NK_vs_Th$t
@@ -206,7 +206,7 @@ Explore the new object that was created. What is its structure? What does it con
 		GO_NK_Th@result[GO_NK_Th@result$Description=="adaptive immune response",]
 	```
 	
-Count the number of up- and down-regulated gene sets similarly to how we count the number of significant genes in exercise 1:
+Count the number of up- and down-regulated gene sets similarly to how we counted the number of significant genes in exercise 1:
 
 ```
 summary(GO_NK_Th@result$p.adjust<0.05&GO_NK_Th@result$NES<0)
@@ -335,7 +335,7 @@ View(h_NK_vs_Th@result)
 length(which(h_NK_vs_Th@result$p.adjust<=0.05)) 
 ```
 
-In the last section of the exercise, we will see several visualzation methods of GSEA or over-representation results. As a teaser, create a dotplot of 
+In the last section of the course, we will see several visualization methods of GSEA or over-representation analysis results. As a teaser, create a dotplot of 
 significant hallmark gene sets:
 
 ```r
@@ -389,11 +389,11 @@ gseaplot(h_NK_vs_Th, geneSetID = "HALLMARK_MTORC1_SIGNALING",
 ```
 
 If you have performed a GSEA of the KEGG pathways, it is possible to overlay the fold change values of your genes on top of the
-KEGG pathway maps available online. For this, create a named vector of fold change values, where the non-significant genes will be grey, the up- and down-
-regulated genes will be colored in the KEGG pathway map. The functions come from the pathview package.
+KEGG pathway maps available online. For this, create a named vector of fold change values, where the non-significant genes will be grey, while the up- and down-
+regulated genes will be colored in the KEGG pathway map. The pathview() function comes from the pathview package (surprisingly...)
 
 ```r
-# pathview with non-significant genes in grey:
+# pathview map with non-significant genes in grey:
 # set log fold change of non-significant genes to 0:
 NK_vs_Th$logFC_0<-ifelse(NK_vs_Th$p.adj>0.05, 0, NK_vs_Th$logFC)
 
@@ -443,14 +443,14 @@ ego2 <- pairwise_termsim(ego)
 emapplot(ego2)
 emapplot_cluster(ego2)
 
-# Distribution of t-statistic for genes included in significant gene sets:
+# Distribution of t-statistic for genes included in significant gene sets or in selected gene sets:
 ridgeplot(GO_NK_Th)
 
-GO_NK_Th_selection = GO_NK_Th[GO_NK_Th$ID == "GO:0000184", asis=T]
+GO_NK_Th_selection <- GO_NK_Th[GO_NK_Th$ID == "GO:0000184", asis=T]
 ridgeplot(GO_NK_Th_selection)
-GO_NK_Th_selection = GO_NK_Th[GO_NK_Th$ID == "GO:0006613", asis=T]
+GO_NK_Th_selection <- GO_NK_Th[GO_NK_Th$ID == "GO:0006613", asis=T]
 ridgeplot(GO_NK_Th_selection)
-GO_NK_Th_selection = GO_NK_Th[grep("membrane",GO_NK_Th@result$Description), asis=T]
+GO_NK_Th_selection <- GO_NK_Th[grep("membrane",GO_NK_Th@result$Description), asis=T]
 ridgeplot(GO_NK_Th_selection)
 ```
 
