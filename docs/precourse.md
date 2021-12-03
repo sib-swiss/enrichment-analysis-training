@@ -3,10 +3,10 @@
 
 ### Previous knowledge / Competencies
 
-As is stated in the course prerequisites at the [announcement web page](https://www.sib.swiss/training/), we expect participants to have previous knowledge in:
+As is stated in the course prerequisites at the [announcement web page](https://www.sib.swiss/training/course/20211203_ENRIC), we expect participants to have previous knowledge in:
 
 * statistics beginner level (T-test, multiple testing methods).
-* R beginner level (Rstudio, install a library, matrix manipulation, read files). Test your R skills with the quiz [here](https://docs.google.com/forms/d/e/1FAIpQLSdIyeuabd_ZOWXgI1MWHapmaOMu20L9ESkLDZiWnpmkpujyOg/viewform)
+* R beginner level (Rstudio, install a library, data frame manipulation, import data from csv file). Test your R skills with the quiz [here](https://docs.google.com/forms/d/e/1FAIpQLSdIyeuabd_ZOWXgI1MWHapmaOMu20L9ESkLDZiWnpmkpujyOg/viewform)
 
 ### Technical
 
@@ -21,9 +21,9 @@ BiocManager::install("clusterProfiler")
 BiocManager::install("org.Hs.eg.db")
 BiocManager::install("pathview")
 BiocManager::install("enrichplot")
+install.packages("ggplot2")
+install.packages("ggrepel")
+
 
 ```
 
-### Data
-
-You can find the data here:
