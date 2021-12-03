@@ -325,6 +325,13 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#extra-exercise-for-ects-credits" class="md-nav__link">
+    Extra exercise for ECTS credits
+  </a>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -409,6 +416,13 @@
         <li class="md-nav__item">
   <a href="#feedback" class="md-nav__link">
     Feedback
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#extra-exercise-for-ects-credits" class="md-nav__link">
+    Extra exercise for ECTS credits
   </a>
   
 </li>
@@ -795,6 +809,27 @@ can be used on these objects, and you can either show the top significant gene s
 </code></pre></div>
 <h2 id="feedback">Feedback <img alt="❇" class="twemoji" src="https://twemoji.maxcdn.com/v/latest/svg/2747.svg" title=":sparkle:" /></h2>
 <p>Thanks for attending this course! Don&rsquo;t forget to give honest feedback via <a href="https://edu.sib.swiss/course/view.php?id=550">this feedback form</a>. </p>
+<h2 id="extra-exercise-for-ects-credits">Extra exercise for ECTS credits</h2>
+<ul>
+<li>Perform GSEA of the NK vs Th data using the Reactome gene sets downloaded from the 
+MSigDB website <a href="http://www.gsea-msigdb.org/gsea/msigdb/download_file.jsp?filePath=/msigdb/release/7.4/c2.cp.reactome.v7.4.symbols.gmt">here</a>.</li>
+<li>How many gene sets are significantly enriched? Generate an ordered barplot of the NES of all genesets, and generate a barcode plot for the gene set with the lowest NES</li>
+</ul>
+<p>Steps</p>
+<ul>
+<li>
+<p>Import the reactome gene sets of the file c2.cp.reactome.v7.1.symbols.gmt using read.gmt()</p>
+</li>
+<li>
+<p>Use GSEA providing a sorted named vector of t-statistics and the reactome gene sets, use minGSSize=30</p>
+</li>
+<li>
+<p>Count the number of significant adjusted p-values</p>
+</li>
+<li>
+<p>Use barplot() and gseaplot() for the visualization of the results</p>
+</li>
+</ul>
                 
               
               
