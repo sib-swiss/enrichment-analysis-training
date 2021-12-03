@@ -21,6 +21,7 @@ BiocManager::install("clusterProfiler")
 BiocManager::install("org.Hs.eg.db")
 BiocManager::install("pathview")
 BiocManager::install("enrichplot")
+BiocManager::install("biomaRt")
 install.packages("ggplot2")
 install.packages("ggrepel")
 
