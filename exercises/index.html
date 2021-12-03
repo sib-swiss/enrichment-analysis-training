@@ -332,6 +332,27 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#more-bonus" class="md-nav__link">
+    More bonus
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#gene-label-conversions" class="md-nav__link">
+    Gene label conversions
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#code-for-a-heatmap-of-p-values" class="md-nav__link">
+    Code for a heatmap of p-values
+  </a>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -423,6 +444,27 @@
         <li class="md-nav__item">
   <a href="#extra-exercise-for-ects-credits" class="md-nav__link">
     Extra exercise for ECTS credits
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#more-bonus" class="md-nav__link">
+    More bonus
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#gene-label-conversions" class="md-nav__link">
+    Gene label conversions
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#code-for-a-heatmap-of-p-values" class="md-nav__link">
+    Code for a heatmap of p-values
   </a>
   
 </li>
@@ -830,6 +872,132 @@ MSigDB website <a href="http://www.gsea-msigdb.org/gsea/msigdb/download_file.jsp
 <p>Use barplot() and gseaplot() for the visualization of the results</p>
 </li>
 </ul>
+<h2 id="more-bonus"><strong>More bonus</strong> <img alt="🥂" class="twemoji" src="https://twemoji.maxcdn.com/v/latest/svg/1f942.svg" title=":champagne_glass:" /></h2>
+<h2 id="gene-label-conversions">Gene label conversions</h2>
+<p>It is often useful to convert different types of gene labels even further. Here is an example for gene label conversion 
+and gene information extraction using <a href="https://bioconductor.org/packages/release/bioc/html/biomaRt.html">biomaRt</a>. A lot of information for each gene can be obtained, such as chromosome location,
+description, biotype, or the symbols of mouse homologs of human genes, etc.</p>
+<div class="highlight"><pre><span></span><code><span class="c1"># install and load the package:</span>
+<span class="n">BiocManager</span><span class="o">::</span><span class="nf">install</span><span class="p">(</span><span class="s">&quot;biomaRt&quot;</span><span class="p">)</span>
+<span class="nf">library</span><span class="p">(</span><span class="n">biomaRt</span><span class="p">)</span>
+<span class="c1"># list the available options</span>
+<span class="nf">listEnsembl</span><span class="p">()</span>
+
+<span class="n">ensembl</span> <span class="o">&lt;-</span> <span class="nf">useEnsembl</span><span class="p">(</span><span class="n">biomart</span> <span class="o">=</span> <span class="s">&quot;genes&quot;</span><span class="p">)</span>
+
+<span class="c1"># List the available species and reference genomes:</span>
+<span class="n">datasets</span> <span class="o">&lt;-</span> <span class="nf">listDatasets</span><span class="p">(</span><span class="n">ensembl</span><span class="p">)</span>
+<span class="nf">head</span><span class="p">(</span><span class="n">datasets</span><span class="p">)</span>
+<span class="c1"># search for human dataset and genome version:</span>
+<span class="n">datasets</span><span class="p">[</span><span class="nf">grep</span><span class="p">(</span><span class="s">&quot;sapiens&quot;</span><span class="p">,</span> <span class="n">datasets</span><span class="o">$</span><span class="n">dataset</span><span class="p">),]</span>
+<span class="c1"># 80 hsapiens_gene_ensembl Human genes (GRCh38.p13) GRCh38.p13</span>
+
+<span class="c1"># To obtain information on human genes, first the data specific to human has to be accessed from the online Ensembl repository</span>
+<span class="n">ensembl</span> <span class="o">&lt;-</span> <span class="nf">useEnsembl</span><span class="p">(</span><span class="n">biomart</span> <span class="o">=</span> <span class="s">&quot;genes&quot;</span><span class="p">,</span> <span class="n">dataset</span> <span class="o">=</span> <span class="s">&quot;hsapiens_gene_ensembl&quot;</span><span class="p">)</span>
+
+<span class="c1"># you can extract gene biotype, description, wiki gene description,</span>
+<span class="c1"># chromosome location of genes, even strand information etc</span>
+<span class="c1"># using the listAttributes function allows you to view the type of information per gene you can extract.</span>
+<span class="n">attributes</span> <span class="o">&lt;-</span> <span class="nf">listAttributes</span><span class="p">(</span><span class="n">ensembl</span><span class="p">)</span>
+<span class="n">attributes</span><span class="p">[</span><span class="m">1</span><span class="o">:</span><span class="m">15</span><span class="p">,]</span>
+
+<span class="c1"># Now we extract symbol (external_gene_name), description, gene_biotype (eg whether it is a protein coding or other type of gene):</span>
+<span class="n">biomart_gene_info</span> <span class="o">&lt;-</span> <span class="nf">getBM</span><span class="p">(</span><span class="n">attributes</span><span class="o">=</span><span class="nf">c</span><span class="p">(</span><span class="s">&quot;ensembl_gene_id&quot;</span><span class="p">,</span> <span class="s">&quot;external_gene_name&quot;</span><span class="p">,</span> <span class="s">&quot;description&quot;</span><span class="p">,</span> <span class="s">&quot;gene_biotype&quot;</span><span class="p">,</span> <span class="s">&quot;wikigene_description&quot;</span><span class="p">),</span>
+                           <span class="n">filter</span><span class="o">=</span><span class="s">&quot;ensembl_gene_id&quot;</span><span class="p">,</span>
+                           <span class="n">values</span><span class="o">=</span><span class="n">NK_vs_Th</span><span class="o">$</span><span class="n">ensembl_gene_id</span><span class="p">,</span>
+                           <span class="n">mart</span><span class="o">=</span><span class="n">ensembl</span><span class="p">)</span>
+<span class="c1"># check the structure of the resulting data frame:</span>
+<span class="nf">head</span><span class="p">(</span><span class="n">biomart_gene_info</span><span class="p">)</span>
+
+<span class="c1"># search for the oncogene key word in the description:</span>
+<span class="n">biomart_gene_info</span><span class="p">[</span><span class="nf">grep</span><span class="p">(</span><span class="s">&quot;oncogene&quot;</span><span class="p">,</span> <span class="n">biomart_gene_info</span><span class="o">$</span><span class="n">description</span><span class="p">),]</span>
+<span class="n">biomart_gene_info</span><span class="p">[</span><span class="nf">grep</span><span class="p">(</span><span class="s">&quot;tumor protein&quot;</span><span class="p">,</span> <span class="n">biomart_gene_info</span><span class="o">$</span><span class="n">description</span><span class="p">),]</span>
+
+<span class="c1"># search for genes that have TP53 in their gene symbol:</span>
+<span class="n">biomart_gene_info</span><span class="p">[</span><span class="nf">grep</span><span class="p">(</span><span class="s">&quot;TP53&quot;</span><span class="p">,</span> <span class="n">biomart_gene_info</span><span class="o">$</span><span class="n">external_gene_name</span><span class="p">),]</span>
+</code></pre></div>
+<p>For conversion of human gene symbols to mouse homologs for example (or vice versa if you provide mouse genes as the &ldquo;values&rdquo; arguments
+and &ldquo;hsapiens_homolog_associated_gene_name&rdquo; in the list of the attributes argument), you can also use biomaRt.</p>
+<div class="highlight"><pre><span></span><code><span class="c1"># Convert human genes to mouse homologs</span>
+<span class="n">ensembl_human_to_mouse</span> <span class="o">&lt;-</span> <span class="nf">getBM</span><span class="p">(</span><span class="n">attributes</span><span class="o">=</span><span class="nf">c</span><span class="p">(</span><span class="s">&quot;ensembl_gene_id&quot;</span><span class="p">,</span><span class="s">&quot;external_gene_name&quot;</span><span class="p">,</span> <span class="s">&quot;mmusculus_homolog_associated_gene_name&quot;</span><span class="p">),</span>
+                          <span class="n">filter</span><span class="o">=</span><span class="s">&quot;ensembl_gene_id&quot;</span><span class="p">,</span>
+                          <span class="n">values</span><span class="o">=</span><span class="n">NK_vs_Th</span><span class="o">$</span><span class="n">ensembl_gene_id</span><span class="p">,</span>
+                          <span class="n">mart</span><span class="o">=</span><span class="n">ensembl</span><span class="p">)</span>
+<span class="nf">head</span><span class="p">(</span><span class="n">ensembl_human_to_mouse</span><span class="p">)</span>
+<span class="c1"># ensembl_gene_id external_gene_name mmusculus_homolog_associated_gene_name</span>
+<span class="c1"># 1 ENSG00000000003             TSPAN6                                 Tspan6</span>
+<span class="c1"># 2 ENSG00000000419               DPM1                                   Dpm1</span>
+<span class="c1"># 3 ENSG00000000419               DPM1                                Gm20716</span>
+<span class="c1"># 4 ENSG00000000457              SCYL3                                  Scyl3</span>
+<span class="c1"># 5 ENSG00000000460           C1orf112                               BC055324</span>
+<span class="c1"># 6 ENSG00000000938                FGR                                    Fgr</span>
+</code></pre></div>
+<h2 id="code-for-a-heatmap-of-p-values">Code for a heatmap of p-values</h2>
+<p>For heatmaps, ggplot2 can also be used. Here is an example for a heatmap of the p-values of 6 different gene sets (gs), and the
+p-value for each gene set was calculated in two comparisons, so we compared the enrichment in genes differentially expressed
+between NK cells and Th cells, and between NK cells and CD8 T cells (note that this is a dummy example just to show you the 
+example of the code, it is not based on real RNA seq data).
+Before using ggplot2, you need to create a dataframe that contains a column with the gene set identities, a column with the 
+name of the cell type comparisons, and a column with the p-value of each gene set in each comparison. So a specific format is 
+required for ggplot2.</p>
+<div class="highlight"><pre><span></span><code><span class="c1"># Create a data frame that contains the p-value for every gene set for every </span>
+<span class="c1"># cell type comparison. You need to include the values also for the non-significant</span>
+<span class="c1"># gene sets. If you use function of the clusterProfiler package, you will usually</span>
+<span class="c1"># obtain results in the @result slot only for significant gene sets. But if you need</span>
+<span class="c1"># p-values also for the non-significant gene sets, you can change the argument</span>
+<span class="c1"># pvalueCutoff = 1 in the gseGO function (and other functions of the clusterProfiler</span>
+<span class="c1"># package)</span>
+
+<span class="c1"># For the example, create a dummy data frame with the list of gene sets (gs), the</span>
+<span class="c1"># 2 cell type comparisons, and the p-value for each gene set in each comparison:</span>
+<span class="n">ora_to_plot</span><span class="o">&lt;-</span><span class="nf">as.data.frame</span><span class="p">(</span><span class="nf">cbind</span><span class="p">(</span><span class="n">ID</span><span class="o">=</span><span class="nf">c</span><span class="p">(</span><span class="s">&quot;gs1&quot;</span><span class="p">,</span> <span class="s">&quot;gs2&quot;</span><span class="p">,</span><span class="s">&quot;gs3&quot;</span><span class="p">,</span><span class="s">&quot;gs4&quot;</span><span class="p">,</span> <span class="s">&quot;gs5&quot;</span><span class="p">,</span> <span class="s">&quot;gs6&quot;</span><span class="p">,</span>
+                        <span class="s">&quot;gs1&quot;</span><span class="p">,</span> <span class="s">&quot;gs2&quot;</span><span class="p">,</span><span class="s">&quot;gs3&quot;</span><span class="p">,</span><span class="s">&quot;gs4&quot;</span><span class="p">,</span> <span class="s">&quot;gs5&quot;</span><span class="p">,</span> <span class="s">&quot;gs6&quot;</span><span class="p">),</span>
+                   <span class="n">comparison</span><span class="o">=</span><span class="nf">c</span><span class="p">(</span><span class="nf">rep</span><span class="p">(</span><span class="s">&quot;NK_vs_Th&quot;</span><span class="p">,</span><span class="m">6</span><span class="p">),</span> <span class="nf">rep</span><span class="p">(</span><span class="s">&quot;NK_vs_CD8&quot;</span><span class="p">,</span><span class="m">6</span><span class="p">)),</span>
+                   <span class="n">p_val</span><span class="o">=</span><span class="nf">as.numeric</span><span class="p">(</span><span class="nf">c</span><span class="p">(</span><span class="m">0.8</span><span class="p">,</span><span class="m">0.9</span><span class="p">,</span><span class="m">0.6</span><span class="p">,</span> <span class="m">0.054</span><span class="p">,</span> <span class="m">0.00001</span><span class="p">,</span> <span class="m">0.0003</span><span class="p">,</span>
+                           <span class="m">0.0002</span><span class="p">,</span> <span class="m">0.004</span><span class="p">,</span> <span class="m">0.001</span><span class="p">,</span><span class="m">0.01</span><span class="p">,</span> <span class="m">0.85</span><span class="p">,</span><span class="m">0.9</span><span class="p">))))</span>
+
+<span class="c1"># transform the p-val to -log10(p-val):</span>
+<span class="n">ora_to_plot</span><span class="o">$</span><span class="n">log10_p_val</span><span class="o">&lt;--</span><span class="nf">log10</span><span class="p">(</span><span class="nf">as.numeric</span><span class="p">(</span><span class="n">ora_to_plot</span><span class="o">$</span><span class="n">p_val</span><span class="p">))</span>
+<span class="c1"># set the none-significant p-values to 0 so that they appear grey in the heatmap:</span>
+<span class="n">ora_to_plot</span><span class="o">$</span><span class="n">log10_p_val</span><span class="o">&lt;-</span><span class="nf">ifelse</span><span class="p">(</span><span class="n">ora_to_plot</span><span class="o">$</span><span class="n">log10_p_val</span><span class="o">&lt;</span><span class="p">(</span><span class="o">-</span><span class="nf">log10</span><span class="p">(</span><span class="m">0.05</span><span class="p">)),</span> <span class="m">0</span><span class="p">,</span> <span class="n">ora_to_plot</span><span class="o">$</span><span class="n">log10_p_val</span><span class="p">)</span>
+<span class="nf">range</span><span class="p">(</span><span class="n">ora_to_plot</span><span class="o">$</span><span class="n">log10_p_val</span><span class="p">)</span> <span class="c1"># [1]  0 5</span>
+
+<span class="nf">head</span><span class="p">(</span><span class="n">ora_to_plot</span><span class="p">,</span> <span class="n">n</span><span class="o">=</span><span class="m">12</span><span class="p">)</span>
+<span class="c1">#     ID comparison p_val log10_p_val</span>
+<span class="c1"># 1  gs1   NK_vs_Th   0.8    0.000000</span>
+<span class="c1"># 2  gs2   NK_vs_Th   0.9    0.000000</span>
+<span class="c1"># 3  gs3   NK_vs_Th   0.6    0.000000</span>
+<span class="c1"># 4  gs4   NK_vs_Th 0.054    0.000000</span>
+<span class="c1"># 5  gs5   NK_vs_Th 1e-05    5.000000</span>
+<span class="c1"># 6  gs6   NK_vs_Th 3e-04    3.522879</span>
+<span class="c1"># 7  gs1  NK_vs_CD8 2e-04    3.698970</span>
+<span class="c1"># 8  gs2  NK_vs_CD8 0.004    2.397940</span>
+<span class="c1"># 9  gs3  NK_vs_CD8 0.001    3.000000</span>
+<span class="c1"># 10 gs4  NK_vs_CD8  0.01    2.000000</span>
+<span class="c1"># 11 gs5  NK_vs_CD8  0.85    0.000000</span>
+<span class="c1"># 12 gs6  NK_vs_CD8   0.9    0.000000</span>
+
+<span class="c1"># create a palette of colors based on the Plasma palette (grDevices package)</span>
+<span class="nf">plot</span><span class="p">(</span><span class="m">1</span><span class="o">:</span><span class="m">20</span><span class="p">,</span> <span class="m">1</span><span class="o">:</span><span class="m">20</span><span class="p">,</span> <span class="n">col</span><span class="o">=</span><span class="nf">hcl.colors</span><span class="p">(</span><span class="m">20</span><span class="p">,</span><span class="s">&quot;Plasma&quot;</span><span class="p">),</span> <span class="n">pch</span><span class="o">=</span><span class="m">15</span><span class="p">,</span> <span class="n">cex</span><span class="o">=</span><span class="m">3</span><span class="p">)</span>
+<span class="nf">hcl.colors</span><span class="p">(</span><span class="m">9</span><span class="p">,</span><span class="s">&quot;Plasma&quot;</span><span class="p">)</span><span class="c1"># &quot;RdYlGn&quot;)</span>
+<span class="n">breaks</span><span class="o">&lt;-</span><span class="nf">seq</span><span class="p">(</span><span class="n">from</span><span class="o">=</span><span class="m">0</span><span class="p">,</span> <span class="n">to</span><span class="o">=</span><span class="m">5</span><span class="p">,</span> <span class="n">by</span><span class="o">=</span><span class="m">0.5</span> <span class="p">)</span>
+
+<span class="n">color</span><span class="o">&lt;-</span><span class="nf">c</span><span class="p">(</span><span class="s">&quot;grey78&quot;</span><span class="p">,</span> <span class="nf">rev</span><span class="p">(</span><span class="nf">hcl.colors</span><span class="p">(</span><span class="m">9</span><span class="p">,</span><span class="s">&quot;Plasma&quot;</span><span class="p">)))</span>
+
+<span class="c1"># create plot and export as png:</span>
+<span class="n">p</span><span class="o">&lt;-</span><span class="nf">ggplot</span><span class="p">(</span><span class="n">ora_to_plot</span><span class="p">,</span> <span class="nf">aes</span><span class="p">(</span><span class="n">comparison</span><span class="p">,</span> <span class="n">ID</span><span class="p">,</span> <span class="n">fill</span><span class="o">=</span> <span class="n">log10_p_val</span><span class="p">))</span> <span class="o">+</span> 
+        <span class="nf">geom_tile</span><span class="p">(</span><span class="n">color</span> <span class="o">=</span> <span class="s">&quot;black&quot;</span><span class="p">)</span> <span class="o">+</span>
+        <span class="nf">scale_fill_gradientn</span><span class="p">(</span><span class="n">breaks</span><span class="o">=</span> <span class="n">breaks</span><span class="p">,</span> 
+                             <span class="n">colors</span> <span class="o">=</span> <span class="n">color</span><span class="p">)</span> <span class="o">+</span>
+        <span class="nf">theme_bw</span><span class="p">()</span> 
+<span class="nf">ggsave</span><span class="p">(</span><span class="n">plot</span> <span class="o">=</span> <span class="n">p</span><span class="p">,</span> <span class="n">filename</span> <span class="o">=</span> <span class="s">&quot;heatmap_p_value_ORA.png&quot;</span><span class="p">,</span> 
+       <span class="n">device</span><span class="o">=</span><span class="s">&quot;png&quot;</span><span class="p">,</span>
+               <span class="n">width</span> <span class="o">=</span> <span class="m">4</span><span class="p">,</span><span class="n">height</span> <span class="o">=</span> <span class="m">6</span><span class="p">)</span>
+</code></pre></div>
+<p>You will obtain the following heatmap:</p>
+<figure>
+  <img src="assets/images/heatmap_p_value_ORA.png" width="20"/>
+</figure>
                 
               
               
