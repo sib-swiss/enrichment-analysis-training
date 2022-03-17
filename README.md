@@ -31,3 +31,5 @@ mkdocs gh-deploy
 This will generate a webpage at:
 
 https://yourname.github.io/reponame
+
+Therefore, this website is available on: https://sib-swiss.github.io/enrichment-analysis-training/
