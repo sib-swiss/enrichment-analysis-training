@@ -5,6 +5,7 @@ nav:
     - Course schedule: course_schedule.md
     - Materials: materials.md
     - Exercises: exercises.md
+    - Bonus code: bonus_code.md
     - Useful links: links.md
 
 theme:
@@ -13,8 +14,8 @@ theme:
   favicon: assets/images/SIB_logo.svg
 
 # Repository
-repo_name: taniawyss/enrichment-analysis
-repo_url: https://github.com/taniawyss/enrichment-analysis
+repo_name: sib-swiss/enrichment-analysis-training
+repo_url: https://github.com/sib-swiss/enrichment-analysis-training
 
 markdown_extensions:
   - abbr

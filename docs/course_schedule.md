@@ -1,5 +1,5 @@
 
-The course starts at 9am and ends around 5pm, with the following breaks: 
+The course starts at *9am* and ends around *5pm*, with the following breaks: 
 
 | start 	| end   	| topic   	|
 |-------	|-------	|---------	|
