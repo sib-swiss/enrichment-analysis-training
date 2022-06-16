@@ -624,84 +624,6 @@ every gene set.</p>
 <span class="nf">View</span><span class="p">(</span><span class="n">GO_enrich</span><span class="o">@</span><span class="n">result</span><span class="p">)</span>
 </code></pre></div>
 <h2 id="exercise-3">Exercise 3</h2>
-<p>For GSEA of the KEGG gene sets, the gene IDs have to be NCBI Entrez gene IDs. ClusterProfiler provides the bitr() function to convert gene label types.</p>
-<div class="highlight"><pre><span></span><code><span class="nf">keytypes</span><span class="p">(</span><span class="n">org.Hs.eg.db</span><span class="p">)</span>
-<span class="c1"># convert from= &quot;ENSEMBL&quot; to &quot;SYMBOL&quot; and &quot;ENTREZID&quot;</span>
-<span class="n">gene_convert</span> <span class="o">&lt;-</span> <span class="nf">bitr</span><span class="p">(</span><span class="nf">as.character</span><span class="p">(</span><span class="n">NK_vs_Th</span><span class="o">$</span><span class="n">ensembl_gene_id</span><span class="p">),</span> 
-                     <span class="n">fromType</span><span class="o">=</span><span class="s">&quot;ENSEMBL&quot;</span><span class="p">,</span> 
-                     <span class="n">toType</span><span class="o">=</span><span class="nf">c</span><span class="p">(</span><span class="s">&quot;SYMBOL&quot;</span><span class="p">,</span> <span class="s">&quot;ENTREZID&quot;</span><span class="p">),</span> <span class="n">OrgDb</span><span class="o">=</span><span class="s">&quot;org.Hs.eg.db&quot;</span><span class="p">)</span>
-
-<span class="c1"># Check the format of the data frame obtained after conversion:                     </span>
-<span class="nf">head</span><span class="p">(</span><span class="n">gene_convert</span><span class="p">)</span>
-<span class="nf">dim</span><span class="p">(</span><span class="n">gene_convert</span><span class="p">)</span>
-</code></pre></div>
-<p>Similarly to the gseGO() function, we need to provide a named and sorted vector of t-statistics, the difference is that the names will be Entrez gene IDs.</p>
-<p><div class="highlight"><pre><span></span><code><span class="c1"># Create a vector of genes that are coded with the EntrezID:</span>
-<span class="c1"># use the sorted gene list gl previously created:</span>
-<span class="n">gl_kegg</span><span class="o">&lt;-</span><span class="nf">cbind</span><span class="p">(</span><span class="n">SYMBOL</span><span class="o">=</span><span class="nf">names</span><span class="p">(</span><span class="n">gl</span><span class="p">),</span> <span class="n">t</span><span class="o">=</span><span class="n">gl</span><span class="p">)</span>
-
-<span class="c1"># merge with converted gene symbols to combine both:</span>
-<span class="c1"># by default the data frames are merged on the columns with names they both have</span>
-<span class="n">gl_kegg</span><span class="o">&lt;-</span><span class="nf">merge</span><span class="p">(</span><span class="n">gl_kegg</span><span class="p">,</span> <span class="n">gene_convert</span><span class="p">)</span>
-<span class="nf">head</span><span class="p">(</span><span class="n">gl_kegg</span><span class="p">)</span>
-
-<span class="n">gl_kegg_list</span><span class="o">&lt;-</span><span class="nf">as.numeric</span><span class="p">(</span><span class="nf">as.character</span><span class="p">(</span><span class="n">gl_kegg</span><span class="o">$</span><span class="n">t</span><span class="p">))</span>
-<span class="nf">names</span><span class="p">(</span><span class="n">gl_kegg_list</span><span class="p">)</span><span class="o">&lt;-</span><span class="nf">as.character</span><span class="p">(</span><span class="n">gl_kegg</span><span class="o">$</span><span class="n">ENTREZID</span><span class="p">)</span>
-<span class="n">gl_kegg_list</span><span class="o">&lt;-</span><span class="nf">sort</span><span class="p">(</span><span class="n">gl_kegg_list</span><span class="p">,</span> <span class="n">decreasing</span> <span class="o">=</span> <span class="bp">T</span><span class="p">)</span>
-
-<span class="c1"># run GSEA of KEGG:</span>
-<span class="n">KEGG_NK_Th</span><span class="o">&lt;-</span><span class="nf">gseKEGG</span><span class="p">(</span><span class="n">gl_kegg_list</span><span class="p">,</span> <span class="n">organism</span> <span class="o">=</span> <span class="s">&quot;hsa&quot;</span><span class="p">,</span> <span class="s">&quot;ncbi-geneid&quot;</span><span class="p">,</span>
-                    <span class="n">minGSSize</span> <span class="o">=</span> <span class="m">30</span><span class="p">,</span>
-                    <span class="n">eps</span><span class="o">=</span><span class="m">1e-50</span><span class="p">,</span>
-                    <span class="n">seed</span><span class="o">=</span><span class="bp">T</span><span class="p">)</span>
-</code></pre></div>
-Explore the new object that was created. What is its structure? What does it contain? How many gene sets are up-regulated? Is their an immune-related gene set significant?
-Because we had NK cells in our dataset, is the <a href="https://www.genome.jp/pathway/hsa04650">NK cell-mediated cytotoxicity</a> KEGG gene set significant? What is the total number of built-in
-KEGG gene sets and how can you view the genes included in a particular gene set?</p>
-<details class="done"><summary>Answer</summary><div class="highlight"><pre><span></span><code>    <span class="nf">str</span><span class="p">(</span><span class="n">KEGG_KEGG_NK_Th</span><span class="p">)</span>
-    <span class="nf">View</span><span class="p">(</span><span class="n">KEGG_NK_Th</span><span class="o">@</span><span class="n">result</span><span class="p">)</span>
-
-    <span class="c1"># Up-regulated gene sets:</span>
-    <span class="nf">summary</span><span class="p">(</span><span class="n">KEGG_NK_Th</span><span class="o">@</span><span class="n">result</span><span class="o">$</span><span class="n">NES</span><span class="o">&gt;</span><span class="m">0</span><span class="p">)</span>
-
-    <span class="n">KEGG_NK_Th</span><span class="o">@</span><span class="n">result</span><span class="p">[</span><span class="nf">grep</span><span class="p">(</span><span class="s">&quot;immune&quot;</span><span class="p">,</span><span class="n">KEGG_NK_Th</span><span class="o">@</span><span class="n">result</span><span class="o">$</span><span class="n">Description</span><span class="p">),</span> <span class="p">]</span>
-
-    <span class="n">KEGG_NK_Th</span><span class="o">@</span><span class="n">result</span><span class="p">[</span><span class="nf">grep</span><span class="p">(</span><span class="s">&quot;Natural killer&quot;</span><span class="p">,</span><span class="n">KEGG_NK_Th</span><span class="o">@</span><span class="n">result</span><span class="o">$</span><span class="n">Description</span><span class="p">),</span> <span class="p">]</span>
-
-    <span class="c1"># How many built-in KEGG pathways are there?</span>
-    <span class="nf">length</span><span class="p">(</span><span class="n">KEGG_NK_Th</span><span class="o">@</span><span class="n">geneSets</span><span class="p">)</span>
-
-    <span class="n">KEGG_NK_Th</span><span class="o">@</span><span class="n">geneSets</span><span class="o">$</span><span class="n">hsa04650</span> <span class="c1"># coded as Entrez Gene ID...</span>
-</code></pre></div>
-</details>
-<p>Very often, researchers have their own gene sets in mind, either that they compiled from the literature, or that they defined from
-previous experiments. If this is the case for your experiment, you can generate an Excel file that contains one gene set per row, the 2 first columns
-contain the gene set ID and the gene set description, and the genes that belong to each gene set are listed in the next columns. To have an idea of
-the structure of this file, open the .gmt file that we provided using Excel or a Text editor.</p>
-<p>In this exercise, we will perform a GSEA of the 50 hallmark gene sets can be downloaded from <a href="http://www.gsea-msigdb.org/gsea/downloads.jsp">MSigDB</a>.
-Import the Hallmark gene sets using read.gmt(). What is the format of the object that is created? Use the GSEA function, by providing the named and sorted
-vector of t-statistics we used above with gseGO(). Why do we use this one and not the one created for gseKEGG()?</p>
-<div class="highlight"><pre><span></span><code><span class="c1"># Import hallmark, convert to term2gene and run GSEA:</span>
-<span class="n">term2gene_h</span><span class="o">&lt;-</span><span class="nf">read.gmt</span><span class="p">(</span><span class="s">&quot;h.all.v7.1.symbols.gmt&quot;</span><span class="p">)</span>
-<span class="nf">head</span><span class="p">(</span><span class="n">term2gene_h</span><span class="p">)</span>
-<span class="nf">length</span><span class="p">(</span><span class="nf">unique</span><span class="p">(</span><span class="n">term2gene_h</span><span class="o">$</span><span class="n">term</span><span class="p">))</span>
-
-<span class="c1"># Run GSEA with the function that allows to use custom gene sets, </span>
-<span class="c1"># provide the named vector of t statistics</span>
-<span class="n">h_NK_vs_Th</span><span class="o">&lt;-</span><span class="nf">GSEA</span><span class="p">(</span><span class="n">gl</span><span class="p">,</span> <span class="n">TERM2GENE</span> <span class="o">=</span> <span class="n">term2gene_h</span><span class="p">,</span>
-                <span class="n">eps</span><span class="o">=</span><span class="m">1e-50</span><span class="p">,</span>
-                <span class="n">seed</span><span class="o">=</span><span class="bp">T</span><span class="p">)</span>
-
-<span class="nf">View</span><span class="p">(</span><span class="n">h_NK_vs_Th</span><span class="o">@</span><span class="n">result</span><span class="p">)</span>
-
-<span class="c1"># Number of significant gene sets:</span>
-<span class="nf">length</span><span class="p">(</span><span class="nf">which</span><span class="p">(</span><span class="n">h_NK_vs_Th</span><span class="o">@</span><span class="n">result</span><span class="o">$</span><span class="n">p.adjust</span><span class="o">&lt;=</span><span class="m">0.05</span><span class="p">))</span> 
-</code></pre></div>
-<p>In the last section of the course, we will see several visualization methods of GSEA or over-representation analysis results. As a teaser, create a dotplot of 
-significant hallmark gene sets:</p>
-<div class="highlight"><pre><span></span><code><span class="nf">dotplot</span><span class="p">(</span><span class="n">h_NK_vs_Th</span><span class="p">,</span> <span class="n">orderBy</span><span class="o">=</span><span class="s">&quot;p.adjust&quot;</span><span class="p">)</span>
-</code></pre></div>
-<h2 id="exercise-4-the-last-one">Exercise 4, the last one <img alt="🌞" class="twemoji" src="https://twemoji.maxcdn.com/v/latest/svg/1f31e.svg" title=":sun_with_face:" /> <img alt="🧑🏽‍🔬" class="twemoji" src="https://twemoji.maxcdn.com/v/latest/svg/1f9d1-1f3fd-200d-1f52c.svg" title=":scientist_tone3:" /></h2>
 <p>Once we have performed a GSEA or over-representation analysis, we need of course to show the results and prepare figures for a publication. Several visualizations are possible.
 The first option is a barplot. It can be a barplot of p-values of top over-represented GO terms. P-values are usually transformed with -log10, so that the 
 very small p-values are emphasized compared to p-values that are closer to 0.05. </p>
@@ -791,6 +713,84 @@ can be used on these objects, and you can either show the top significant gene s
 <span class="nf">ridgeplot</span><span class="p">(</span><span class="n">GO_NK_Th_selection</span><span class="p">)</span>
 <span class="n">GO_NK_Th_selection</span> <span class="o">&lt;-</span> <span class="n">GO_NK_Th</span><span class="p">[</span><span class="nf">grep</span><span class="p">(</span><span class="s">&quot;membrane&quot;</span><span class="p">,</span><span class="n">GO_NK_Th</span><span class="o">@</span><span class="n">result</span><span class="o">$</span><span class="n">Description</span><span class="p">),</span> <span class="n">asis</span><span class="o">=</span><span class="bp">T</span><span class="p">]</span>
 <span class="nf">ridgeplot</span><span class="p">(</span><span class="n">GO_NK_Th_selection</span><span class="p">)</span>
+</code></pre></div>
+<h2 id="exercise-4-the-last-one">Exercise 4, the last one <img alt="🌞" class="twemoji" src="https://twemoji.maxcdn.com/v/latest/svg/1f31e.svg" title=":sun_with_face:" /> <img alt="🧑🏽‍🔬" class="twemoji" src="https://twemoji.maxcdn.com/v/latest/svg/1f9d1-1f3fd-200d-1f52c.svg" title=":scientist_tone3:" /></h2>
+<p>For GSEA of the KEGG gene sets, the gene IDs have to be NCBI Entrez gene IDs. ClusterProfiler provides the bitr() function to convert gene label types.</p>
+<div class="highlight"><pre><span></span><code><span class="nf">keytypes</span><span class="p">(</span><span class="n">org.Hs.eg.db</span><span class="p">)</span>
+<span class="c1"># convert from= &quot;ENSEMBL&quot; to &quot;SYMBOL&quot; and &quot;ENTREZID&quot;</span>
+<span class="n">gene_convert</span> <span class="o">&lt;-</span> <span class="nf">bitr</span><span class="p">(</span><span class="nf">as.character</span><span class="p">(</span><span class="n">NK_vs_Th</span><span class="o">$</span><span class="n">ensembl_gene_id</span><span class="p">),</span> 
+                     <span class="n">fromType</span><span class="o">=</span><span class="s">&quot;ENSEMBL&quot;</span><span class="p">,</span> 
+                     <span class="n">toType</span><span class="o">=</span><span class="nf">c</span><span class="p">(</span><span class="s">&quot;SYMBOL&quot;</span><span class="p">,</span> <span class="s">&quot;ENTREZID&quot;</span><span class="p">),</span> <span class="n">OrgDb</span><span class="o">=</span><span class="s">&quot;org.Hs.eg.db&quot;</span><span class="p">)</span>
+
+<span class="c1"># Check the format of the data frame obtained after conversion:                     </span>
+<span class="nf">head</span><span class="p">(</span><span class="n">gene_convert</span><span class="p">)</span>
+<span class="nf">dim</span><span class="p">(</span><span class="n">gene_convert</span><span class="p">)</span>
+</code></pre></div>
+<p>Similarly to the gseGO() function, we need to provide a named and sorted vector of t-statistics, the difference is that the names will be Entrez gene IDs.</p>
+<p><div class="highlight"><pre><span></span><code><span class="c1"># Create a vector of genes that are coded with the EntrezID:</span>
+<span class="c1"># use the sorted gene list gl previously created:</span>
+<span class="n">gl_kegg</span><span class="o">&lt;-</span><span class="nf">cbind</span><span class="p">(</span><span class="n">SYMBOL</span><span class="o">=</span><span class="nf">names</span><span class="p">(</span><span class="n">gl</span><span class="p">),</span> <span class="n">t</span><span class="o">=</span><span class="n">gl</span><span class="p">)</span>
+
+<span class="c1"># merge with converted gene symbols to combine both:</span>
+<span class="c1"># by default the data frames are merged on the columns with names they both have</span>
+<span class="n">gl_kegg</span><span class="o">&lt;-</span><span class="nf">merge</span><span class="p">(</span><span class="n">gl_kegg</span><span class="p">,</span> <span class="n">gene_convert</span><span class="p">)</span>
+<span class="nf">head</span><span class="p">(</span><span class="n">gl_kegg</span><span class="p">)</span>
+
+<span class="n">gl_kegg_list</span><span class="o">&lt;-</span><span class="nf">as.numeric</span><span class="p">(</span><span class="nf">as.character</span><span class="p">(</span><span class="n">gl_kegg</span><span class="o">$</span><span class="n">t</span><span class="p">))</span>
+<span class="nf">names</span><span class="p">(</span><span class="n">gl_kegg_list</span><span class="p">)</span><span class="o">&lt;-</span><span class="nf">as.character</span><span class="p">(</span><span class="n">gl_kegg</span><span class="o">$</span><span class="n">ENTREZID</span><span class="p">)</span>
+<span class="n">gl_kegg_list</span><span class="o">&lt;-</span><span class="nf">sort</span><span class="p">(</span><span class="n">gl_kegg_list</span><span class="p">,</span> <span class="n">decreasing</span> <span class="o">=</span> <span class="bp">T</span><span class="p">)</span>
+
+<span class="c1"># run GSEA of KEGG:</span>
+<span class="n">KEGG_NK_Th</span><span class="o">&lt;-</span><span class="nf">gseKEGG</span><span class="p">(</span><span class="n">gl_kegg_list</span><span class="p">,</span> <span class="n">organism</span> <span class="o">=</span> <span class="s">&quot;hsa&quot;</span><span class="p">,</span> <span class="s">&quot;ncbi-geneid&quot;</span><span class="p">,</span>
+                    <span class="n">minGSSize</span> <span class="o">=</span> <span class="m">30</span><span class="p">,</span>
+                    <span class="n">eps</span><span class="o">=</span><span class="m">1e-50</span><span class="p">,</span>
+                    <span class="n">seed</span><span class="o">=</span><span class="bp">T</span><span class="p">)</span>
+</code></pre></div>
+Explore the new object that was created. What is its structure? What does it contain? How many gene sets are up-regulated? Is their an immune-related gene set significant?
+Because we had NK cells in our dataset, is the <a href="https://www.genome.jp/pathway/hsa04650">NK cell-mediated cytotoxicity</a> KEGG gene set significant? What is the total number of built-in
+KEGG gene sets and how can you view the genes included in a particular gene set?</p>
+<details class="done"><summary>Answer</summary><div class="highlight"><pre><span></span><code>    <span class="nf">str</span><span class="p">(</span><span class="n">KEGG_KEGG_NK_Th</span><span class="p">)</span>
+    <span class="nf">View</span><span class="p">(</span><span class="n">KEGG_NK_Th</span><span class="o">@</span><span class="n">result</span><span class="p">)</span>
+
+    <span class="c1"># Up-regulated gene sets:</span>
+    <span class="nf">summary</span><span class="p">(</span><span class="n">KEGG_NK_Th</span><span class="o">@</span><span class="n">result</span><span class="o">$</span><span class="n">NES</span><span class="o">&gt;</span><span class="m">0</span><span class="p">)</span>
+
+    <span class="n">KEGG_NK_Th</span><span class="o">@</span><span class="n">result</span><span class="p">[</span><span class="nf">grep</span><span class="p">(</span><span class="s">&quot;immune&quot;</span><span class="p">,</span><span class="n">KEGG_NK_Th</span><span class="o">@</span><span class="n">result</span><span class="o">$</span><span class="n">Description</span><span class="p">),</span> <span class="p">]</span>
+
+    <span class="n">KEGG_NK_Th</span><span class="o">@</span><span class="n">result</span><span class="p">[</span><span class="nf">grep</span><span class="p">(</span><span class="s">&quot;Natural killer&quot;</span><span class="p">,</span><span class="n">KEGG_NK_Th</span><span class="o">@</span><span class="n">result</span><span class="o">$</span><span class="n">Description</span><span class="p">),</span> <span class="p">]</span>
+
+    <span class="c1"># How many built-in KEGG pathways are there?</span>
+    <span class="nf">length</span><span class="p">(</span><span class="n">KEGG_NK_Th</span><span class="o">@</span><span class="n">geneSets</span><span class="p">)</span>
+
+    <span class="n">KEGG_NK_Th</span><span class="o">@</span><span class="n">geneSets</span><span class="o">$</span><span class="n">hsa04650</span> <span class="c1"># coded as Entrez Gene ID...</span>
+</code></pre></div>
+</details>
+<p>Very often, researchers have their own gene sets in mind, either that they compiled from the literature, or that they defined from
+previous experiments. If this is the case for your experiment, you can generate an Excel file that contains one gene set per row, the 2 first columns
+contain the gene set ID and the gene set description, and the genes that belong to each gene set are listed in the next columns. To have an idea of
+the structure of this file, open the .gmt file that we provided using Excel or a Text editor.</p>
+<p>In this exercise, we will perform a GSEA of the 50 hallmark gene sets can be downloaded from <a href="http://www.gsea-msigdb.org/gsea/downloads.jsp">MSigDB</a>.
+Import the Hallmark gene sets using read.gmt(). What is the format of the object that is created? Use the GSEA function, by providing the named and sorted
+vector of t-statistics we used above with gseGO(). Why do we use this one and not the one created for gseKEGG()?</p>
+<div class="highlight"><pre><span></span><code><span class="c1"># Import hallmark, convert to term2gene and run GSEA:</span>
+<span class="n">term2gene_h</span><span class="o">&lt;-</span><span class="nf">read.gmt</span><span class="p">(</span><span class="s">&quot;h.all.v7.1.symbols.gmt&quot;</span><span class="p">)</span>
+<span class="nf">head</span><span class="p">(</span><span class="n">term2gene_h</span><span class="p">)</span>
+<span class="nf">length</span><span class="p">(</span><span class="nf">unique</span><span class="p">(</span><span class="n">term2gene_h</span><span class="o">$</span><span class="n">term</span><span class="p">))</span>
+
+<span class="c1"># Run GSEA with the function that allows to use custom gene sets, </span>
+<span class="c1"># provide the named vector of t statistics</span>
+<span class="n">h_NK_vs_Th</span><span class="o">&lt;-</span><span class="nf">GSEA</span><span class="p">(</span><span class="n">gl</span><span class="p">,</span> <span class="n">TERM2GENE</span> <span class="o">=</span> <span class="n">term2gene_h</span><span class="p">,</span>
+                <span class="n">eps</span><span class="o">=</span><span class="m">1e-50</span><span class="p">,</span>
+                <span class="n">seed</span><span class="o">=</span><span class="bp">T</span><span class="p">)</span>
+
+<span class="nf">View</span><span class="p">(</span><span class="n">h_NK_vs_Th</span><span class="o">@</span><span class="n">result</span><span class="p">)</span>
+
+<span class="c1"># Number of significant gene sets:</span>
+<span class="nf">length</span><span class="p">(</span><span class="nf">which</span><span class="p">(</span><span class="n">h_NK_vs_Th</span><span class="o">@</span><span class="n">result</span><span class="o">$</span><span class="n">p.adjust</span><span class="o">&lt;=</span><span class="m">0.05</span><span class="p">))</span> 
+</code></pre></div>
+<p>In the last section of the course, we will see several visualization methods of GSEA or over-representation analysis results. As a teaser, create a dotplot of 
+significant hallmark gene sets:</p>
+<div class="highlight"><pre><span></span><code><span class="nf">dotplot</span><span class="p">(</span><span class="n">h_NK_vs_Th</span><span class="p">,</span> <span class="n">orderBy</span><span class="o">=</span><span class="s">&quot;p.adjust&quot;</span><span class="p">)</span>
 </code></pre></div>
 <h2 id="feedback">Feedback <img alt="❇" class="twemoji" src="https://twemoji.maxcdn.com/v/latest/svg/2747.svg" title=":sparkle:" /></h2>
 <p>Thanks for attending this course! Don&rsquo;t forget to give honest feedback via the link sent by the course organizer.</p>
