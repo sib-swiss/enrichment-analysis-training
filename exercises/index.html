@@ -268,43 +268,30 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#summary-of-de-genes" class="md-nav__link">
-    Summary of DE genes:
-  </a>
-  
-    <nav class="md-nav" aria-label="Summary of DE genes:">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
   <a href="#exercise-2" class="md-nav__link">
     Exercise 2
   </a>
   
 </li>
-        
-          <li class="md-nav__item">
+      
+        <li class="md-nav__item">
   <a href="#exercise-3-the-last-one" class="md-nav__link">
     Exercise 3, the last one
   </a>
   
 </li>
-        
-          <li class="md-nav__item">
+      
+        <li class="md-nav__item">
   <a href="#feedback" class="md-nav__link">
     Feedback
   </a>
   
 </li>
-        
-          <li class="md-nav__item">
+      
+        <li class="md-nav__item">
   <a href="#extra-exercise-for-ects-credits" class="md-nav__link">
     Extra exercise for ECTS credits
   </a>
-  
-</li>
-        
-      </ul>
-    </nav>
   
 </li>
       
@@ -384,43 +371,30 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#summary-of-de-genes" class="md-nav__link">
-    Summary of DE genes:
-  </a>
-  
-    <nav class="md-nav" aria-label="Summary of DE genes:">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
   <a href="#exercise-2" class="md-nav__link">
     Exercise 2
   </a>
   
 </li>
-        
-          <li class="md-nav__item">
+      
+        <li class="md-nav__item">
   <a href="#exercise-3-the-last-one" class="md-nav__link">
     Exercise 3, the last one
   </a>
   
 </li>
-        
-          <li class="md-nav__item">
+      
+        <li class="md-nav__item">
   <a href="#feedback" class="md-nav__link">
     Feedback
   </a>
   
 </li>
-        
-          <li class="md-nav__item">
+      
+        <li class="md-nav__item">
   <a href="#extra-exercise-for-ects-credits" class="md-nav__link">
     Extra exercise for ECTS credits
   </a>
-  
-</li>
-        
-      </ul>
-    </nav>
   
 </li>
       
@@ -440,6 +414,8 @@
                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20.71 7.04c.39-.39.39-1.04 0-1.41l-2.34-2.34c-.37-.39-1.02-.39-1.41 0l-1.84 1.83 3.75 3.75M3 17.25V21h3.75L17.81 9.93l-3.75-3.75L3 17.25z"/></svg>
                   </a>
                 
+                
+                  <h1>Exercises</h1>
                 
                 <p>In this section, you will find the R code that we will use during the course. We will explain the code and output during correction of the exercises.</p>
 <h2 id="source-of-data">Source of data</h2>
@@ -480,21 +456,18 @@ adjustment for any list of p-values. Look at the help of the function and try to
 <div class="highlight"><pre><span></span><code><span class="o">?</span><span class="n">p.adjust</span>
 </code></pre></div></p>
 <p>Let&rsquo;s explore our differential gene expression table a bit before digging into enrichment analysis. How many genes are differentially upregulated or downregulated between NK and Th cells?</p>
-<details class="done"><summary>Answer</summary><p>```r
-NK_vs_Th$p.adj &lt;- p.adjust(NK_vs_Th$P.Value, method = &ldquo;BH&rdquo;)</p>
-<h1 id="summary-of-de-genes">Summary of DE genes:</h1>
-</details>
-<p># Number of up-regulated genes (positive fold change value = more expressed in NK cells than in Th cells)
-    summary(NK_vs_Th$p.adj&lt;=0.05&amp;NK_vs_Th$logFC&gt;0)
-    # Mode      FALSE    TRUE 
-    # logical   18528    1957 
-    # Number of down-regulated genes (negative fold change value = less expressed in NK cells than in Th cells)
-    summary(NK_vs_Th$p.adj&lt;=0.05&amp;NK_vs_Th$logFC&lt;0)
-    #    Mode   FALSE    TRUE 
-    # logical   18590    1895 </p>
-<div class="codehilite"><pre><span></span><code>```
+<details class="done"><summary>Answer</summary><div class="highlight"><pre><span></span><code><span class="n">NK_vs_Th</span><span class="o">$</span><span class="n">p.adj</span> <span class="o">&lt;-</span> <span class="nf">p.adjust</span><span class="p">(</span><span class="n">NK_vs_Th</span><span class="o">$</span><span class="n">P.Value</span><span class="p">,</span> <span class="n">method</span> <span class="o">=</span> <span class="s">&quot;BH&quot;</span><span class="p">)</span>
+<span class="c1"># Summary of DE genes:</span>
+<span class="c1"># Number of up-regulated genes (positive fold change value = more expressed in NK cells than in Th cells)</span>
+<span class="nf">summary</span><span class="p">(</span><span class="n">NK_vs_Th</span><span class="o">$</span><span class="n">p.adj</span><span class="o">&lt;=</span><span class="m">0.05</span><span class="o">&amp;</span><span class="n">NK_vs_Th</span><span class="o">$</span><span class="n">logFC</span><span class="o">&gt;</span><span class="m">0</span><span class="p">)</span>
+<span class="c1"># Mode      FALSE    TRUE </span>
+<span class="c1"># logical   18528    1957 </span>
+<span class="c1"># Number of down-regulated genes (negative fold change value = less expressed in NK cells than in Th cells)</span>
+<span class="nf">summary</span><span class="p">(</span><span class="n">NK_vs_Th</span><span class="o">$</span><span class="n">p.adj</span><span class="o">&lt;=</span><span class="m">0.05</span><span class="o">&amp;</span><span class="n">NK_vs_Th</span><span class="o">$</span><span class="n">logFC</span><span class="o">&lt;</span><span class="m">0</span><span class="p">)</span>
+<span class="c1">#    Mode   FALSE    TRUE </span>
+<span class="c1"># logical   18590    1895 </span>
 </code></pre></div>
-
+</details>
 <p>We can also compare the raw p-value and adjusted p-value for any gene. Raw p-values that are close to 0.05 will often become higher than 0.05 after adjustment,
 while very small p-values more likely remain below 0.05 after adjustment. </p>
 <div class="highlight"><pre><span></span><code><span class="n">NK_vs_Th</span><span class="p">[</span><span class="nf">which</span><span class="p">(</span><span class="n">NK_vs_Th</span><span class="o">$</span><span class="n">symbol</span><span class="o">==</span><span class="s">&quot;CPS1&quot;</span><span class="p">),]</span>
