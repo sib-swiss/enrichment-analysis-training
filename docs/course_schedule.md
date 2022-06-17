@@ -1,9 +1,11 @@
 
-The course starts at *9am* and ends around *5pm*, with the following breaks: 
+The course starts at *9am* and ends around *5pm*, with the following breaks (approximate times, please allow for some flexibility):
 
-| start 	| end   	| topic   	|
-|-------	|-------	|---------	|
-| 10am	 	| 10:30am 	| coffee! 	|
-| 12:30pm 	| 1:30pm 	| lunch!  	|
-| 3:30pm 	| 4:00pm 	| coffee!  	|
+|     	| Topic   |
+|-------	|-------	|
+| 9am     | Start of course  |    
+| 10am to 10:30am 	| Coffee break 	|
+| 12:30pm to 1:30pm 	| Lunch break 	|
+| 3:30pm to 4:00pm 	| Coffee break 	|
+| Approx. 5pm | End of course |
 
