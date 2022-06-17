@@ -58,18 +58,16 @@ Let's explore our differential gene expression table a bit before digging into e
 
 ??? done "Answer"
 	```r
-	NK_vs_Th$p.adj <- p.adjust(NK_vs_Th$P.Value, method = "BH")
-	
-	# Summary of DE genes:
-  # Number of up-regulated genes (positive fold change value = more expressed in NK cells than in Th cells)
-	summary(NK_vs_Th$p.adj<=0.05&NK_vs_Th$logFC>0)
-	# Mode      FALSE    TRUE 
-	# logical   18528    1957 
-	# Number of down-regulated genes (negative fold change value = less expressed in NK cells than in Th cells)
-	summary(NK_vs_Th$p.adj<=0.05&NK_vs_Th$logFC<0)
-	#    Mode   FALSE    TRUE 
-	# logical   18590    1895 
-	
+  	NK_vs_Th$p.adj <- p.adjust(NK_vs_Th$P.Value, method = "BH")
+  	# Summary of DE genes:
+    # Number of up-regulated genes (positive fold change value = more expressed in NK cells than in Th cells)
+  	summary(NK_vs_Th$p.adj<=0.05&NK_vs_Th$logFC>0)
+  	# Mode      FALSE    TRUE 
+  	# logical   18528    1957 
+  	# Number of down-regulated genes (negative fold change value = less expressed in NK cells than in Th cells)
+  	summary(NK_vs_Th$p.adj<=0.05&NK_vs_Th$logFC<0)
+  	#    Mode   FALSE    TRUE 
+  	# logical   18590    1895 
 	```
 
 We can also compare the raw p-value and adjusted p-value for any gene. Raw p-values that are close to 0.05 will often become higher than 0.05 after adjustment,
