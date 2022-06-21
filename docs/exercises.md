@@ -54,6 +54,7 @@ adjustment for any list of p-values. Look at the help of the function and try to
 
 
 
+
 We can compare the raw p-value and adjusted p-value for any gene. Raw p-values that are close to 0.05 will often become higher than 0.05 after adjustment,
 while very small p-values more likely remain below 0.05 after adjustment. Search for 2 genes in the data.frame, CPS1 and GZMB, and verify the effect of adjustment on their p-values. Are both genes still significant after adjustment?
 
