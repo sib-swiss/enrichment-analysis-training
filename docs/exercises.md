@@ -53,97 +53,167 @@ adjustment for any list of p-values. Look at the help of the function and try to
 ```
 
 
-Let's explore our differential gene expression table a bit before digging into enrichment analysis. How many genes are differentially upregulated or downregulated between NK and Th cells?
 
+We can compare the raw p-value and adjusted p-value for any gene. Raw p-values that are close to 0.05 will often become higher than 0.05 after adjustment,
+while very small p-values more likely remain below 0.05 after adjustment. Search for 2 genes in the data.frame, CPS1 and GZMB, and verify the effect of adjustment on their p-values. Are both genes still significant after adjustment?
 
 ??? done "Answer"
 	```r
-  	NK_vs_Th$p.adj <- p.adjust(NK_vs_Th$P.Value, method = "BH")
-  	# Summary of DE genes:
-    # Number of up-regulated genes (positive fold change value = more expressed in NK cells than in Th cells)
-  	summary(NK_vs_Th$p.adj<=0.05&NK_vs_Th$logFC>0)
-  	# Mode      FALSE    TRUE 
-  	# logical   18528    1957 
-  	# Number of down-regulated genes (negative fold change value = less expressed in NK cells than in Th cells)
-  	summary(NK_vs_Th$p.adj<=0.05&NK_vs_Th$logFC<0)
-  	#    Mode   FALSE    TRUE 
-  	# logical   18590    1895 
+  	NK_vs_Th[which(NK_vs_Th$symbol=="CPS1"),]
+
+    NK_vs_Th[which(NK_vs_Th$symbol=="GZMB"),] 
 	```
-
-We can also compare the raw p-value and adjusted p-value for any gene. Raw p-values that are close to 0.05 will often become higher than 0.05 after adjustment,
-while very small p-values more likely remain below 0.05 after adjustment. 
-
-```r
-NK_vs_Th[which(NK_vs_Th$symbol=="CPS1"),]
-
-NK_vs_Th[which(NK_vs_Th$symbol=="GZMB"),]
-
-```
 
 If we expect a particular group (or set) of genes to be altered between 2 conditions, we can specifically test for this using a single Fisher test, i.e an over-representation analysis.
 Here, because we compared cells that are involved in the innate immune response (NK cells) to cells involved in the adaptive immune response (Th cells), we
 expect that there are differences in genes involved in the adaptive immune response. Which direction do you think the adaptive immune response genes should have? Rather up-regulated in NK or down-regulated in NK vs Th cells?
 
-As you will see later in the course, there are databases available where you can obtain gene sets. We have obtained the adaptive immune response gene set from Gene Ontology.
-Import the list of genes included in this gene set, and build a contingency table of number of genes that are part of the gene set or not and number of genes 
-that are significantly up-regulated or not.
+As you will see later in the course, there are databases available where you can obtain gene sets. We have obtained the Gene Ontology adaptive immune response gene set from the [MSigDB](http://www.gsea-msigdb.org/gsea/msigdb/geneset_page.jsp?geneSetName=GOBP_ADAPTIVE_IMMUNE_RESPONSE&keywords=adaptive%20immune%20response) resource.
+Import the list of genes included in this gene set, and determine using a Fisher test whether the genes up-regulated in Th cells (i.e. down-regulated in NK cells) are enriched in the adaptive immune response. 
 
 ```r
-adimresp_term2gene<-read.csv("adaptive_immune_response_geneset_term2gene.csv",
-                             header = T)
-nrow(adimresp_term2gene) # 663
-View(adimresp_term2gene)
+# Import the adaptive immune response gene set (gmt file)
+adaptive<-clusterProfiler::read.gmt("GOBP_ADAPTIVE_IMMUNE_RESPONSE.v7.5.1.gmt")
+nrow(adaptive) # 719
+View(adaptive)
 ```
 
 RNA sequencing analysis often involves filtering genes to remove lowly expressed genes. Therefore, it is possible that not all genes that are part of a gene set are 
-found in your RNA seq dataset. Check how many genes in the gene sets are part of the RNA seq data set.
+found in your RNA seq dataset. Check how many genes in the gene set are part of the RNA seq data set.
 
 ```r
-length(which(NK_vs_Th$symbol %in% adimresp_term2gene$V2)) # 485
+length(which(NK_vs_Th$symbol %in% adaptive$gene)) # 513
 ```
 
-Determine the number of up-regulated genes that are within or outside of the gene set of interest.
+To perform a Fisher's exact test, we need to build a contingency table of the number of genes that are up-regulated or not significant in Th cells, and that are part or not of the gene set of interest. First, count the number of genes up-regulated in Th cells (i.e. down-regulated in NK cells), then the number of not significant genes, then determine for each type of genes whether they are part of the adaptive immune response gene set or not.
+
+??? done "Answer"
+	```r
+    # Extract the number of genes up-regulated in Th (i.e. down-regulated in NK):
+    Th_up<-subset(NK_vs_Th, 
+    NK_vs_Th$p.adj<=0.05&NK_vs_Th$logFC<0)
+    # Are these genes part of the gene set?            
+    summary(Th_up$symbol %in% adaptive$gene)
+    #    Mode   FALSE    TRUE 
+    # logical    1753     142 
+    table(Th_up$symbol %in% adaptive$gene)
+
+    # Extract the number of not significant genes:
+    Th_not_DE<-subset(NK_vs_Th, NK_vs_Th$p.adj>0.05)
+    # Are these genes part of the gene set?            
+    summary(Th_not_DE$symbol %in% adaptive$gene)
+    #    Mode   FALSE    TRUE 
+    # logical   16344     289
+    ```
+
+Next, build a contingency table that has the following format:
+
+|     	            |  Up-reg.   	| Not up-reg.   |
+|-------	|-------	|-------	|
+|  In gene set   	  |	    #        |	    #          |
+|  Not in gene set 	|      #       |        #       | 
+
+
+
+Finally, use the fisher.test() function to determine whether the adaptive immune response is over-represented among the genes up-regulated in Th cells. If you don't know how to use the fisher.test() function, remember to use the help:
+
 ```r
-NK_up<-subset(NK_vs_Th, 
-              NK_vs_Th$p.adj<=0.05&NK_vs_Th$logFC>0)
-
-summary(NK_up$symbol %in% adimresp_term2gene$V2)
-#    Mode   FALSE    TRUE 
-# logical    1882      75
-
-NK_not_DE<-subset(NK_vs_Th, NK_vs_Th$p.adj>0.05)
-summary(NK_not_DE$symbol %in% adimresp_term2gene$V2)
-#    Mode   FALSE    TRUE 
-# logical   16363     270
+?fisher.test()
 ```
 
-Build the contingency table of number of genes that are up-regulated or not and part of the gene set or not, then run the Fisher test. What is the result?
+
+??? done "Answer"
+	```r
+    # There are several ways to build the contigency table:
+    # 1: by hand:
+    cont.table<-matrix(c(142, 1753, 289, 16344), ncol=2,byrow = F)
+    cont.table
+
+    # 2: by using the individual values of the table() function:
+    cont.table<-matrix(c(unlist(table(Th_up$symbol %in% adaptive$gene))[[2]],
+    unlist(table(Th_up$symbol %in% adaptive$gene))[[1]], 
+    unlist(table(Th_not_DE$symbol %in% adaptive$gene))[[2]], 
+    unlist(table(Th_not_DE$symbol %in% adaptive$gene))[[1]]), 
+    ncol=2, byrow = F)
+    cont.table
+    # 3: by using the 2 rows (reversed) of the table() function:
+    cont.table<-matrix(c(rev(unlist(table(Th_up$symbol %in% adaptive$gene))), 
+    rev(unlist(table(Th_not_DE$symbol %in% adaptive$gene)))), 
+    ncol=2, byrow = F)
+    cont.table
+    
+    # Add row and colum names so that you know what each number corresponds to:
+    colnames(cont.table)<-c("up", "not_up")
+    rownames(cont.table)<-c("in_set", "not_in_set")
+    cont.table
+    #              up   not_up
+    # in_set      142      289
+    # not_in_set 1753    16344
+    142/1753
+    289/16344
+
+    # Run fisher test:
+    fisher.test(cont.table)
+    # Fisher's Exact Test for Count Data
+    # data:  cont.table
+    # p-value < 2.2e-16
+    # alternative hypothesis: true odds ratio is not equal to 1
+    # 95 percent confidence interval:
+    #  3.697701 5.654348
+    # sample estimates:
+    # odds ratio 
+    #   4.580549 
+
+    ```
+
+
+
+The clusterProfiler package includes the enricher() function which allows you to perform a hypergeometric test (a one-side Fisher test).
+Check out the help of the function: What arguments do you need to provide? 
+
+Determine whether the genes up-regulated in NK are over-represented in 3 gene sets: the adaptive immune response gene set used above, another related to cell activation, and one un-related to immune cells (hair cell differentiation).
+
 
 ```r
-cont.table<-matrix(c(75, 1882, 270, 16363), ncol=2,byrow = F)
+# Help: hypergeometric test (like one-sided Fisher test = greater)
+?enricher()
 
-colnames(cont.table)<-c("up", "not_up")
-rownames(cont.table)<-c("in_set", "not_in_set")
-cont.table
-#              up not_up
-# in_set       75    270
-# not_in_set 1882  16363
+# Test 3 gene sets among the genes up-regulated in NK cells,
+# with enricher()
+# First, obtain the genes up-regulated in NK:
 
+nk_up_genes<-subset(NK_vs_Th, NK_vs_Th$logFC>0&NK_vs_Th$p.adj<=0.05)$symbol
 
-fisher.test(cont.table)
+# Import 2 other gene sets, 1 un-related to immune cells:
+hair<-read.gmt("GOBP_HAIR_CELL_DIFFERENTIATION.v7.5.1.gmt")
+dim(hair)
+cell_active<-read.gmt("GOBP_CELL_ACTIVATION.v7.5.1.gmt")
+dim(cell_active)
+  
+genesets3<-rbind(adaptive, hair, cell_active)
+  
+hyper_3genesets<-enricher(gene=nk_up_genes,
+                      universe = NK_vs_Th$symbol,
+                      TERM2GENE = genesets3,
+                      maxGSSize = 1000)
+View(hyper_3genesets@result)
+
 ```
 
-**Bonus** How would you represent this result? An option might be a volcano plot coloring genes that are part of the gene set 
+
+
+
+**Bonus** How would you represent the over-representation result for the adaptive immune response? An option might be a volcano plot coloring genes that are part of the gene set 
 and significant using [ggplot2](https://ggplot2.tidyverse.org/).
 
 ```r
 library(ggplot2)
 library(ggrepel)
 
-sig_genes<-subset(NK_vs_Th, NK_vs_Th$symbol %in% adimresp_term2gene$V2 & NK_vs_Th$p.adj<=0.05)
+sig_genes<-subset(NK_vs_Th, NK_vs_Th$symbol %in% adaptive$gene & NK_vs_Th$p.adj<=0.05)
 sig_genes_label<-subset(sig_genes, sig_genes$p.adj<=0.00001)
 
-ggplot(NK_vs_Th, aes(x = logFC,  # invert to focus AG221 vs DMSO
+ggplot(NK_vs_Th, aes(x = logFC,  # 
                      y = -log10(p.adj))) +
         geom_point(color="grey87")  +
         ggtitle("Genes belonging to the adaptive immune response gene set") +
@@ -159,6 +229,8 @@ ggplot(NK_vs_Th, aes(x = logFC,  # invert to focus AG221 vs DMSO
         geom_hline(yintercept = -log10(0.05), linetype="dashed") +
         geom_vline(xintercept = 0, linetype="dashed")
 ```
+
+## Exercise 2
 
 
 Next, we will use functions of the clusterProfiler package to perform a gene set enrichment analysis (GSEA) of Gene Ontology terms. For this, we first need
@@ -185,7 +257,7 @@ GO_NK_Th<-gseGO(gl, ont="BP",
                 seed=T)
 ```
 
-Explore the new object that was created. What is its structure? What does it contain? Is the adaptive immune response gene set significant?
+Explore the new object that was created. What is its structure? What does it contain? Is the adaptive immune response gene set significant? How many gene sets are down- or up-regulated?
 
 ??? done "Answer"
 	```r
@@ -194,18 +266,14 @@ Explore the new object that was created. What is its structure? What does it con
 		View(GO_NK_Th@result)
 	
 		GO_NK_Th@result[GO_NK_Th@result$Description=="adaptive immune response",]
-	```
-	
-Count the number of up- and down-regulated gene sets similarly to how we counted the number of significant genes in exercise 1:
+		summary(GO_NK_Th@result$p.adjust<0.05&GO_NK_Th@result$NES<0)
+      Mode   FALSE    TRUE 
+      # logical    303      86 
+      summary(GO_NK_Th@result$p.adjust<0.05&GO_NK_Th@result$NES>0)
+      #     Mode   FALSE    TRUE 
+      # logical      86     303 
 
-```
-summary(GO_NK_Th@result$p.adjust<0.05&GO_NK_Th@result$NES<0)
-Mode   FALSE    TRUE 
-# logical    303      86 
-summary(GO_NK_Th@result$p.adjust<0.05&GO_NK_Th@result$NES>0)
-#     Mode   FALSE    TRUE 
-# logical      86     303 
-```
+	```
 
 
 Finally, you can export the results to a csv file, if you would want to summarize the results using Revigo for example (see later in course).
@@ -224,7 +292,7 @@ unlist(strsplit(GO_NK_Th@result[GO_NK_Th@result$Description=="adaptive immune re
 GO_NK_Th@geneSets$`GO:0002250`
 ```
 
-**Bonus** In the context of single-cell RNA sequencing data, single-cells are clustered, and marker genes per cluster are obtained. In this case, we
+**Bonus** In the context of single-cell RNA sequencing data for example, single-cells are clustered, and marker genes per cluster are obtained. In this case, we
 don't always obtain a t-statistic or fold change value for every gene in the dataset, but rather a simple list of significant genes. With this list,
 you can perform an over-representation analysis of the GO terms using enrichGO(). The output will not contain enrichment scores, but rather p-values for
 every gene set.
@@ -240,8 +308,7 @@ View(GO_enrich@result)
 
 
 
-
-## Exercise 2
+## Exercise 3
 
 
 Once we have performed a GSEA or over-representation analysis, we need of course to show the results and prepare figures for a publication. Several visualizations are possible.
@@ -265,66 +332,37 @@ Now that you know how to use the barplot() function, how would you create a barp
 
 ??? done "Answer"
 	```r
-		# Barplot of NES of the top GO gene sets, with different color for up- or down-reg gene sets:
-		sorted_GO_NK_Th<- GO_NK_Th@result[order(GO_NK_Th@result$NES, decreasing = F),]
-		sorted_GO_NK_Th$color<-ifelse(sorted_GO_NK_Th$NES<0, "red", "darkblue")
+  		# Barplot of NES of the top GO gene sets, with different color for up- or down-reg gene sets:
+  		sorted_GO_NK_Th<- GO_NK_Th@result[order(GO_NK_Th@result$NES, decreasing = F),]
+  		sorted_GO_NK_Th$color<-ifelse(sorted_GO_NK_Th$NES<0, "red", "darkblue")
 
-		par(mar=c(5,20,3,3))
-		barplot(sorted_GO_NK_Th$NES[c(1:10, (nrow(sorted_GO_NK_Th)-9):nrow(sorted_GO_NK_Th))],
-        	horiz = T, names=sorted_GO_NK_Th$Description[c(1:10, (nrow(sorted_GO_NK_Th)-9):nrow(sorted_GO_NK_Th))],
-        	las=2, xlab="NES",
-        	cex.names = 0.7,
-        	col=sorted_GO_NK_Th$color[c(1:10, (nrow(sorted_GO_NK_Th)-9):nrow(sorted_GO_NK_Th))]) 
+  		par(mar=c(5,20,3,3))
+  		barplot(sorted_GO_NK_Th$NES[c(1:10, (nrow(sorted_GO_NK_Th)-9):nrow(sorted_GO_NK_Th))],
+          	horiz = T, names=sorted_GO_NK_Th$Description[c(1:10, (nrow(sorted_GO_NK_Th)-9):nrow(sorted_GO_NK_Th))],
+          	las=2, xlab="NES",
+          	cex.names = 0.7,
+          	col=sorted_GO_NK_Th$color[c(1:10, (nrow(sorted_GO_NK_Th)-9):nrow(sorted_GO_NK_Th))]) 
 	```
 
 A common way to represent the enrichment score of a single gene set after GSEA is the barcode plot, with the gseaplot() function that can be used
-directly on objects of class "gseaResult" (i.e. output by clusterProfiler functions). Try here with the MTORC1 signaling gene set.
+directly on objects of class "gseaResult" (i.e. output by clusterProfiler functions). 
 
 ```r
-gseaplot(h_NK_vs_Th, geneSetID = "HALLMARK_MTORC1_SIGNALING",
-         title="HALLMARK_MTORC1_SIGNALING")
+gseaplot(, geneSetID = "",
+         title="")
 ```
 
-If you have performed a GSEA of the KEGG pathways, it is possible to overlay the fold change values of your genes on top of the
-KEGG pathway maps available online. For this, create a named vector of fold change values, where the non-significant genes will be grey, while the up- and down-
-regulated genes will be colored in the KEGG pathway map. The pathview() function comes from the pathview package (surprisingly...)
 
-```r
-# pathview map with non-significant genes in grey:
-# set log fold change of non-significant genes to 0:
-NK_vs_Th$logFC_0<-ifelse(NK_vs_Th$p.adj>0.05, 0, NK_vs_Th$logFC)
-
-# create named vector of fold change values:
-genePW<-NK_vs_Th$logFC_0
-names(genePW)<-NK_vs_Th$symbol
-
-# create pathview map of Natural killer cell mediated cytotoxicity = hsa04650
-pathview(gene.data  = genePW,
-         pathway.id = "hsa04650",
-         species    = "hsa",
-         gene.idtype = "SYMBOL")
-
-# pathview map for Ribosome = hsa03010
-pathview(gene.data  = genePW,
-         pathway.id = "hsa03010",
-         species    = "hsa",
-         gene.idtype = "SYMBOL")
-```
-Finally, clusterProfiler provides several visualization methods that can be used directly on objects of class "gseaResult". The barplot function
+Finally, clusterProfiler provides several visualization methods that can be used directly on objects of class "gseaResult". The barplot() function
 can be used on these objects, and you can either show the top significant gene sets, or a custom selection. Also, a dotplot can be used.
 
 ```r
-# Generate a quick GO over-representation analysis with the top most highly over-expressed genes in NK:
-NK_up_2 <-subset(NK_vs_Th, 
-              NK_vs_Th$p.adj<=0.05&NK_vs_Th$logFC>3)
-NK_up_2<-as.character(NK_up_2$symbol)
+# Use the GO_enrich analysis performed above, of the over-representation analysis of genes up-regulated in NK cells:
 
-ego <- enrichGO(NK_up_2, OrgDb='org.Hs.eg.db', ont="BP", keyType = "SYMBOL")
+barplot(GO_enrich)
 
-barplot(ego)
-
-ego_selection = ego[ego$ID == "GO:0002703" || ego$ID == "GO:0002228", asis=T]
-barplot(ego_selection)
+# ego_selection = GO_enrich[GO_enrich$ID == "GO:0019864" || GO_enrich$ID == "GO:0032393", asis=T]
+# barplot(ego_selection)
 
 dotplot(ego, orderBy="p.adjust")
 ```
@@ -333,12 +371,13 @@ For plots that show similarity among gene sets, use the following functions:
 
 ```r
 # Which genes are shared by several gene sets:
-cnetplot(ego, categorySize="pvalue")
+cnetplot(GO_enrich, categorySize="pvalue")
 
 # Similarity among gene sets:
-ego2 <- pairwise_termsim(ego)
+ego2 <- pairwise_termsim(GO_enrich)
 emapplot(ego2)
 emapplot_cluster(ego2)
+# emapplot(ego2)
 
 # Distribution of t-statistic for genes included in significant gene sets or in selected gene sets:
 ridgeplot(GO_NK_Th)
@@ -352,8 +391,9 @@ ridgeplot(GO_NK_Th_selection)
 ```
 
 
-## Exercise 3, the last one :sun_with_face: :scientist_tone3:
+## Exercise 4, the last one :sun_with_face: :scientist_tone3:
 
+We will now perform GSEA of other collections of gene sets, such as KEGG or Hallmark.
 For GSEA of the KEGG gene sets, the gene IDs have to be NCBI Entrez gene IDs. ClusterProfiler provides the bitr() function to convert gene label types.
 
 ```r
@@ -412,13 +452,43 @@ KEGG gene sets and how can you view the genes included in a particular gene set?
 		KEGG_NK_Th@geneSets$hsa04650 # coded as Entrez Gene ID...
 	```
 
+Once you have performed a GSEA of the KEGG pathways, it is possible to overlay the fold change values of your genes on top of the
+KEGG pathway maps available online. For this, create a named vector of fold change values, where the non-significant genes will be grey, while the up- and down-
+regulated genes will be colored in the KEGG pathway map. The pathview() function comes from the pathview package (surprisingly...)
+
+```r
+
+library(pathview)
+
+# pathview map with non-significant genes in grey:
+# set log fold change of non-significant genes to 0:
+NK_vs_Th$logFC_0<-ifelse(NK_vs_Th$p.adj>0.05, 0, NK_vs_Th$logFC)
+
+# create named vector of fold change values:
+genePW<-NK_vs_Th$logFC_0
+names(genePW)<-NK_vs_Th$symbol
+
+# create pathview map of Natural killer cell mediated cytotoxicity = hsa04650
+pathview(gene.data  = genePW,
+         pathway.id = "hsa04650",
+         species    = "hsa",
+         gene.idtype = "SYMBOL")
+
+# pathview map for Ribosome = hsa03010
+pathview(gene.data  = genePW,
+         pathway.id = "hsa03010",
+         species    = "hsa",
+         gene.idtype = "SYMBOL")
+```
+
+
 Very often, researchers have their own gene sets in mind, either that they compiled from the literature, or that they defined from
 previous experiments. If this is the case for your experiment, you can generate an Excel file that contains one gene set per row, the 2 first columns
 contain the gene set ID and the gene set description, and the genes that belong to each gene set are listed in the next columns. To have an idea of
 the structure of this file, open the .gmt file that we provided using Excel or a Text editor.
 
 In this exercise, we will perform a GSEA of the 50 hallmark gene sets can be downloaded from [MSigDB](http://www.gsea-msigdb.org/gsea/downloads.jsp).
-Import the Hallmark gene sets using read.gmt(). What is the format of the object that is created? Use the GSEA function, by providing the named and sorted
+Import the Hallmark gene sets using read.gmt(). What is the format of the object that is created? Use the GSEA() function, by providing the named and sorted
 vector of t-statistics we used above with gseGO(). Why do we use this one and not the one created for gseKEGG()?
 
 ```r
@@ -439,11 +509,13 @@ View(h_NK_vs_Th@result)
 length(which(h_NK_vs_Th@result$p.adjust<=0.05)) 
 ```
 
-In the last section of the course, we will see several visualization methods of GSEA or over-representation analysis results. As a teaser, create a dotplot of 
-significant hallmark gene sets:
+Finally, we can easily visualize the results:
 
 ```r
 dotplot(h_NK_vs_Th, orderBy="p.adjust")
+
+gseaplot(h_NK_vs_Th, geneSetID = "HALLMARK_MTORC1_SIGNALING",
+         title="HALLMARK_MTORC1_SIGNALING")
 ```
 
 
@@ -453,7 +525,7 @@ Thanks for attending this course! Don't forget to give honest feedback via the l
 
 ## Extra exercise for ECTS credits
 - Perform GSEA of the NK vs Th data using the Reactome gene sets downloaded from the 
-MSigDB website [here](http://www.gsea-msigdb.org/gsea/msigdb/download_file.jsp?filePath=/msigdb/release/7.4/c2.cp.reactome.v7.4.symbols.gmt).
+MSigDB website [here](http://www.gsea-msigdb.org/gsea/msigdb/download_file.jsp?filePath=/msigdb/release/7.5.1/c2.cp.reactome.v7.5.1.symbols.gmt).
 - How many gene sets are significantly enriched? Generate an ordered barplot of the NES of all genesets, and generate a barcode plot for the gene set with the lowest NES
 
 Steps
