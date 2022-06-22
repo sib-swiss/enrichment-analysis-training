@@ -261,29 +261,29 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#exercise-1" class="md-nav__link">
-    Exercise 1
+  <a href="#exercise-1-over-representation-analysis" class="md-nav__link">
+    Exercise 1 - Over-representation analysis
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#exercise-2" class="md-nav__link">
-    Exercise 2
+  <a href="#exercise-2-gene-set-enrichment-analysis-gsea" class="md-nav__link">
+    Exercise 2 - Gene set enrichment analysis (GSEA)
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#exercise-3" class="md-nav__link">
-    Exercise 3
+  <a href="#exercise-3-visualization-of-enrichment-results" class="md-nav__link">
+    Exercise 3 - Visualization of enrichment results
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#exercise-4-the-last-one" class="md-nav__link">
-    Exercise 4, the last one
+  <a href="#exercise-4-the-last-one-enrichment-of-other-collections-of-gene-sets" class="md-nav__link">
+    Exercise 4 (the last one  ) - Enrichment of other collections of gene sets
   </a>
   
 </li>
@@ -371,29 +371,29 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#exercise-1" class="md-nav__link">
-    Exercise 1
+  <a href="#exercise-1-over-representation-analysis" class="md-nav__link">
+    Exercise 1 - Over-representation analysis
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#exercise-2" class="md-nav__link">
-    Exercise 2
+  <a href="#exercise-2-gene-set-enrichment-analysis-gsea" class="md-nav__link">
+    Exercise 2 - Gene set enrichment analysis (GSEA)
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#exercise-3" class="md-nav__link">
-    Exercise 3
+  <a href="#exercise-3-visualization-of-enrichment-results" class="md-nav__link">
+    Exercise 3 - Visualization of enrichment results
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#exercise-4-the-last-one" class="md-nav__link">
-    Exercise 4, the last one
+  <a href="#exercise-4-the-last-one-enrichment-of-other-collections-of-gene-sets" class="md-nav__link">
+    Exercise 4 (the last one  ) - Enrichment of other collections of gene sets
   </a>
   
 </li>
@@ -451,7 +451,7 @@ and load the necessary packages. Also, set the seed so that results are replicab
 <span class="c1"># set seed</span>
 <span class="nf">set.seed</span><span class="p">(</span><span class="m">1234</span><span class="p">)</span>
 </code></pre></div>
-<h2 id="exercise-1">Exercise 1</h2>
+<h2 id="exercise-1-over-representation-analysis">Exercise 1 - Over-representation analysis</h2>
 <p>Import the data into your R session and explore its structure: what are the different columns corresponding to?
 How can you search for a particular gene within this table?</p>
 <div class="highlight"><pre><span></span><code><span class="c1"># Import DE table:</span>
@@ -576,9 +576,9 @@ found in your RNA seq dataset. Check how many genes in the gene set are part of 
 <span class="c1">#   4.580549 </span>
 </code></pre></div>
 </details>
-<p>The clusterProfiler package includes the enricher() function which allows you to perform a hypergeometric test (a one-side Fisher test).
+<p><strong>Bonus</strong>  In case you wish to run an over-representation analysis for several gene sets at once, instead of running several independent Fisher tests, you can use the enricher() function of the clusterProfiler package. This function allows you to perform an over-representation analysis of several gene sets at once, using an implementation of the hypergeometric test (a one-sided Fisher&rsquo;s exact test).
 Check out the help of the function: What arguments do you need to provide? </p>
-<p>Determine whether the genes up-regulated in NK are over-represented in 3 gene sets: the adaptive immune response gene set used above, another related to cell activation, and one un-related to immune cells (hair cell differentiation).</p>
+<p>Determine whether the genes up-regulated in NK cells are over-represented in 3 gene sets: the adaptive immune response gene set used above, another related to cell activation, and one un-related to immune cells (hair cell differentiation).</p>
 <div class="highlight"><pre><span></span><code><span class="c1"># Help: hypergeometric test (like one-sided Fisher test = greater)</span>
 <span class="o">?</span><span class="nf">enricher</span><span class="p">()</span>
 
@@ -594,6 +594,7 @@ Check out the help of the function: What arguments do you need to provide? </p>
 <span class="n">cell_active</span><span class="o">&lt;-</span><span class="nf">read.gmt</span><span class="p">(</span><span class="s">&quot;GOBP_CELL_ACTIVATION.v7.5.1.gmt&quot;</span><span class="p">)</span>
 <span class="nf">dim</span><span class="p">(</span><span class="n">cell_active</span><span class="p">)</span>
 
+<span class="c1"># Combine the 3 gene sets into a single data.frame for the TERM2GENE argument:</span>
 <span class="n">genesets3</span><span class="o">&lt;-</span><span class="nf">rbind</span><span class="p">(</span><span class="n">adaptive</span><span class="p">,</span> <span class="n">hair</span><span class="p">,</span> <span class="n">cell_active</span><span class="p">)</span>
 
 <span class="n">hyper_3genesets</span><span class="o">&lt;-</span><span class="nf">enricher</span><span class="p">(</span><span class="n">gene</span><span class="o">=</span><span class="n">nk_up_genes</span><span class="p">,</span>
@@ -626,7 +627,7 @@ and significant using <a href="https://ggplot2.tidyverse.org/">ggplot2</a>.</p>
         <span class="nf">geom_hline</span><span class="p">(</span><span class="n">yintercept</span> <span class="o">=</span> <span class="o">-</span><span class="nf">log10</span><span class="p">(</span><span class="m">0.05</span><span class="p">),</span> <span class="n">linetype</span><span class="o">=</span><span class="s">&quot;dashed&quot;</span><span class="p">)</span> <span class="o">+</span>
         <span class="nf">geom_vline</span><span class="p">(</span><span class="n">xintercept</span> <span class="o">=</span> <span class="m">0</span><span class="p">,</span> <span class="n">linetype</span><span class="o">=</span><span class="s">&quot;dashed&quot;</span><span class="p">)</span>
 </code></pre></div>
-<h2 id="exercise-2">Exercise 2</h2>
+<h2 id="exercise-2-gene-set-enrichment-analysis-gsea">Exercise 2 - Gene set enrichment analysis (GSEA)</h2>
 <p>Next, we will use functions of the clusterProfiler package to perform a gene set enrichment analysis (GSEA) of Gene Ontology terms. For this, we first need
 to create a vector with the t-statistic of each gene, assign the gene symbol to each t-statistic in the vector (i.e. names), then sort the vector.</p>
 <div class="admonition warning">
@@ -696,13 +697,14 @@ every gene set.</p>
                     <span class="n">keyType</span> <span class="o">=</span> <span class="s">&quot;SYMBOL&quot;</span><span class="p">,</span>
                     <span class="n">maxGSSize</span> <span class="o">=</span> <span class="m">30</span><span class="p">)</span>
 <span class="nf">View</span><span class="p">(</span><span class="n">GO_enrich</span><span class="o">@</span><span class="n">result</span><span class="p">)</span>
+
+<span class="nf">class</span><span class="p">(</span><span class="n">GO_enrich</span><span class="p">)</span>
+<span class="nf">class</span><span class="p">(</span><span class="n">GO_NK_Th</span><span class="p">)</span>
 </code></pre></div>
 <p>This method can also be used if you have a list of genes involved in a disease, such as genes that are mutated in cancer, or lists of genes obtained by other omics methods, such as genes that have a transcription factor binding site in their promoter (ChIP-seq), etc.</p>
-<h2 id="exercise-3">Exercise 3</h2>
+<h2 id="exercise-3-visualization-of-enrichment-results">Exercise 3 - Visualization of enrichment results</h2>
 <p>Once we have performed a GSEA or over-representation analysis, we need of course to show the results and prepare figures for a publication. Several visualizations are possible.
-The first option is a barplot. It can be a barplot of p-values of top over-represented GO terms. P-values are usually transformed with -log10, so that the very small p-values are emphasized compared to p-values that are closer to 0.05. </p>
-<p>A barplot can also be created with the NES obtained after GSEA, to show which gene sets are up-regulated and which are down-regulated.
-The barplot() function is part of the graphics package and can be used for over-representation results.</p>
+The first option is a barplot. It can be a barplot of p-values of top over-represented GO terms. P-values are usually -log<sub>10</sub>-transformed, so that the very small p-values are emphasized compared to p-values that are closer to 0.05. The barplot() function comes from the graphics package. </p>
 <div class="highlight"><pre><span></span><code><span class="nf">par</span><span class="p">(</span><span class="n">mar</span><span class="o">=</span><span class="nf">c</span><span class="p">(</span><span class="m">5</span><span class="p">,</span><span class="m">20</span><span class="p">,</span><span class="m">3</span><span class="p">,</span><span class="m">3</span><span class="p">))</span>
 <span class="nf">barplot</span><span class="p">(</span><span class="nf">rev</span><span class="p">(</span><span class="o">-</span><span class="nf">log10</span><span class="p">(</span><span class="n">GO_NK_Th</span><span class="o">@</span><span class="n">result</span><span class="o">$</span><span class="n">pvalue</span><span class="p">[</span><span class="m">1</span><span class="o">:</span><span class="m">10</span><span class="p">])),</span>
         <span class="n">horiz</span> <span class="o">=</span> <span class="bp">T</span><span class="p">,</span> <span class="n">names</span><span class="o">=</span><span class="nf">rev</span><span class="p">(</span><span class="n">GO_NK_Th</span><span class="o">@</span><span class="n">result</span><span class="o">$</span><span class="n">Description</span><span class="p">[</span><span class="m">1</span><span class="o">:</span><span class="m">10</span><span class="p">]),</span>
@@ -711,6 +713,7 @@ The barplot() function is part of the graphics package and can be used for over-
         <span class="n">col</span><span class="o">=</span><span class="s">&quot;lightgreen&quot;</span><span class="p">)</span> 
 <span class="nf">abline</span><span class="p">(</span><span class="n">v</span><span class="o">=-</span><span class="nf">log10</span><span class="p">(</span><span class="m">0.05</span><span class="p">))</span>
 </code></pre></div>
+<p>In publications, we often see barplots of normalized enrichment scores (NES), showing which gene sets are up-regulated and which are down-regulated.</p>
 <p>Now that you know how to use the barplot() function, how would you create a barplot of NES of the top 10 up-regulated and the top 10 down-regulated genes sets,
  with red bars for the up-regulated gene sets and blue bars for the down-regulated gene sets?</p>
 <details class="done"><summary>Answer</summary><div class="highlight"><pre><span></span><code>    <span class="c1"># Barplot of NES of the top GO gene sets, with different color for up- or down-reg gene sets:</span>
@@ -723,45 +726,62 @@ The barplot() function is part of the graphics package and can be used for over-
         <span class="n">las</span><span class="o">=</span><span class="m">2</span><span class="p">,</span> <span class="n">xlab</span><span class="o">=</span><span class="s">&quot;NES&quot;</span><span class="p">,</span>
         <span class="n">cex.names</span> <span class="o">=</span> <span class="m">0.7</span><span class="p">,</span>
         <span class="n">col</span><span class="o">=</span><span class="n">sorted_GO_NK_Th</span><span class="o">$</span><span class="n">color</span><span class="p">[</span><span class="nf">c</span><span class="p">(</span><span class="m">1</span><span class="o">:</span><span class="m">10</span><span class="p">,</span> <span class="p">(</span><span class="nf">nrow</span><span class="p">(</span><span class="n">sorted_GO_NK_Th</span><span class="p">)</span><span class="m">-9</span><span class="p">)</span><span class="o">:</span><span class="nf">nrow</span><span class="p">(</span><span class="n">sorted_GO_NK_Th</span><span class="p">))])</span> 
+    <span class="nf">abline</span><span class="p">(</span><span class="n">v</span><span class="o">=</span><span class="m">0</span><span class="p">)</span>
 </code></pre></div>
 </details>
+<p>With results of an over-representation analysis, where the output is of class &ldquo;enrichResult&rdquo;, the barplot() function can be used directly. You can either show the significant gene sets, or a custom selection of them.</p>
+<div class="highlight"><pre><span></span><code><span class="c1"># Use the GO_enrich analysis performed above, of the over-representation analysis </span>
+<span class="c1"># of genes up-regulated in NK cells:</span>
+<span class="c1"># Barplot on enrichResult object:</span>
+<span class="n">graphics</span><span class="o">::</span><span class="nf">barplot</span><span class="p">(</span><span class="n">GO_enrich</span><span class="p">)</span>
+
+<span class="c1"># Select only 2 out of the significant gene sets:</span>
+<span class="n">ego_selection</span> <span class="o">=</span> <span class="n">GO_enrich</span><span class="p">[</span><span class="n">GO_enrich</span><span class="o">$</span><span class="n">ID</span> <span class="o">==</span> <span class="s">&quot;GO:0019864&quot;</span> <span class="o">|</span> <span class="n">GO_enrich</span><span class="o">$</span><span class="n">ID</span> <span class="o">==</span> <span class="s">&quot;GO:0045159&quot;</span><span class="p">,</span> <span class="n">asis</span><span class="o">=</span><span class="bp">T</span><span class="p">]</span>
+<span class="n">graphics</span><span class="o">::</span><span class="nf">barplot</span><span class="p">(</span><span class="n">ego_selection</span><span class="p">)</span>
+</code></pre></div>
 <p>A common way to represent the enrichment score of a single gene set after GSEA is the barcode plot, with the gseaplot() function that can be used
 directly on objects of class &ldquo;gseaResult&rdquo; (i.e. output by clusterProfiler functions). </p>
-<div class="highlight"><pre><span></span><code><span class="nf">gseaplot</span><span class="p">(,</span> <span class="n">geneSetID</span> <span class="o">=</span> <span class="s">&quot;&quot;</span><span class="p">,</span>
-         <span class="n">title</span><span class="o">=</span><span class="s">&quot;&quot;</span><span class="p">)</span>
+<div class="highlight"><pre><span></span><code><span class="c1"># Barcode plot</span>
+<span class="c1"># You need the ID of the GO gene set to plot:</span>
+<span class="n">GO_NK_Th</span><span class="o">@</span><span class="n">result</span><span class="p">[</span><span class="m">1</span><span class="o">:</span><span class="m">10</span><span class="p">,</span><span class="m">1</span><span class="o">:</span><span class="m">6</span><span class="p">]</span>
+
+<span class="c1"># For a gene set that is down-regulated in NK cells:</span>
+<span class="nf">gseaplot</span><span class="p">(</span><span class="n">GO_NK_Th</span><span class="p">,</span> <span class="n">geneSetID</span> <span class="o">=</span> <span class="s">&quot;GO:0002181&quot;</span><span class="p">,</span>
+         <span class="n">title</span><span class="o">=</span><span class="s">&quot;GO:0002181 - cytoplasmic translation&quot;</span><span class="p">)</span>
+<span class="c1"># And one that is up-regulated in NK cells</span>
+<span class="nf">gseaplot</span><span class="p">(</span><span class="n">GO_NK_Th</span><span class="p">,</span> <span class="n">geneSetID</span> <span class="o">=</span> <span class="s">&quot;GO:0002443&quot;</span><span class="p">,</span>
+         <span class="n">title</span><span class="o">=</span><span class="s">&quot;GO:0002443 - leukocyte mediated immunity&quot;</span><span class="p">)</span>
 </code></pre></div>
-<p>Finally, clusterProfiler provides several visualization methods that can be used directly on objects of class &ldquo;gseaResult&rdquo;. The barplot() function
-can be used on these objects, and you can either show the top significant gene sets, or a custom selection. Also, a dotplot can be used.</p>
-<div class="highlight"><pre><span></span><code><span class="c1"># Use the GO_enrich analysis performed above, of the over-representation analysis of genes up-regulated in NK cells:</span>
+<p>Finally, clusterProfiler provides several visualization methods that can be used directly on objects of class &ldquo;gseaResult&rdquo; or &ldquo;enrichResult. These functions are implemented in the enrichplot package that was developped to go with clusterProfiler. Examples are the dotplot, the gene-concept network (cnetplot), the enrichment map (emapplot) and the ridge plots.
+Feel free to consult the <a href="http://yulab-smu.top/biomedical-knowledge-mining-book/enrichplot.html">chapter on visualization of the nice clusterProfiler book</a> to see all the possible options and test others than the ones listed here!</p>
+<div class="highlight"><pre><span></span><code><span class="c1"># Dotplot on enrichResult and gseaResult objects:</span>
+<span class="n">enrichplot</span><span class="o">::</span><span class="nf">dotplot</span><span class="p">(</span><span class="n">GO_enrich</span><span class="p">,</span> <span class="n">orderBy</span><span class="o">=</span><span class="s">&quot;p.adjust&quot;</span><span class="p">)</span>
+<span class="n">enrichplot</span><span class="o">::</span><span class="nf">dotplot</span><span class="p">(</span><span class="n">GO_NK_Th</span><span class="p">,</span> <span class="n">orderBy</span><span class="o">=</span><span class="s">&quot;p.adjust&quot;</span><span class="p">)</span>
 
-<span class="nf">barplot</span><span class="p">(</span><span class="n">GO_enrich</span><span class="p">)</span>
-
-<span class="c1"># ego_selection = GO_enrich[GO_enrich$ID == &quot;GO:0019864&quot; || GO_enrich$ID == &quot;GO:0032393&quot;, asis=T]</span>
-<span class="c1"># barplot(ego_selection)</span>
-
-<span class="nf">dotplot</span><span class="p">(</span><span class="n">ego</span><span class="p">,</span> <span class="n">orderBy</span><span class="o">=</span><span class="s">&quot;p.adjust&quot;</span><span class="p">)</span>
-</code></pre></div>
-<p>For plots that show similarity among gene sets, use the following functions:</p>
-<div class="highlight"><pre><span></span><code><span class="c1"># Which genes are shared by several gene sets:</span>
+<span class="c1"># Gene concept network:</span>
 <span class="nf">cnetplot</span><span class="p">(</span><span class="n">GO_enrich</span><span class="p">,</span> <span class="n">categorySize</span><span class="o">=</span><span class="s">&quot;pvalue&quot;</span><span class="p">)</span>
+<span class="nf">cnetplot</span><span class="p">(</span><span class="n">GO_NK_Th</span><span class="p">,</span> <span class="n">showCategory</span> <span class="o">=</span> <span class="m">3</span><span class="p">)</span>
 
-<span class="c1"># Similarity among gene sets:</span>
-<span class="n">ego2</span> <span class="o">&lt;-</span> <span class="nf">pairwise_termsim</span><span class="p">(</span><span class="n">GO_enrich</span><span class="p">)</span>
-<span class="nf">emapplot</span><span class="p">(</span><span class="n">ego2</span><span class="p">)</span>
-<span class="nf">emapplot_cluster</span><span class="p">(</span><span class="n">ego2</span><span class="p">)</span>
-<span class="c1"># emapplot(ego2)</span>
+<span class="c1"># The enrichment map:</span>
+<span class="n">ego2</span> <span class="o">&lt;-</span> <span class="nf">pairwise_termsim</span><span class="p">(</span><span class="n">GO_NK_Th</span><span class="p">)</span>
+<span class="nf">emapplot</span><span class="p">(</span><span class="n">ego2</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s">&quot;p.adjust&quot;</span><span class="p">)</span>
 
+<span class="c1"># The ridge plots:</span>
 <span class="c1"># Distribution of t-statistic for genes included in significant gene sets or in selected gene sets:</span>
 <span class="nf">ridgeplot</span><span class="p">(</span><span class="n">GO_NK_Th</span><span class="p">)</span>
 
-<span class="n">GO_NK_Th_selection</span> <span class="o">&lt;-</span> <span class="n">GO_NK_Th</span><span class="p">[</span><span class="n">GO_NK_Th</span><span class="o">$</span><span class="n">ID</span> <span class="o">==</span> <span class="s">&quot;GO:0000184&quot;</span><span class="p">,</span> <span class="n">asis</span><span class="o">=</span><span class="bp">T</span><span class="p">]</span>
+<span class="c1"># Select which GO terms to show in the ridge plot:</span>
+<span class="n">GO_NK_Th_selection</span> <span class="o">&lt;-</span> <span class="n">GO_NK_Th</span><span class="p">[</span><span class="n">GO_NK_Th</span><span class="o">$</span><span class="n">ID</span> <span class="o">==</span> <span class="s">&quot;GO:0002181&quot;</span><span class="p">,</span> <span class="n">asis</span><span class="o">=</span><span class="bp">T</span><span class="p">]</span>
 <span class="nf">ridgeplot</span><span class="p">(</span><span class="n">GO_NK_Th_selection</span><span class="p">)</span>
-<span class="n">GO_NK_Th_selection</span> <span class="o">&lt;-</span> <span class="n">GO_NK_Th</span><span class="p">[</span><span class="n">GO_NK_Th</span><span class="o">$</span><span class="n">ID</span> <span class="o">==</span> <span class="s">&quot;GO:0006613&quot;</span><span class="p">,</span> <span class="n">asis</span><span class="o">=</span><span class="bp">T</span><span class="p">]</span>
+<span class="n">GO_NK_Th_selection</span> <span class="o">&lt;-</span> <span class="n">GO_NK_Th</span><span class="p">[</span><span class="n">GO_NK_Th</span><span class="o">$</span><span class="n">ID</span> <span class="o">%in%</span> <span class="nf">c</span><span class="p">(</span><span class="s">&quot;GO:0002181&quot;</span><span class="p">,</span><span class="s">&quot;GO:0022613&quot;</span><span class="p">,</span>
+                                                  <span class="s">&quot;GO:0042254&quot;</span><span class="p">),</span> 
+                                                  <span class="n">asis</span><span class="o">=</span><span class="bp">T</span><span class="p">]</span>
 <span class="nf">ridgeplot</span><span class="p">(</span><span class="n">GO_NK_Th_selection</span><span class="p">)</span>
-<span class="n">GO_NK_Th_selection</span> <span class="o">&lt;-</span> <span class="n">GO_NK_Th</span><span class="p">[</span><span class="nf">grep</span><span class="p">(</span><span class="s">&quot;membrane&quot;</span><span class="p">,</span><span class="n">GO_NK_Th</span><span class="o">@</span><span class="n">result</span><span class="o">$</span><span class="n">Description</span><span class="p">),</span> <span class="n">asis</span><span class="o">=</span><span class="bp">T</span><span class="p">]</span>
+<span class="c1"># Terms that contain the keyword &quot;leukocyte&quot;</span>
+<span class="n">GO_NK_Th_selection</span> <span class="o">&lt;-</span> <span class="n">GO_NK_Th</span><span class="p">[</span><span class="nf">grep</span><span class="p">(</span><span class="s">&quot;leukocyte&quot;</span><span class="p">,</span><span class="n">GO_NK_Th</span><span class="o">@</span><span class="n">result</span><span class="o">$</span><span class="n">Description</span><span class="p">),</span> <span class="n">asis</span><span class="o">=</span><span class="bp">T</span><span class="p">]</span>
 <span class="nf">ridgeplot</span><span class="p">(</span><span class="n">GO_NK_Th_selection</span><span class="p">)</span>
 </code></pre></div>
-<h2 id="exercise-4-the-last-one">Exercise 4, the last one <img alt="🌞" class="twemoji" src="https://twemoji.maxcdn.com/v/latest/svg/1f31e.svg" title=":sun_with_face:" /> <img alt="🧑🏽‍🔬" class="twemoji" src="https://twemoji.maxcdn.com/v/latest/svg/1f9d1-1f3fd-200d-1f52c.svg" title=":scientist_tone3:" /></h2>
+<h2 id="exercise-4-the-last-one-enrichment-of-other-collections-of-gene-sets">Exercise 4 (the last one <img alt="🌞" class="twemoji" src="https://twemoji.maxcdn.com/v/latest/svg/1f31e.svg" title=":sun_with_face:" /> <img alt="🧑🏽‍🔬" class="twemoji" src="https://twemoji.maxcdn.com/v/latest/svg/1f9d1-1f3fd-200d-1f52c.svg" title=":scientist_tone3:" />) - Enrichment of other collections of gene sets</h2>
 <p>We will now perform GSEA of other collections of gene sets, such as KEGG or Hallmark.
 For GSEA of the KEGG gene sets, the gene IDs have to be NCBI Entrez gene IDs. ClusterProfiler provides the bitr() function to convert gene label types.</p>
 <div class="highlight"><pre><span></span><code><span class="nf">keytypes</span><span class="p">(</span><span class="n">org.Hs.eg.db</span><span class="p">)</span>
