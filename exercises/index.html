@@ -464,7 +464,7 @@ How can you search for a particular gene within this table?</p>
 <span class="c1"># Search for a gene symbol in the data.frame, eg NCAM1 (CD56)</span>
 <span class="n">NK_vs_Th</span><span class="p">[</span><span class="nf">which</span><span class="p">(</span><span class="n">NK_vs_Th</span><span class="o">$</span><span class="n">symbol</span><span class="o">==</span><span class="s">&quot;NCAM1&quot;</span><span class="p">),]</span>
 </code></pre></div>
-<p>This table contains the typical information obtained after differential gene expression analysis. For each gene, you have log2 fold change values and significance information via the raw p-value and adjusted p-value. 
+<p>This table contains the typical information obtained after differential gene expression analysis. For each gene, you have log<sub>2</sub> fold change values and significance information via the raw p-value and adjusted p-value. A positive log<sub>2</sub> fold change value indicates that the gene is more expressed in NK cells than in Th cells, while a negative log<sub>2</sub> fold change value indicates that the gene is less expressed in NK cells than in Th cells.
 The p-value is usually computed automatically by R packages designed for differential gene expression analysis such as edgeR, limma or DESeq2. If you ever need to perform p-value adjustment, there is a function that is part of the stats package called p.adjust(), that allows you to perform p-value
 adjustment for any list of p-values. Look at the help of the function and try to understand the arguments that can be used. 
 <div class="highlight"><pre><span></span><code><span class="o">?</span><span class="n">p.adjust</span>
@@ -558,6 +558,8 @@ found in your RNA seq dataset. Check how many genes in the gene set are part of 
 <span class="c1">#              up   not_up</span>
 <span class="c1"># in_set      142      289</span>
 <span class="c1"># not_in_set 1753    16344</span>
+
+<span class="c1"># Compare the proportions: </span>
 <span class="m">142</span><span class="o">/</span><span class="m">1753</span>
 <span class="m">289</span><span class="o">/</span><span class="m">16344</span>
 
@@ -626,7 +628,7 @@ and significant using <a href="https://ggplot2.tidyverse.org/">ggplot2</a>.</p>
 </code></pre></div>
 <h2 id="exercise-2">Exercise 2</h2>
 <p>Next, we will use functions of the clusterProfiler package to perform a gene set enrichment analysis (GSEA) of Gene Ontology terms. For this, we first need
-to create a vector with the t-statistic for each gene, assign the gene symbol to each t-statistic in the vector (i.e. names), then sort the vector.</p>
+to create a vector with the t-statistic of each gene, assign the gene symbol to each t-statistic in the vector (i.e. names), then sort the vector.</p>
 <div class="admonition warning">
 <p class="admonition-title">Warning<p>A single gene can be labeled with different types of gene labels: Ensembl IDs, NCBI Entrez IDs, gene symbols, UniProt IDs, etc. 
 Therefore, first check whether the way the genes are labeled is supported by clusterProfiler using:
@@ -653,14 +655,21 @@ Therefore, first check whether the way the genes are labeled is supported by clu
 
     <span class="n">GO_NK_Th</span><span class="o">@</span><span class="n">result</span><span class="p">[</span><span class="n">GO_NK_Th</span><span class="o">@</span><span class="n">result</span><span class="o">$</span><span class="n">Description</span><span class="o">==</span><span class="s">&quot;adaptive immune response&quot;</span><span class="p">,]</span>
     <span class="nf">summary</span><span class="p">(</span><span class="n">GO_NK_Th</span><span class="o">@</span><span class="n">result</span><span class="o">$</span><span class="n">p.adjust</span><span class="o">&lt;</span><span class="m">0.05</span><span class="o">&amp;</span><span class="n">GO_NK_Th</span><span class="o">@</span><span class="n">result</span><span class="o">$</span><span class="n">NES</span><span class="o">&lt;</span><span class="m">0</span><span class="p">)</span>
-  <span class="n">Mode</span>   <span class="kc">FALSE</span>    <span class="kc">TRUE</span> 
-  <span class="c1"># logical    303      86 </span>
-  <span class="nf">summary</span><span class="p">(</span><span class="n">GO_NK_Th</span><span class="o">@</span><span class="n">result</span><span class="o">$</span><span class="n">p.adjust</span><span class="o">&lt;</span><span class="m">0.05</span><span class="o">&amp;</span><span class="n">GO_NK_Th</span><span class="o">@</span><span class="n">result</span><span class="o">$</span><span class="n">NES</span><span class="o">&gt;</span><span class="m">0</span><span class="p">)</span>
-  <span class="c1">#     Mode   FALSE    TRUE </span>
-  <span class="c1"># logical      86     303 </span>
+<span class="c1"># Mode   FALSE    TRUE </span>
+<span class="c1"># logical    271      65 </span>
+<span class="nf">summary</span><span class="p">(</span><span class="n">GO_NK_Th</span><span class="o">@</span><span class="n">result</span><span class="o">$</span><span class="n">p.adjust</span><span class="o">&lt;</span><span class="m">0.05</span><span class="o">&amp;</span><span class="n">GO_NK_Th</span><span class="o">@</span><span class="n">result</span><span class="o">$</span><span class="n">NES</span><span class="o">&gt;</span><span class="m">0</span><span class="p">)</span>
+<span class="c1">#     Mode   FALSE    TRUE </span>
+<span class="c1"># logical      65     271 </span>
 </code></pre></div>
 </details>
-<p>Finally, you can export the results to a csv file, if you would want to summarize the results using Revigo for example (see later in course).
+<p>Among the results, some gene sets seem to be a bit redundant based on the genes they contain (column &ldquo;core_enrichment&rdquo;). We can simplify the results by using the simplify() function of the clusterProfiler package:</p>
+<p><div class="highlight"><pre><span></span><code><span class="c1"># Simplify:</span>
+<span class="o">?</span><span class="nf">simplify</span><span class="p">()</span>
+<span class="n">GO_NK_Th_simplify</span> <span class="o">&lt;-</span> <span class="n">clusterProfiler</span><span class="o">::</span><span class="nf">simplify</span><span class="p">(</span><span class="n">GO_NK_Th</span><span class="p">)</span>
+<span class="nf">View</span><span class="p">(</span><span class="n">GO_NK_Th_simplify</span><span class="o">@</span><span class="n">result</span><span class="p">)</span>
+<span class="n">GO_NK_Th_simplify</span><span class="o">@</span><span class="n">result</span><span class="p">[</span><span class="n">GO_NK_Th_simplify</span><span class="o">@</span><span class="n">result</span><span class="o">$</span><span class="n">Description</span><span class="o">==</span><span class="s">&quot;adaptive immune response&quot;</span><span class="p">,]</span>
+</code></pre></div>
+Finally, you can export the results to a csv file, if you would want to summarize the results using <a href="http://revigo.irb.hr/">Revigo</a> for example (see later in course).
 To obtain the list of leading edge genes, split the corresponding column in the @result slot on the based on the slash. And if you want to obtain a full list
 of genes belonging to a particular GO term, this information is also stored in the @geneSets slot.
 <div class="highlight"><pre><span></span><code><span class="c1"># Export results</span>
@@ -678,13 +687,17 @@ of genes belonging to a particular GO term, this information is also stored in t
 don&rsquo;t always obtain a t-statistic or fold change value for every gene in the dataset, but rather a simple list of significant genes. With this list,
 you can perform an over-representation analysis of the GO terms using enrichGO(). The output will not contain enrichment scores, but rather p-values for
 every gene set.</p>
-<div class="highlight"><pre><span></span><code><span class="n">GO_enrich</span><span class="o">&lt;-</span><span class="nf">enrichGO</span><span class="p">(</span><span class="n">gene</span><span class="o">=</span><span class="n">NK_up</span><span class="o">$</span><span class="n">symbol</span><span class="p">,</span>
+<div class="highlight"><pre><span></span><code><span class="n">nk_up_genes</span><span class="o">&lt;-</span><span class="nf">subset</span><span class="p">(</span><span class="n">NK_vs_Th</span><span class="p">,</span> <span class="n">NK_vs_Th</span><span class="o">$</span><span class="n">logFC</span><span class="o">&gt;</span><span class="m">0</span><span class="o">&amp;</span><span class="n">NK_vs_Th</span><span class="o">$</span><span class="n">p.adj</span><span class="o">&lt;=</span><span class="m">0.05</span><span class="p">)</span><span class="o">$</span><span class="n">symbol</span>
+
+<span class="c1"># Provide list of significant genes for over-representation analysis of GO gene sets </span>
+<span class="c1"># using enrichGO():</span>
+<span class="n">GO_enrich</span><span class="o">&lt;-</span><span class="nf">enrichGO</span><span class="p">(</span><span class="n">gene</span><span class="o">=</span><span class="n">nk_up_genes</span><span class="p">,</span>
                     <span class="n">OrgDb</span> <span class="o">=</span> <span class="n">org.Hs.eg.db</span><span class="p">,</span>
                     <span class="n">keyType</span> <span class="o">=</span> <span class="s">&quot;SYMBOL&quot;</span><span class="p">,</span>
-                    <span class="n">minGSSize</span><span class="o">=</span><span class="m">30</span><span class="p">,</span>
-                    <span class="n">universe</span> <span class="o">=</span> <span class="n">NK_vs_Th</span><span class="o">$</span><span class="n">symbol</span><span class="p">)</span>
+                    <span class="n">maxGSSize</span> <span class="o">=</span> <span class="m">30</span><span class="p">)</span>
 <span class="nf">View</span><span class="p">(</span><span class="n">GO_enrich</span><span class="o">@</span><span class="n">result</span><span class="p">)</span>
 </code></pre></div>
+<p>This method can also be used if you have a list of genes involved in a disease, such as genes that are mutated in cancer, or lists of genes obtained by other omics methods, such as genes that have a transcription factor binding site in their promoter (ChIP-seq), etc.</p>
 <h2 id="exercise-3">Exercise 3</h2>
 <p>Once we have performed a GSEA or over-representation analysis, we need of course to show the results and prepare figures for a publication. Several visualizations are possible.
 The first option is a barplot. It can be a barplot of p-values of top over-represented GO terms. P-values are usually transformed with -log10, so that the very small p-values are emphasized compared to p-values that are closer to 0.05. </p>
