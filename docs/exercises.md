@@ -45,7 +45,7 @@ head(NK_vs_Th)
 NK_vs_Th[which(NK_vs_Th$symbol=="NCAM1"),]
 ``` 
 
-This table contains the typical information obtained after differential gene expression analysis. For each gene, you have log2 fold change values and significance information via the raw p-value and adjusted p-value. 
+This table contains the typical information obtained after differential gene expression analysis. For each gene, you have log<sub>2</sub> fold change values and significance information via the raw p-value and adjusted p-value. A positive log<sub>2</sub> fold change value indicates that the gene is more expressed in NK cells than in Th cells, while a negative log<sub>2</sub> fold change value indicates that the gene is less expressed in NK cells than in Th cells.
 The p-value is usually computed automatically by R packages designed for differential gene expression analysis such as edgeR, limma or DESeq2. If you ever need to perform p-value adjustment, there is a function that is part of the stats package called p.adjust(), that allows you to perform p-value
 adjustment for any list of p-values. Look at the help of the function and try to understand the arguments that can be used. 
 ```r
@@ -150,6 +150,8 @@ Finally, use the fisher.test() function to determine whether the adaptive immune
     #              up   not_up
     # in_set      142      289
     # not_in_set 1753    16344
+    
+    # Compare the proportions: 
     142/1753
     289/16344
 
@@ -235,7 +237,7 @@ ggplot(NK_vs_Th, aes(x = logFC,  #
 
 
 Next, we will use functions of the clusterProfiler package to perform a gene set enrichment analysis (GSEA) of Gene Ontology terms. For this, we first need
-to create a vector with the t-statistic for each gene, assign the gene symbol to each t-statistic in the vector (i.e. names), then sort the vector.
+to create a vector with the t-statistic of each gene, assign the gene symbol to each t-statistic in the vector (i.e. names), then sort the vector.
 
 !!! warning
 		A single gene can be labeled with different types of gene labels: Ensembl IDs, NCBI Entrez IDs, gene symbols, UniProt IDs, etc. 
@@ -268,16 +270,25 @@ Explore the new object that was created. What is its structure? What does it con
 	
 		GO_NK_Th@result[GO_NK_Th@result$Description=="adaptive immune response",]
 		summary(GO_NK_Th@result$p.adjust<0.05&GO_NK_Th@result$NES<0)
-      Mode   FALSE    TRUE 
-      # logical    303      86 
-      summary(GO_NK_Th@result$p.adjust<0.05&GO_NK_Th@result$NES>0)
-      #     Mode   FALSE    TRUE 
-      # logical      86     303 
+    # Mode   FALSE    TRUE 
+    # logical    271      65 
+    summary(GO_NK_Th@result$p.adjust<0.05&GO_NK_Th@result$NES>0)
+    #     Mode   FALSE    TRUE 
+    # logical      65     271 
 
 	```
 
+Among the results, some gene sets seem to be a bit redundant based on the genes they contain (column "core_enrichment"). We can simplify the results by using the simplify() function of the clusterProfiler package:
 
-Finally, you can export the results to a csv file, if you would want to summarize the results using Revigo for example (see later in course).
+```r
+# Simplify:
+?simplify()
+GO_NK_Th_simplify <- clusterProfiler::simplify(GO_NK_Th)
+View(GO_NK_Th_simplify@result)
+GO_NK_Th_simplify@result[GO_NK_Th_simplify@result$Description=="adaptive immune response",]
+
+```
+Finally, you can export the results to a csv file, if you would want to summarize the results using [Revigo](http://revigo.irb.hr/) for example (see later in course).
 To obtain the list of leading edge genes, split the corresponding column in the @result slot on the based on the slash. And if you want to obtain a full list
 of genes belonging to a particular GO term, this information is also stored in the @geneSets slot.
 ```r
@@ -299,14 +310,19 @@ you can perform an over-representation analysis of the GO terms using enrichGO()
 every gene set.
 
 ```r
-GO_enrich<-enrichGO(gene=NK_up$symbol,
+nk_up_genes<-subset(NK_vs_Th, NK_vs_Th$logFC>0&NK_vs_Th$p.adj<=0.05)$symbol
+
+# Provide list of significant genes for over-representation analysis of GO gene sets 
+# using enrichGO():
+GO_enrich<-enrichGO(gene=nk_up_genes,
                     OrgDb = org.Hs.eg.db,
                     keyType = "SYMBOL",
-                    minGSSize=30,
-                    universe = NK_vs_Th$symbol)
+                    maxGSSize = 30)
 View(GO_enrich@result)
+
 ```
 
+This method can also be used if you have a list of genes involved in a disease, such as genes that are mutated in cancer, or lists of genes obtained by other omics methods, such as genes that have a transcription factor binding site in their promoter (ChIP-seq), etc.
 
 
 ## Exercise 3
