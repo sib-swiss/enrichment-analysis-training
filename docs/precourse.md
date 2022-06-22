@@ -10,7 +10,7 @@ As is stated in the course prerequisites on the [announcement web page](https://
 
 ### Technical
 
-This course will be streamed, you are thus required to have your own computer with an internet connection, and with latest version of [R](https://cran.r-project.org/)
+This course will be streamed, you are thus required to have your own computer with an internet connection, and with latest the version of [R](https://cran.r-project.org/)
 and the free version of [RStudio](https://www.rstudio.com/products/rstudio/download/) installed.
 
 You can install the necessary packages using:

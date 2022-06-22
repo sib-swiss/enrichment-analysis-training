@@ -27,7 +27,7 @@ set.seed(1234)
 
 ```
 
-## Exercise 1
+## Exercise 1 - Over-representation analysis
 
 
 Import the data into your R session and explore its structure: what are the different columns corresponding to?
@@ -171,10 +171,10 @@ Finally, use the fisher.test() function to determine whether the adaptive immune
 
 
 
-The clusterProfiler package includes the enricher() function which allows you to perform a hypergeometric test (a one-side Fisher test).
+**Bonus**  In case you wish to run an over-representation analysis for several gene sets at once, instead of running several independent Fisher tests, you can use the enricher() function of the clusterProfiler package. This function allows you to perform an over-representation analysis of several gene sets at once, using an implementation of the hypergeometric test (a one-sided Fisher's exact test).
 Check out the help of the function: What arguments do you need to provide? 
 
-Determine whether the genes up-regulated in NK are over-represented in 3 gene sets: the adaptive immune response gene set used above, another related to cell activation, and one un-related to immune cells (hair cell differentiation).
+Determine whether the genes up-regulated in NK cells are over-represented in 3 gene sets: the adaptive immune response gene set used above, another related to cell activation, and one un-related to immune cells (hair cell differentiation).
 
 
 ```r
@@ -192,7 +192,8 @@ hair<-read.gmt("GOBP_HAIR_CELL_DIFFERENTIATION.v7.5.1.gmt")
 dim(hair)
 cell_active<-read.gmt("GOBP_CELL_ACTIVATION.v7.5.1.gmt")
 dim(cell_active)
-  
+
+# Combine the 3 gene sets into a single data.frame for the TERM2GENE argument:
 genesets3<-rbind(adaptive, hair, cell_active)
   
 hyper_3genesets<-enricher(gene=nk_up_genes,
@@ -233,7 +234,7 @@ ggplot(NK_vs_Th, aes(x = logFC,  #
         geom_vline(xintercept = 0, linetype="dashed")
 ```
 
-## Exercise 2
+## Exercise 2 - Gene set enrichment analysis (GSEA)
 
 
 Next, we will use functions of the clusterProfiler package to perform a gene set enrichment analysis (GSEA) of Gene Ontology terms. For this, we first need
@@ -320,19 +321,19 @@ GO_enrich<-enrichGO(gene=nk_up_genes,
                     maxGSSize = 30)
 View(GO_enrich@result)
 
+class(GO_enrich)
+class(GO_NK_Th)
+
 ```
 
 This method can also be used if you have a list of genes involved in a disease, such as genes that are mutated in cancer, or lists of genes obtained by other omics methods, such as genes that have a transcription factor binding site in their promoter (ChIP-seq), etc.
 
 
-## Exercise 3
+## Exercise 3 - Visualization of enrichment results
 
 
 Once we have performed a GSEA or over-representation analysis, we need of course to show the results and prepare figures for a publication. Several visualizations are possible.
-The first option is a barplot. It can be a barplot of p-values of top over-represented GO terms. P-values are usually transformed with -log10, so that the very small p-values are emphasized compared to p-values that are closer to 0.05. 
-
-A barplot can also be created with the NES obtained after GSEA, to show which gene sets are up-regulated and which are down-regulated.
-The barplot() function is part of the graphics package and can be used for over-representation results.
+The first option is a barplot. It can be a barplot of p-values of top over-represented GO terms. P-values are usually -log<sub>10</sub>-transformed, so that the very small p-values are emphasized compared to p-values that are closer to 0.05. The barplot() function comes from the graphics package. 
 
 ```r
 par(mar=c(5,20,3,3))
@@ -343,6 +344,8 @@ barplot(rev(-log10(GO_NK_Th@result$pvalue[1:10])),
         col="lightgreen") 
 abline(v=-log10(0.05))
 ```
+
+In publications, we often see barplots of normalized enrichment scores (NES), showing which gene sets are up-regulated and which are down-regulated.
 
 Now that you know how to use the barplot() function, how would you create a barplot of NES of the top 10 up-regulated and the top 10 down-regulated genes sets,
  with red bars for the up-regulated gene sets and blue bars for the down-regulated gene sets?
@@ -359,56 +362,77 @@ Now that you know how to use the barplot() function, how would you create a barp
           	las=2, xlab="NES",
           	cex.names = 0.7,
           	col=sorted_GO_NK_Th$color[c(1:10, (nrow(sorted_GO_NK_Th)-9):nrow(sorted_GO_NK_Th))]) 
+        abline(v=0)
+      	
 	```
+
+With results of an over-representation analysis, where the output is of class "enrichResult", the barplot() function can be used directly. You can either show the significant gene sets, or a custom selection of them.
+
+```r
+# Use the GO_enrich analysis performed above, of the over-representation analysis 
+# of genes up-regulated in NK cells:
+# Barplot on enrichResult object:
+graphics::barplot(GO_enrich)
+
+# Select only 2 out of the significant gene sets:
+ego_selection = GO_enrich[GO_enrich$ID == "GO:0019864" | GO_enrich$ID == "GO:0045159", asis=T]
+graphics::barplot(ego_selection)
+
+```
 
 A common way to represent the enrichment score of a single gene set after GSEA is the barcode plot, with the gseaplot() function that can be used
 directly on objects of class "gseaResult" (i.e. output by clusterProfiler functions). 
 
 ```r
-gseaplot(, geneSetID = "",
-         title="")
+
+# Barcode plot
+# You need the ID of the GO gene set to plot:
+GO_NK_Th@result[1:10,1:6]
+
+# For a gene set that is down-regulated in NK cells:
+gseaplot(GO_NK_Th, geneSetID = "GO:0002181",
+         title="GO:0002181 - cytoplasmic translation")
+# And one that is up-regulated in NK cells
+gseaplot(GO_NK_Th, geneSetID = "GO:0002443",
+         title="GO:0002443 - leukocyte mediated immunity")
+
 ```
 
 
-Finally, clusterProfiler provides several visualization methods that can be used directly on objects of class "gseaResult". The barplot() function
-can be used on these objects, and you can either show the top significant gene sets, or a custom selection. Also, a dotplot can be used.
+Finally, clusterProfiler provides several visualization methods that can be used directly on objects of class "gseaResult" or "enrichResult. These functions are implemented in the enrichplot package that was developped to go with clusterProfiler. Examples are the dotplot, the gene-concept network (cnetplot), the enrichment map (emapplot) and the ridge plots.
+Feel free to consult the [chapter on visualization of the nice clusterProfiler book](http://yulab-smu.top/biomedical-knowledge-mining-book/enrichplot.html) to see all the possible options and test others than the ones listed here!
 
 ```r
-# Use the GO_enrich analysis performed above, of the over-representation analysis of genes up-regulated in NK cells:
+# Dotplot on enrichResult and gseaResult objects:
+enrichplot::dotplot(GO_enrich, orderBy="p.adjust")
+enrichplot::dotplot(GO_NK_Th, orderBy="p.adjust")
 
-barplot(GO_enrich)
-
-# ego_selection = GO_enrich[GO_enrich$ID == "GO:0019864" || GO_enrich$ID == "GO:0032393", asis=T]
-# barplot(ego_selection)
-
-dotplot(ego, orderBy="p.adjust")
-```
-
-For plots that show similarity among gene sets, use the following functions:
-
-```r
-# Which genes are shared by several gene sets:
+# Gene concept network:
 cnetplot(GO_enrich, categorySize="pvalue")
+cnetplot(GO_NK_Th, showCategory = 3)
 
-# Similarity among gene sets:
-ego2 <- pairwise_termsim(GO_enrich)
-emapplot(ego2)
-emapplot_cluster(ego2)
-# emapplot(ego2)
+# The enrichment map:
+ego2 <- pairwise_termsim(GO_NK_Th)
+emapplot(ego2, color="p.adjust")
 
+# The ridge plots:
 # Distribution of t-statistic for genes included in significant gene sets or in selected gene sets:
 ridgeplot(GO_NK_Th)
 
-GO_NK_Th_selection <- GO_NK_Th[GO_NK_Th$ID == "GO:0000184", asis=T]
+# Select which GO terms to show in the ridge plot:
+GO_NK_Th_selection <- GO_NK_Th[GO_NK_Th$ID == "GO:0002181", asis=T]
 ridgeplot(GO_NK_Th_selection)
-GO_NK_Th_selection <- GO_NK_Th[GO_NK_Th$ID == "GO:0006613", asis=T]
+GO_NK_Th_selection <- GO_NK_Th[GO_NK_Th$ID %in% c("GO:0002181","GO:0022613",
+                                                  "GO:0042254"), 
+                                                  asis=T]
 ridgeplot(GO_NK_Th_selection)
-GO_NK_Th_selection <- GO_NK_Th[grep("membrane",GO_NK_Th@result$Description), asis=T]
+# Terms that contain the keyword "leukocyte"
+GO_NK_Th_selection <- GO_NK_Th[grep("leukocyte",GO_NK_Th@result$Description), asis=T]
 ridgeplot(GO_NK_Th_selection)
 ```
 
 
-## Exercise 4, the last one :sun_with_face: :scientist_tone3:
+## Exercise 4 (the last one :sun_with_face: :scientist_tone3:) - Enrichment of other collections of gene sets
 
 We will now perform GSEA of other collections of gene sets, such as KEGG or Hallmark.
 For GSEA of the KEGG gene sets, the gene IDs have to be NCBI Entrez gene IDs. ClusterProfiler provides the bitr() function to convert gene label types.
