@@ -290,6 +290,13 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#code-for-barplots-with-ggplot2" class="md-nav__link">
+    Code for barplots with ggplot2
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#code-for-a-heatmap-of-p-values" class="md-nav__link">
     Code for a heatmap of p-values
   </a>
@@ -359,6 +366,13 @@
         <li class="md-nav__item">
   <a href="#msigdbr-package" class="md-nav__link">
     msigdbr package
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#code-for-barplots-with-ggplot2" class="md-nav__link">
+    Code for barplots with ggplot2
   </a>
   
 </li>
@@ -458,6 +472,42 @@ description, biotype, or the symbols of mouse homologs of human genes, etc.</p>
 <span class="c1"># Create the 2 column-format (TERM2GENE argument) required by clusterProfiler:</span>
 <span class="n">h_gmt</span> <span class="o">&lt;-</span> <span class="n">gmt</span><span class="p">[,</span><span class="nf">c</span><span class="p">(</span><span class="s">&quot;gs_name&quot;</span><span class="p">,</span> <span class="s">&quot;gene_symbol&quot;</span><span class="p">)]</span>
 </code></pre></div></p>
+<h2 id="code-for-barplots-with-ggplot2">Code for barplots with ggplot2</h2>
+<p>Barplot of the 10 most significant gene sets:</p>
+<p><div class="highlight"><pre><span></span><code><span class="nf">library</span><span class="p">(</span><span class="n">ggplot2</span><span class="p">)</span>
+<span class="nf">library</span><span class="p">(</span><span class="n">tidyverse</span><span class="p">)</span>
+
+<span class="n">GO_NK_Th</span><span class="o">@</span><span class="n">result</span> <span class="o">%&gt;%</span>
+  <span class="n">dplyr</span><span class="o">::</span><span class="nf">arrange</span><span class="p">(</span><span class="n">p.adjust</span><span class="p">)</span> <span class="o">%&gt;%</span>
+  <span class="nf">slice_head</span><span class="p">(</span><span class="n">n</span> <span class="o">=</span> <span class="m">10</span><span class="p">)</span> <span class="o">%&gt;%</span>
+  <span class="nf">ggplot</span><span class="p">(</span><span class="nf">aes</span><span class="p">(</span><span class="n">x</span> <span class="o">=</span> <span class="o">-</span><span class="nf">log10</span><span class="p">(</span><span class="n">p.adjust</span><span class="p">),</span> <span class="n">y</span> <span class="o">=</span> <span class="nf">reorder</span><span class="p">(</span><span class="n">Description</span><span class="p">,</span> <span class="o">-</span><span class="n">p.adjust</span><span class="p">)))</span> <span class="o">+</span>
+    <span class="nf">geom_bar</span><span class="p">(</span><span class="n">stat</span> <span class="o">=</span> <span class="s">&quot;identity&quot;</span><span class="p">)</span> <span class="o">+</span>
+    <span class="nf">geom_vline</span><span class="p">(</span><span class="n">xintercept</span> <span class="o">=</span> <span class="o">-</span><span class="nf">log10</span><span class="p">(</span><span class="m">0.05</span><span class="p">),</span> <span class="n">linetype</span> <span class="o">=</span> <span class="s">&quot;dashed&quot;</span><span class="p">)</span> <span class="o">+</span>
+    <span class="nf">labs</span><span class="p">(</span><span class="n">y</span> <span class="o">=</span> <span class="s">&quot;Description&quot;</span><span class="p">)</span> <span class="o">+</span>
+    <span class="nf">theme_classic</span><span class="p">()</span>
+</code></pre></div>
+<br />
+<figure>
+  <img src="../assets/images/barplot_p_value.png" width="300"/>
+  </figure>
+</p>
+<p>Barplot of NES colored according to direction:
+<div class="highlight"><pre><span></span><code><span class="n">sorted_GO_NK_Th</span> <span class="o">%&gt;%</span>
+  <span class="n">dplyr</span><span class="o">::</span><span class="nf">group_by</span><span class="p">(</span><span class="n">color</span><span class="p">)</span> <span class="o">%&gt;%</span>
+  <span class="n">dplyr</span><span class="o">::</span><span class="nf">arrange</span><span class="p">(</span><span class="nf">desc</span><span class="p">(</span><span class="nf">abs</span><span class="p">(</span><span class="n">NES</span><span class="p">)))</span> <span class="o">%&gt;%</span>
+  <span class="nf">slice_head</span><span class="p">(</span><span class="n">n</span> <span class="o">=</span> <span class="m">10</span><span class="p">)</span> <span class="o">%&gt;%</span>
+  <span class="nf">ggplot</span><span class="p">(</span><span class="nf">aes</span><span class="p">(</span><span class="n">x</span> <span class="o">=</span> <span class="n">NES</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="nf">reorder</span><span class="p">(</span><span class="n">Description</span><span class="p">,</span> <span class="n">NES</span><span class="p">),</span> <span class="n">fill</span> <span class="o">=</span> <span class="n">color</span><span class="p">))</span> <span class="o">+</span>
+  <span class="nf">geom_bar</span><span class="p">(</span><span class="n">stat</span> <span class="o">=</span> <span class="s">&quot;identity&quot;</span><span class="p">)</span> <span class="o">+</span>
+  <span class="nf">geom_vline</span><span class="p">(</span><span class="n">xintercept</span> <span class="o">=</span> <span class="m">0</span><span class="p">)</span> <span class="o">+</span>
+  <span class="nf">labs</span><span class="p">(</span><span class="n">y</span> <span class="o">=</span> <span class="s">&quot;Description&quot;</span><span class="p">)</span> <span class="o">+</span>
+  <span class="nf">theme_classic</span><span class="p">()</span> <span class="o">+</span>
+  <span class="nf">theme</span><span class="p">(</span><span class="n">legend.position</span> <span class="o">=</span> <span class="s">&quot;none&quot;</span><span class="p">)</span>
+</code></pre></div>
+<br />
+<figure>
+  <img src="../assets/images/barplot_NES.png" width="300"/>
+  </figure>
+</p>
 <h2 id="code-for-a-heatmap-of-p-values">Code for a heatmap of p-values</h2>
 <p>For heatmaps, ggplot2 can also be used. Here is an example for a heatmap of the p-values of 6 different gene sets (gs), and the
 p-value for each gene set was calculated in two comparisons, so we compared the enrichment in genes differentially expressed
