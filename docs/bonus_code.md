@@ -88,7 +88,6 @@ h_gmt <- gmt[,c("gs_name", "gene_symbol")]
 Barplot of the 10 most significant gene sets:
 
 ```r
-library(ggplot2)
 library(tidyverse)
 
 GO_NK_Th@result %>%

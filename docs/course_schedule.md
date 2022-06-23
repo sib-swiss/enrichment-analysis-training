@@ -4,8 +4,8 @@ The course starts at *9am* and ends around *5pm*, with the following breaks (app
 |     	| Topic   |
 |-------	|-------	|
 | 9am     | Start of course  |    
-| 10am to 10:30am 	| Coffee break 	|
+| 10:30am to 10:50am 	| Coffee break 	|
 | 12:30pm to 1:30pm 	| Lunch break 	|
-| 3:30pm to 4:00pm 	| Coffee break 	|
+| 3:30pm to 3:50pm 	| Coffee break 	|
 | Approx. 5pm | End of course |
 
