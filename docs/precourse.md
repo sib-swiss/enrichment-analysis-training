@@ -26,6 +26,10 @@ install.packages("ggplot2")
 install.packages("ggrepel")
 install.packages("msigdbr")
 
+install.packages("ggridges")
+install.packages("tidyverse")
+
+
 
 ```
 

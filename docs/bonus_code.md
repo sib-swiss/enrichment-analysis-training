@@ -83,6 +83,47 @@ h_gmt <- gmt[,c("gs_name", "gene_symbol")]
 
 ```
 
+## Code for barplots with ggplot2
+
+Barplot of the 10 most significant gene sets:
+
+```r
+library(ggplot2)
+library(tidyverse)
+
+GO_NK_Th@result %>%
+  dplyr::arrange(p.adjust) %>%
+  slice_head(n = 10) %>%
+  ggplot(aes(x = -log10(p.adjust), y = reorder(Description, -p.adjust))) +
+    geom_bar(stat = "identity") +
+    geom_vline(xintercept = -log10(0.05), linetype = "dashed") +
+    labs(y = "Description") +
+    theme_classic()
+
+```
+  <figure>
+  <img src="../assets/images/barplot_p_value.png" width="300"/>
+  </figure>
+
+
+
+Barplot of NES colored according to direction:
+```r
+sorted_GO_NK_Th %>%
+  dplyr::group_by(color) %>%
+  dplyr::arrange(desc(abs(NES))) %>%
+  slice_head(n = 10) %>%
+  ggplot(aes(x = NES, y = reorder(Description, NES), fill = color)) +
+  geom_bar(stat = "identity") +
+  geom_vline(xintercept = 0) +
+  labs(y = "Description") +
+  theme_classic() +
+  theme(legend.position = "none")
+```
+  <figure>
+  <img src="../assets/images/barplot_NES.png" width="300"/>
+  </figure>
+
 
 ## Code for a heatmap of p-values
 
