@@ -424,6 +424,8 @@ emapplot(ego2, color="p.adjust")
 # The ridge plots:
 # Distribution of t-statistic for genes included in significant gene sets or in selected gene sets:
 ridgeplot(GO_NK_Th)
+# What is the difference with core_enrichment =F?
+ridgeplot(GO_NK_Th, core_enrichment = F)
 
 # Select which GO terms to show in the ridge plot:
 GO_NK_Th_selection <- GO_NK_Th[GO_NK_Th$ID == "GO:0002181", asis=T]
