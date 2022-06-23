@@ -772,6 +772,8 @@ Feel free to consult the <a href="http://yulab-smu.top/biomedical-knowledge-mini
 <span class="c1"># The ridge plots:</span>
 <span class="c1"># Distribution of t-statistic for genes included in significant gene sets or in selected gene sets:</span>
 <span class="nf">ridgeplot</span><span class="p">(</span><span class="n">GO_NK_Th</span><span class="p">)</span>
+<span class="c1"># What is the difference with core_enrichment =F?</span>
+<span class="nf">ridgeplot</span><span class="p">(</span><span class="n">GO_NK_Th</span><span class="p">,</span> <span class="n">core_enrichment</span> <span class="o">=</span> <span class="bp">F</span><span class="p">)</span>
 
 <span class="c1"># Select which GO terms to show in the ridge plot:</span>
 <span class="n">GO_NK_Th_selection</span> <span class="o">&lt;-</span> <span class="n">GO_NK_Th</span><span class="p">[</span><span class="n">GO_NK_Th</span><span class="o">$</span><span class="n">ID</span> <span class="o">==</span> <span class="s">&quot;GO:0002181&quot;</span><span class="p">,</span> <span class="n">asis</span><span class="o">=</span><span class="bp">T</span><span class="p">]</span>
