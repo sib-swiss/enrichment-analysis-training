@@ -474,8 +474,7 @@ description, biotype, or the symbols of mouse homologs of human genes, etc.</p>
 </code></pre></div></p>
 <h2 id="code-for-barplots-with-ggplot2">Code for barplots with ggplot2</h2>
 <p>Barplot of the 10 most significant gene sets:</p>
-<p><div class="highlight"><pre><span></span><code><span class="nf">library</span><span class="p">(</span><span class="n">ggplot2</span><span class="p">)</span>
-<span class="nf">library</span><span class="p">(</span><span class="n">tidyverse</span><span class="p">)</span>
+<p><div class="highlight"><pre><span></span><code><span class="nf">library</span><span class="p">(</span><span class="n">tidyverse</span><span class="p">)</span>
 
 <span class="n">GO_NK_Th</span><span class="o">@</span><span class="n">result</span> <span class="o">%&gt;%</span>
   <span class="n">dplyr</span><span class="o">::</span><span class="nf">arrange</span><span class="p">(</span><span class="n">p.adjust</span><span class="p">)</span> <span class="o">%&gt;%</span>
