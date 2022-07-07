@@ -25,6 +25,7 @@ BiocManager::install("biomaRt")
 install.packages("ggplot2")
 install.packages("ggrepel")
 install.packages("msigdbr")
+install.packages("ggnewscale")
 
 install.packages("ggridges")
 install.packages("tidyverse")
