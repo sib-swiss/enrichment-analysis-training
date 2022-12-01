@@ -486,6 +486,32 @@ description, biotype, or the symbols of mouse homologs of human genes, etc.</p>
 <span class="c1"># Create the 2 column-format (TERM2GENE argument) required by clusterProfiler:</span>
 <span class="n">h_gmt</span> <span class="o">&lt;-</span> <span class="n">gmt</span><span class="p">[,</span><span class="nf">c</span><span class="p">(</span><span class="s">&quot;gs_name&quot;</span><span class="p">,</span> <span class="s">&quot;gene_symbol&quot;</span><span class="p">)]</span>
 </code></pre></div></p>
+<p>To determine what other species are available with msigdbr:</p>
+<div class="highlight"><pre><span></span><code><span class="nf">msigdbr_species</span><span class="p">()</span>
+<span class="c1">#&gt; # A tibble: 20 × 2</span>
+<span class="c1">#&gt;    species_name                    species_common_name                          </span>
+<span class="c1">#&gt;    &lt;chr&gt;                           &lt;chr&gt;                                        </span>
+<span class="c1">#&gt;  1 Anolis carolinensis             Carolina anole, green anole                  </span>
+<span class="c1">#&gt;  2 Bos taurus                      bovine, cattle, cow, dairy cow, domestic cat…</span>
+<span class="c1">#&gt;  3 Caenorhabditis elegans          NA                                           </span>
+<span class="c1">#&gt;  4 Canis lupus familiaris          dog, dogs                                    </span>
+<span class="c1">#&gt;  5 Danio rerio                     leopard danio, zebra danio, zebra fish, zebr…</span>
+<span class="c1">#&gt;  6 Drosophila melanogaster         fruit fly                                    </span>
+<span class="c1">#&gt;  7 Equus caballus                  domestic horse, equine, horse                </span>
+<span class="c1">#&gt;  8 Felis catus                     cat, cats, domestic cat                      </span>
+<span class="c1">#&gt;  9 Gallus gallus                   bantam, chicken, chickens, Gallus domesticus</span>
+<span class="c1">#&gt; 10 Homo sapiens                    human                                        </span>
+<span class="c1">#&gt; 11 Macaca mulatta                  rhesus macaque, rhesus macaques, Rhesus monk…</span>
+<span class="c1">#&gt; 12 Monodelphis domestica           gray short-tailed opossum                    </span>
+<span class="c1">#&gt; 13 Mus musculus                    house mouse, mouse                           </span>
+<span class="c1">#&gt; 14 Ornithorhynchus anatinus        duck-billed platypus, duckbill platypus, pla…</span>
+<span class="c1">#&gt; 15 Pan troglodytes                 chimpanzee                                   </span>
+<span class="c1">#&gt; 16 Rattus norvegicus               brown rat, Norway rat, rat, rats             </span>
+<span class="c1">#&gt; 17 Saccharomyces cerevisiae        baker&#39;s yeast, brewer&#39;s yeast, S. cerevisiae</span>
+<span class="c1">#&gt; 18 Schizosaccharomyces pombe 972h- NA                                           </span>
+<span class="c1">#&gt; 19 Sus scrofa                      pig, pigs, swine, wild boar                  </span>
+<span class="c1">#&gt; 20 Xenopus tropicalis              tropical clawed frog, western clawed frog</span>
+</code></pre></div>
 <h2 id="code-for-barplots-with-ggplot2">Code for barplots with ggplot2</h2>
 <p>Barplot of the 10 most significant gene sets:</p>
 <p><div class="highlight"><pre><span></span><code><span class="nf">library</span><span class="p">(</span><span class="n">tidyverse</span><span class="p">)</span>
