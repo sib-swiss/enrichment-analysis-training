@@ -2,7 +2,7 @@
 
 Slides of lectures:
 
-[Download slides](assets/pdf/EA_062022_TW_ad.pdf){: .md-button }
+[Download slides](assets/pdf/EA_slides.pdf){: .md-button }
 
 <!-- [Download part 2](assets/pdf/EA_122021_ID.PDF){: .md-button } -->
 
