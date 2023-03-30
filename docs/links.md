@@ -57,4 +57,7 @@ for [Drosophila](https://bioconductor.org/packages/release/data/annotation/html/
 
 For fungi, [FungiDB](https://fungidb.org/fungidb/app/search/pathway/PathwaysByGeneList) provides identification of metabolic pathways based on list of genes
 
+PlantGSAD: a gene set database for plants [https://academic.oup.com/nar/article/50/D1/D1456/6371972?login=true](https://academic.oup.com/nar/article/50/D1/D1456/6371972?login=true)
+
 Eventually this repository by [Zhang et al](https://bmcbioinformatics.biomedcentral.com/articles/10.1186/s12859-020-3408-y)
+
