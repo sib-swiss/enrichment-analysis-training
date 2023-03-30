@@ -562,8 +562,8 @@ found in your RNA seq dataset. Check how many genes in the RNA-seq data set are 
 <span class="c1"># not_in_set 1753    16344</span>
 
 <span class="c1"># Compare the proportions: </span>
-<span class="m">142</span><span class="o">/</span><span class="m">1753</span>
-<span class="m">289</span><span class="o">/</span><span class="m">16344</span>
+<span class="m">142</span><span class="o">/</span><span class="p">(</span><span class="m">142+1753</span><span class="p">)</span>
+<span class="m">289</span><span class="o">/</span><span class="p">(</span><span class="m">289+16344</span><span class="p">)</span>
 
 <span class="c1"># Run fisher test:</span>
 <span class="nf">fisher.test</span><span class="p">(</span><span class="n">cont.table</span><span class="p">)</span>
@@ -648,7 +648,7 @@ Therefore, first check whether the way the genes are labeled is supported by clu
                 <span class="n">OrgDb</span> <span class="o">=</span> <span class="n">org.Hs.eg.db</span><span class="p">,</span>
                 <span class="n">keyType</span> <span class="o">=</span> <span class="s">&quot;SYMBOL&quot;</span><span class="p">,</span>
                 <span class="n">minGSSize</span><span class="o">=</span><span class="m">30</span><span class="p">,</span>
-                <span class="n">eps</span><span class="o">=</span><span class="m">1e-50</span><span class="p">,</span>  <span class="c1"># or try using eps=0</span>
+                <span class="n">eps</span><span class="o">=</span><span class="m">0</span><span class="p">,</span>
                 <span class="n">seed</span><span class="o">=</span><span class="bp">T</span><span class="p">)</span>
 </code></pre></div>
 <p>Explore the new object that was created. What is its structure? What does it contain? Is the adaptive immune response gene set significant? How many gene sets are down- or up-regulated?</p>
@@ -697,7 +697,8 @@ every gene set.</p>
 <span class="n">GO_enrich</span><span class="o">&lt;-</span><span class="nf">enrichGO</span><span class="p">(</span><span class="n">gene</span><span class="o">=</span><span class="n">nk_up_genes</span><span class="p">,</span>
                     <span class="n">OrgDb</span> <span class="o">=</span> <span class="n">org.Hs.eg.db</span><span class="p">,</span>
                     <span class="n">keyType</span> <span class="o">=</span> <span class="s">&quot;SYMBOL&quot;</span><span class="p">,</span>
-                    <span class="n">maxGSSize</span> <span class="o">=</span> <span class="m">30</span><span class="p">)</span>
+                    <span class="n">maxGSSize</span> <span class="o">=</span> <span class="m">30</span><span class="p">)</span> <span class="c1">#</span>
+                    <span class="c1"># universe=NK_vs_Th$symbol) # will bug with barplot() if used</span>
 <span class="nf">View</span><span class="p">(</span><span class="n">GO_enrich</span><span class="o">@</span><span class="n">result</span><span class="p">)</span>
 
 <span class="nf">class</span><span class="p">(</span><span class="n">GO_enrich</span><span class="p">)</span>
@@ -816,7 +817,7 @@ For GSEA of the KEGG gene sets, the gene IDs have to be NCBI Entrez gene IDs. Cl
 <span class="c1"># run GSEA of KEGG:</span>
 <span class="n">KEGG_NK_Th</span><span class="o">&lt;-</span><span class="nf">gseKEGG</span><span class="p">(</span><span class="n">gl_kegg_list</span><span class="p">,</span> <span class="n">organism</span> <span class="o">=</span> <span class="s">&quot;hsa&quot;</span><span class="p">,</span> <span class="s">&quot;ncbi-geneid&quot;</span><span class="p">,</span>
                     <span class="n">minGSSize</span> <span class="o">=</span> <span class="m">30</span><span class="p">,</span>
-                    <span class="n">eps</span><span class="o">=</span><span class="m">1e-50</span><span class="p">,</span> <span class="c1"># or try with eps=0</span>
+                    <span class="n">eps</span><span class="o">=</span><span class="m">0</span><span class="p">,</span>
                     <span class="n">seed</span><span class="o">=</span><span class="bp">T</span><span class="p">)</span>
 </code></pre></div>
 Explore the new object that was created. What is its structure? What does it contain? How many gene sets are up-regulated? Is their an immune-related gene set significant?
@@ -878,7 +879,7 @@ vector of t-statistics we used above with gseGO(). Why do we use this one and no
 <span class="c1"># Run GSEA with the function that allows to use custom gene sets, </span>
 <span class="c1"># provide the named vector of t statistics</span>
 <span class="n">h_NK_vs_Th</span><span class="o">&lt;-</span><span class="nf">GSEA</span><span class="p">(</span><span class="n">gl</span><span class="p">,</span> <span class="n">TERM2GENE</span> <span class="o">=</span> <span class="n">term2gene_h</span><span class="p">,</span>
-                <span class="n">eps</span><span class="o">=</span><span class="m">1e-50</span><span class="p">,</span> <span class="c1"># or try eps=0</span>
+                <span class="n">eps</span><span class="o">=</span><span class="m">0</span><span class="p">,</span>
                 <span class="n">seed</span><span class="o">=</span><span class="bp">T</span><span class="p">)</span>
 
 <span class="nf">View</span><span class="p">(</span><span class="n">h_NK_vs_Th</span><span class="o">@</span><span class="n">result</span><span class="p">)</span>
@@ -900,7 +901,7 @@ vector of t-statistics we used above with gseGO(). Why do we use this one and no
 <h2 id="extra-exercise-for-ects-credits">Extra exercise for ECTS credits</h2>
 <ul>
 <li>Perform GSEA of the NK vs Th data using the Reactome gene sets downloaded from the 
-MSigDB website <a href="http://www.gsea-msigdb.org/gsea/msigdb/download_file.jsp?filePath=/msigdb/release/7.5.1/c2.cp.reactome.v7.5.1.symbols.gmt">here</a>.</li>
+MSigDB website <a href="http://www.gsea-msigdb.org/gsea/msigdb/download_file.jsp?filePath=/msigdb/release/2023.1.Hs/c2.cp.reactome.v2023.1.Hs.symbols.gmt">here</a>.</li>
 <li>How many gene sets are significantly enriched? Generate an ordered barplot of the NES of all genesets, and generate a barcode plot for the gene set with the lowest NES</li>
 </ul>
 <p>Steps</p>
