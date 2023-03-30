@@ -154,8 +154,8 @@ Finally, use the fisher.test() function to determine whether the adaptive immune
     # not_in_set 1753    16344
     
     # Compare the proportions: 
-    142/1753
-    289/16344
+    142/(142+1753)
+    289/(289+16344)
 
     # Run fisher test:
     fisher.test(cont.table)
@@ -259,7 +259,7 @@ GO_NK_Th<-gseGO(gl, ont="BP",
                 OrgDb = org.Hs.eg.db,
                 keyType = "SYMBOL",
                 minGSSize=30,
-                eps=1e-50,  # or try using eps=0
+                eps=0,
                 seed=T)
 ```
 
@@ -320,7 +320,8 @@ nk_up_genes<-subset(NK_vs_Th, NK_vs_Th$logFC>0&NK_vs_Th$p.adj<=0.05)$symbol
 GO_enrich<-enrichGO(gene=nk_up_genes,
                     OrgDb = org.Hs.eg.db,
                     keyType = "SYMBOL",
-                    maxGSSize = 30)
+                    maxGSSize = 30) #
+                    # universe=NK_vs_Th$symbol) # will bug with barplot() if used
 View(GO_enrich@result)
 
 class(GO_enrich)
@@ -476,7 +477,7 @@ gl_kegg_list<-sort(gl_kegg_list, decreasing = T)
 # run GSEA of KEGG:
 KEGG_NK_Th<-gseKEGG(gl_kegg_list, organism = "hsa", "ncbi-geneid",
                     minGSSize = 30,
-                    eps=1e-50, # or try with eps=0
+                    eps=0,
                     seed=T)
 ```
 Explore the new object that was created. What is its structure? What does it contain? How many gene sets are up-regulated? Is their an immune-related gene set significant?
@@ -549,7 +550,7 @@ length(unique(term2gene_h$term))
 # Run GSEA with the function that allows to use custom gene sets, 
 # provide the named vector of t statistics
 h_NK_vs_Th<-GSEA(gl, TERM2GENE = term2gene_h,
-                eps=1e-50, # or try eps=0
+                eps=0,
                 seed=T)
 
 View(h_NK_vs_Th@result)
@@ -577,7 +578,7 @@ Thanks for attending this course! Don't forget to give honest feedback via the l
 
 ## Extra exercise for ECTS credits
 - Perform GSEA of the NK vs Th data using the Reactome gene sets downloaded from the 
-MSigDB website [here](http://www.gsea-msigdb.org/gsea/msigdb/download_file.jsp?filePath=/msigdb/release/7.5.1/c2.cp.reactome.v7.5.1.symbols.gmt).
+MSigDB website [here](http://www.gsea-msigdb.org/gsea/msigdb/download_file.jsp?filePath=/msigdb/release/2023.1.Hs/c2.cp.reactome.v2023.1.Hs.symbols.gmt).
 - How many gene sets are significantly enriched? Generate an ordered barplot of the NES of all genesets, and generate a barcode plot for the gene set with the lowest NES
 
 Steps
