@@ -303,6 +303,10 @@ deseq2_NK_vs_Th[grep("GZMB", rownames(deseq2_NK_vs_Th)),]
 
 ```
 
+## Small information on a typical RNAseq workflow
+
+[Download pdf](assets/pdf/brief_RNAseq_workflow.pdf){: .md-button }
+
 
 
 
