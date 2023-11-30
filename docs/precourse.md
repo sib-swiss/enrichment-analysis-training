@@ -29,8 +29,5 @@ install.packages("ggnewscale")
 
 install.packages("ggridges")
 install.packages("tidyverse")
-
-
-
 ```
 

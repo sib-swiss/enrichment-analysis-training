@@ -11,7 +11,7 @@ Before starting the exercises, set the working directory to where you have downl
 and load the necessary packages. Also, set the seed so that results are replicable.
 
 !!! warning
-    When using setwd(), change the path within quotes to where you have saved the data for the exercises
+    When using `setwd()`, change the path within quotes to where you have saved the data for the exercises
 
 
 ```r
@@ -22,7 +22,12 @@ library(clusterProfiler)
 library(enrichplot)
 library(pathview)
 library(org.Hs.eg.db)
-library(tidyverse)
+library(ggplot2)
+library(ggrepel)
+library(msigdbr)
+
+library(tidyverse) # for bonus code/dplyr/pipe
+
 
 # set seed
 set.seed(1234)
@@ -53,9 +58,6 @@ adjustment for any list of p-values. Look at the help of the function and try to
 ```r
 ?p.adjust
 ```
-
-
-
 
 We can compare the raw p-value and adjusted p-value for any gene. Raw p-values that are close to 0.05 will often become higher than 0.05 after adjustment,
 while very small p-values more likely remain below 0.05 after adjustment. Search for 2 genes in the data.frame, CPS1 and GZMB, and verify the effect of adjustment on their p-values. Are both genes still significant after adjustment?
@@ -117,8 +119,7 @@ Next, build a contingency table that has the following format:
 |  Not in gene set 	|      #       |        #       | 
 
 
-
-Finally, use the fisher.test() function to determine whether the adaptive immune response is over-represented among the genes up-regulated in Th cells. If you don't know how to use the fisher.test() function, remember to use the help:
+Finally, use the `fisher.test()` function to determine whether the adaptive immune response is over-represented among the genes up-regulated in Th cells. If you don't know how to use the `fisher.test() function, remember to use the help:
 
 ```r
 ?fisher.test()
@@ -171,9 +172,7 @@ Finally, use the fisher.test() function to determine whether the adaptive immune
 
     ```
 
-
-
-**Bonus**  In case you wish to run an over-representation analysis for several gene sets at once, instead of running several independent Fisher tests, you can use the enricher() function of the clusterProfiler package. This function allows you to perform an over-representation analysis of several gene sets at once, using an implementation of the hypergeometric test (a one-sided Fisher's exact test).
+In case you wish to run an over-representation analysis for several gene sets at once, instead of running several independent Fisher tests, you can use the `enricher()` function of the clusterProfiler package. This function allows you to perform an over-representation analysis of several gene sets at once, using an implementation of the hypergeometric test (a one-sided Fisher's exact test).
 Check out the help of the function: What arguments do you need to provide? 
 
 Determine whether the genes up-regulated in NK cells are over-represented in 3 gene sets: the adaptive immune response gene set used above, another related to cell activation, and one un-related to immune cells (hair cell differentiation).
@@ -206,9 +205,6 @@ View(hyper_3genesets@result)
 
 ```
 
-
-
-
 **Bonus** How would you represent the over-representation result for the adaptive immune response? An option might be a volcano plot coloring genes that are part of the gene set 
 and significant using [ggplot2](https://ggplot2.tidyverse.org/).
 
@@ -230,11 +226,16 @@ ggplot(NK_vs_Th, aes(x = logFC,  #
                         max.overlaps = 20) +
         geom_point(data=sig_genes, col="dodgerblue2") +
         theme(legend.position = "none") +
-        scale_x_continuous(name = "log2(fold change) NK vs Th cells") +
-        scale_y_continuous(name = "-log10 p-value") +
+        scale_x_continuous(name = expression("log"[2]*"(fold change), NK vs Th cells")) +
+        scale_y_continuous(name = expression("-"*"log"[10]*"(adj. p-value)")) +
         geom_hline(yintercept = -log10(0.05), linetype="dashed") +
         geom_vline(xintercept = 0, linetype="dashed")
 ```
+
+  <figure>
+  <img src="../assets/images/bonus_volcano.png" width="700"/>
+  </figure>
+
 
 ## Exercise 2 - Gene set enrichment analysis (GSEA)
 
@@ -273,15 +274,16 @@ Explore the new object that was created. What is its structure? What does it con
 	
 		GO_NK_Th@result[GO_NK_Th@result$Description=="adaptive immune response",]
 		summary(GO_NK_Th@result$p.adjust<0.05&GO_NK_Th@result$NES<0)
-    # Mode   FALSE    TRUE 
-    # logical    271      65 
-    summary(GO_NK_Th@result$p.adjust<0.05&GO_NK_Th@result$NES>0)
-    #     Mode   FALSE    TRUE 
-    # logical      65     271 
+      # Mode     FALSE    TRUE 
+      # logical    290      61
+      
+      summary(GO_NK_Th@result$p.adjust<0.05&GO_NK_Th@result$NES>0)
+      #     Mode   FALSE    TRUE 
+      # logical       61     290 
 
 	```
 
-Among the results, some gene sets seem to be a bit redundant based on the genes they contain (column "core_enrichment"). We can simplify the results by using the simplify() function of the clusterProfiler package:
+Among the results, some gene sets seem to be a bit redundant based on the genes they contain (column "core_enrichment"). We can simplify the results by using the `simplify()` function of the clusterProfiler package:
 
 ```r
 # Simplify:
@@ -292,8 +294,9 @@ GO_NK_Th_simplify@result[GO_NK_Th_simplify@result$Description=="adaptive immune 
 
 ```
 Finally, you can export the results to a csv file, if you would want to summarize the results using [Revigo](http://revigo.irb.hr/) for example (see later in course).
-To obtain the list of leading edge genes, split the corresponding column in the @result slot on the based on the slash. And if you want to obtain a full list
-of genes belonging to a particular GO term, this information is also stored in the @geneSets slot.
+To obtain the list of leading edge genes, split the corresponding column in the `@result` by using the slash. And if you want to obtain a full list
+of genes belonging to a particular GO term, this information is also stored in the `@geneSets` slot.
+
 ```r
 # Export results
 write.csv(GO_NK_Th@result, "GO_GSEA_NK_vs_Th.csv",
@@ -321,11 +324,18 @@ GO_enrich<-enrichGO(gene=nk_up_genes,
                     OrgDb = org.Hs.eg.db,
                     keyType = "SYMBOL",
                     maxGSSize = 30) #
-                    # universe=NK_vs_Th$symbol) # will bug with barplot() if used
+                    universe=NK_vs_Th$symbol) # may bug with barplot below if universe is added, depending on version
 View(GO_enrich@result)
 
+# Check the class of the objects created:
 class(GO_enrich)
+# [1] "enrichResult"
+# attr(,"package")
+# [1] "DOSE"
 class(GO_NK_Th)
+# [1] "gseaResult"
+# attr(,"package")
+# [1] "DOSE"
 
 ```
 
@@ -333,7 +343,6 @@ This method can also be used if you have a list of genes involved in a disease, 
 
 
 ## Exercise 3 - Visualization of enrichment results
-
 
 Once we have performed a GSEA or over-representation analysis, we need of course to show the results and prepare figures for a publication. Several visualizations are possible.
 The first option is a barplot. It can be a barplot of p-values of top over-represented GO terms. P-values are usually -log<sub>10</sub>-transformed, so that the very small p-values are emphasized compared to p-values that are closer to 0.05. The barplot() function comes from the graphics package. 
@@ -374,8 +383,13 @@ With results of an over-representation analysis, where the output is of class "e
 ```r
 # Use the GO_enrich analysis performed above, of the over-representation analysis 
 # of genes up-regulated in NK cells:
-# Barplot on enrichResult object:
+# barplot() can be directly used on enrichResult objects: but not on gseaResult objects
 graphics::barplot(GO_enrich)
+graphics::barplot(GO_enrich, color = "qvalue", x = "GeneRatio")
+
+graphics::barplot(GO_NK_Th) # this is a gseaResult object
+# Error in barplot.default(GO_NK_Th) : 
+# 'height' must be a vector or a matrix
 
 # Select only 2 out of the significant gene sets:
 ego_selection = GO_enrich[GO_enrich$ID == "GO:0019864" | GO_enrich$ID == "GO:0045159", asis=T]
@@ -385,10 +399,7 @@ graphics::barplot(ego_selection)
 
 Here, we used the barplot function of the graphics package, but you can of course use ggplot2 functions. Please see the [Bonus code](https://sib-swiss.github.io/enrichment-analysis-training/bonus_code/) page for examples of barplots with ggplot2 (and tidyverse) functions. 
 
-
-
-A common way to represent the enrichment score of a single gene set after GSEA is the barcode plot, with the gseaplot() function that can be used
-directly on objects of class "gseaResult" (i.e. output by clusterProfiler functions). 
+A common way to represent the enrichment score of a single gene set after GSEA is the barcode plot (i.e gsea plot), with the `gseaplot()` function that can be used directly on objects of class "gseaResult" (i.e. output by clusterProfiler functions). 
 
 ```r
 
@@ -404,6 +415,14 @@ gseaplot(GO_NK_Th, geneSetID = "GO:0002443",
          title="GO:0002443 - leukocyte mediated immunity")
 
 ```
+
+  <figure>
+  <img src="../assets/images/gseaplot1.png" width="700"/>
+  </figure>
+
+  <figure>
+  <img src="../assets/images/gseaplot2.png" width="700"/>
+  </figure>
 
 
 Finally, clusterProfiler provides several visualization methods that can be used directly on objects of class "gseaResult" or "enrichResult. These functions are implemented in the enrichplot package that was developped to go with clusterProfiler. Examples are the dotplot, the gene-concept network (cnetplot), the enrichment map (emapplot) and the ridge plots.
@@ -441,7 +460,7 @@ ridgeplot(GO_NK_Th_selection)
 ```
 
 
-## Exercise 4 (the last one :sun_with_face: :scientist_tone3:) - Enrichment of other collections of gene sets
+## Exercise 4 (the last one!) - Enrichment of other collections of gene sets
 
 We will now perform GSEA of other collections of gene sets, such as KEGG or Hallmark.
 For GSEA of the KEGG gene sets, the gene IDs have to be NCBI Entrez gene IDs. ClusterProfiler provides the bitr() function to convert gene label types.
@@ -480,6 +499,7 @@ KEGG_NK_Th<-gseKEGG(gl_kegg_list, organism = "hsa", "ncbi-geneid",
                     eps=0,
                     seed=T)
 ```
+
 Explore the new object that was created. What is its structure? What does it contain? How many gene sets are up-regulated? Is their an immune-related gene set significant?
 Because we had NK cells in our dataset, is the [NK cell-mediated cytotoxicity](https://www.genome.jp/pathway/hsa04650) KEGG gene set significant? What is the total number of built-in
 KEGG gene sets and how can you view the genes included in a particular gene set?
@@ -518,40 +538,47 @@ NK_vs_Th$logFC_0<-ifelse(NK_vs_Th$p.adj>0.05, 0, NK_vs_Th$logFC)
 genePW<-NK_vs_Th$logFC_0
 names(genePW)<-NK_vs_Th$symbol
 
-# create pathview map of Natural killer cell mediated cytotoxicity = hsa04650
+# Create pathview map for Ribosome = hsa03010
+pathview(gene.data  = genePW,
+         pathway.id = "hsa03010",
+         species    = "hsa",
+         gene.idtype = "SYMBOL")
+
+# Create pathview map of Natural killer cell mediated cytotoxicity = hsa04650
 pathview(gene.data  = genePW,
          pathway.id = "hsa04650",
          species    = "hsa",
          gene.idtype = "SYMBOL")
 
-# pathview map for Ribosome = hsa03010
-pathview(gene.data  = genePW,
-         pathway.id = "hsa03010",
-         species    = "hsa",
-         gene.idtype = "SYMBOL")
+
 ```
 
+  <figure>
+  <img src="../assets/images/hsa04650.pathview.png" width="700"/>
+  </figure>
 
-Very often, researchers have their own gene sets in mind, either that they compiled from the literature, or that they defined from
-previous experiments. If this is the case for your experiment, you can generate an Excel file that contains one gene set per row, the 2 first columns
-contain the gene set ID and the gene set description, and the genes that belong to each gene set are listed in the next columns. To have an idea of
-the structure of this file, open the .gmt file that we provided using Excel or a Text editor.
 
-In this exercise, we will perform a GSEA of the 50 hallmark gene sets that can be downloaded from [MSigDB](http://www.gsea-msigdb.org/gsea/downloads.jsp).
-Import the Hallmark gene sets using read.gmt(). What is the format of the object that is created? Use the GSEA() function, by providing the named and sorted
+Very often, researchers have their own gene sets in mind, either that they compiled from the literature, or that they defined from previous experiments. If this is the case for your experiment, you can generate an Excel file that contains one gene set per row, the 2 first columns contain the gene set ID and the gene set description, and the genes that belong to each gene set are listed in the next columns. To have an idea of
+the structure of this file, open the .gmt file that we provided using Excel or a Text editor (NotePad, TextWrangler, BBEdit, etc).
+
+In this exercise, we will perform a GSEA of the 50 hallmark gene sets that can be downloaded from [MSigDB](http://www.gsea-msigdb.org/gsea/downloads.jsp), which we can import using `clusterProfiler::read.gmt()`. 
+Alternatively, we can import the Hallmark gene sets using `msigdbr`. What is the format of the object that is created? Use the GSEA() function, by providing the named and sorted
 vector of t-statistics we used above with gseGO(). Why do we use this one and not the one created for gseKEGG()?
 
 ```r
 # Import hallmark, convert to term2gene and run GSEA:
-term2gene_h<-read.gmt("data/h.all.v7.1.symbols.gmt")
+term2gene_h <- msigdbr(species = "Homo sapiens", category = "H")
+# Or alternatively:
+# term2gene_h<-read.gmt("h.all.v2023.2.Hs.symbols.gmt")
+
 head(term2gene_h)
-length(unique(term2gene_h$term))
+length(unique(term2gene_h$gs_name)) # 50
 
 # Run GSEA with the function that allows to use custom gene sets, 
 # provide the named vector of t statistics
-h_NK_vs_Th<-GSEA(gl, TERM2GENE = term2gene_h,
-                eps=0,
-                seed=T)
+h_NK_vs_Th<-GSEA(gl, TERM2GENE = term2gene_h[,c("gs_name", "gene_symbol")],
+                 eps=0,
+                 seed=T)
 
 View(h_NK_vs_Th@result)
 
@@ -572,30 +599,23 @@ gseaplot2(h_NK_vs_Th, geneSetID = "HALLMARK_MTORC1_SIGNALING",
 ```
 
 
-## Feedback :sparkle:
+## Feedback
 Thanks for attending this course! Don't forget to give honest feedback via the link sent by the course organizer.
 
 
 ## Extra exercise for ECTS credits
-- Perform GSEA of the NK vs Th data using the Reactome gene sets downloaded from the 
+- Perform GSEA of the NK vs Th data using the Reactome gene sets either downloaded using the `msigdbr`  packege or downloaded from the 
 MSigDB website [here](http://www.gsea-msigdb.org/gsea/msigdb/download_file.jsp?filePath=/msigdb/release/2023.1.Hs/c2.cp.reactome.v2023.1.Hs.symbols.gmt).
-- How many gene sets are significantly enriched? Generate an ordered barplot of the NES of all genesets, and generate a barcode plot for the gene set with the lowest NES
+* How many gene sets are significantly enriched?  
+* Generate a barplot of the NES of all significant gene sets, with the bars ordered according to NES value.  
+* Generate a barcode plot (i.e. gsea plot) for the gene set with the lowest NES.  
 
-Steps
+**Steps**
 
-- Import the reactome gene sets of the file c2.cp.reactome.v7.5.1.symbols.gmt using read.gmt()
-
-- Use the GSEA function providing a sorted named vector of t-statistics and the reactome gene sets, use minGSSize=30
-
-- Count the number of significant adjusted p-values
-
-- Use barplot() and gseaplot() for the visualization of the results
-
-
-
-
-
-
+* Import the reactome gene sets using `msigdbr()` with arguments `category="C2"` and `subcategory="CP:REACTOME"`, or import from the provided file `c2.cp.reactome.v2023.1.Hs.symbols.gmt` using `read.gmt()`.  
+* Use the `GSEA()` function providing a sorted named vector of t-statistics and the reactome gene sets, and use argument `minGSSize=30`.  
+* Count the number of significant adjusted p-values.  
+* Use `barplot()` and `gseaplot()` for the visualization of the results.  
 
 
 

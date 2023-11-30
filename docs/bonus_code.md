@@ -1,4 +1,4 @@
-## **Bonus code** :champagne_glass:
+## **Bonus code**
 
 The following code was added thanks to questions from course participants of past sessions. They might be useful for you too.
 
@@ -114,7 +114,6 @@ msigdbr_species()
 
 ```
 
-
 ## Code for barplots with ggplot2
 
 Barplot of the 10 most significant gene sets:
@@ -229,9 +228,12 @@ You will obtain the following heatmap:
   </figure>
 
 
+## Small information on a typical RNAseq workflow
+
+[Download pdf](assets/pdf/brief_RNAseq_workflow.pdf){: .md-button }
+
 
 ## Example for DE analysis with DESeq2
-
 
 [Download data](assets/exercises/htseq_counts_NK_Th.csv){: .md-button }
 [Download script](assets/exercises/DGE_DESeq2_example.R){: .md-button }
@@ -303,9 +305,6 @@ deseq2_NK_vs_Th[grep("GZMB", rownames(deseq2_NK_vs_Th)),]
 
 ```
 
-## Small information on a typical RNAseq workflow
-
-[Download pdf](assets/pdf/brief_RNAseq_workflow.pdf){: .md-button }
 
 
 
