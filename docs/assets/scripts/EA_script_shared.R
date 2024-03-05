@@ -4,13 +4,13 @@
 #  Tested on R version 4.3.2 (2023-10-31)
 
 # load the packages needed for the R exercise
-library(clusterProfiler) # 4.6.2
-library(enrichplot)
+library(clusterProfiler) #  v 4.10.0
+library(enrichplot) # v 1.22.0
 library(pathview)
-library(org.Hs.eg.db)
+library(org.Hs.eg.db) # v 3.18.0
 library(ggplot2)
 library(ggrepel)
-library(msigdbr)
+library(msigdbr) # v 7.5.1
 
 library(tidyverse) # for bonus code/dplyr/pipe
 
@@ -21,9 +21,8 @@ library(tidyverse) # for bonus code/dplyr/pipe
 ??adjust
 ??stats::adjust
 
-
 # set the working directory to where the data files are located:
-setwd("/export/scratch/twyss/SIB_training/EA_122023/data/")
+setwd()
 # set seed
 set.seed(1234)
 
@@ -50,7 +49,6 @@ NK_vs_Th[which(NK_vs_Th$symbol=="NCAM1"),]
 # Check the effect of p-value adjustment in data.frame:
 NK_vs_Th[which(NK_vs_Th$symbol=="CPS1"),]
 NK_vs_Th[which(NK_vs_Th$symbol=="GZMB"),]
-
 
 # Determine whether the genes up-regulated in Th cells (i.e.down-regulated in NK cells)
 # are enriched in the adaptive immune response gene set:
@@ -93,18 +91,6 @@ summary(Th_not_DE$symbol %in% adaptive$gene)
 # not_in_set    .      .
 
 
-# 1: by hand:
-cont.table<-matrix(c(142, 1753, 289, 16344), ncol=2,byrow = F)
-cont.table
-
-# 2: individual values of table() outputs: 
-cont.table<-matrix(c(unlist(table(Th_up$symbol %in% adaptive$gene))[[2]],
-                     unlist(table(Th_up$symbol %in% adaptive$gene))[[1]], 
-                     unlist(table(Th_not_DE$symbol %in% adaptive$gene))[[2]], 
-                     unlist(table(Th_not_DE$symbol %in% adaptive$gene))[[1]]), 
-                   ncol=2, byrow = F)
-cont.table
-
 # 3: reversed rows of table outputs:
 cont.table<-matrix(c(rev(unlist(table(Th_up$symbol %in% adaptive$gene))), 
                      rev(unlist(table(Th_not_DE$symbol %in% adaptive$gene)))), 
@@ -120,7 +106,6 @@ cont.table
 # not_in_set 1753    16344
 142/(142+1753)
 289/(289+16344)
-
 
 fisher.test(cont.table)
 # Fisher's Exact Test for Count Data
@@ -178,6 +163,13 @@ ggplot(NK_vs_Th, aes(x = logFC,  #
   geom_vline(xintercept = 0, linetype="dashed")
 
 
+## Bonus: over-representation analysis of genes up-regulated in Th cells:
+up_reg_th <- NK_vs_Th$symbol[NK_vs_Th$logFC < 0 & NK_vs_Th$p.adj < 0.05 ]  
+hyper_3genesets_Th<-enricher(gene=up_reg_th,
+                             universe = NK_vs_Th$symbol,
+                             TERM2GENE = genesets3,
+                             maxGSSize = 1000)
+View(hyper_3genesets_Th@result)
 
 # --------------- Exercise 2
 # GSEA: prepare gene symbol-named vector of sorted t-statistics
@@ -209,7 +201,7 @@ View(GO_NK_Th@result)
 GO_NK_Th@result[GO_NK_Th@result$Description=="adaptive immune response",]
 summary(GO_NK_Th@result$p.adjust<0.05&GO_NK_Th@result$NES<0)
 # Mode       FALSE    TRUE 
-# llogical     290      61 
+# logical     290      61 
 summary(GO_NK_Th@result$p.adjust<0.05&GO_NK_Th@result$NES>0)
 #     Mode   FALSE    TRUE 
 # logical       61     290  
@@ -233,7 +225,8 @@ unlist(strsplit(GO_NK_Th@result[GO_NK_Th@result$Description=="adaptive immune re
 # How to obtain the list of all genes included in a GO term:
 GO_NK_Th@geneSets$`GO:0002250`
 
-# Single cell RNA seq: list of significant genes tested against GO gene sets with
+
+# Bonus: Single cell RNA seq: list of significant genes tested against GO gene sets with
 # over-representation analysis:
 
 # ORA of GO:
@@ -251,7 +244,7 @@ range(unlist(lapply(GO_enrich@geneSets, length)))
 class(GO_enrich)
 class(GO_NK_Th)
 
-# Histogram of the length of GO gene sets:
+# Bonus: Histogram of the length of GO gene sets:
 hist(unlist(lapply(GO_NK_Th@geneSets, length)), breaks = c(seq(0,500,by=100),seq(1000,20000,by=1000)), xlab="Length of GO gene sets", main="")
 
 # --------------- Exercise 3: visualization
@@ -260,7 +253,8 @@ hist(unlist(lapply(GO_NK_Th@geneSets, length)), breaks = c(seq(0,500,by=100),seq
 
 par(mar=c(5,15,3,3))
 graphics::barplot(rev(-log10(GO_NK_Th@result$p.adjust[1:10])),
-                  horiz = T, names=rev(GO_NK_Th@result$Description[1:10]),
+                  horiz = T, 
+                  names=rev(GO_NK_Th@result$Description[1:10]),
                   las=2, xlab="-log10(adj.p-value)",
                   cex.names = 0.7,
                   col="lightgreen") 
@@ -322,7 +316,6 @@ p2
 # dplyr::mutate(GO_enrich, qscore = -log(p.adjust, base=10)) %>% 
 #   barplot(x="qscore")
 
-
 # Barcode plot (i.e. gsea plot)
 # You need the ID of the GO gene set to plot:
 GO_NK_Th@result[1:10,1:6]
@@ -333,7 +326,6 @@ gseaplot(GO_NK_Th, geneSetID = "GO:0002181",
 # And one that is up-regulated in NK cells
 gseaplot(GO_NK_Th, geneSetID = "GO:0002443",
          title="GO:0002443 - leukocyte mediated immunity")
-
 
 # Dotplot on enrichResult and gseaResult objects:
 enrichplot::dotplot(GO_enrich, orderBy="p.adjust")
@@ -370,6 +362,49 @@ ridgeplot(GO_NK_Th_selection)
 GO_NK_Th_selection <- GO_NK_Th[grep("leukocyte",GO_NK_Th@result$Description), asis=T]
 ridgeplot(GO_NK_Th_selection)
 ?ridgeplot
+
+# Bonus: lollipop plot of p-values of leukocyte-related GO pathways. The 
+# color will represent up- (red) or down-regulated (blue) gene sets, 
+# the dot size represents the setSize.
+# The length of the gene set description is truncated to 50 characters:
+View(GO_NK_Th_selection@result)
+df <- GO_NK_Th_selection@result
+head(df[,1:8])
+#                    ID                       Description setSize enrichmentScore       NES       pvalue   p.adjust     qvalue
+# GO:0097529 GO:0097529       myeloid leukocyte migration     182       0.3358543  1.459329 0.0060333962 0.04957978 0.03849908
+# GO:0030595 GO:0030595              leukocyte chemotaxis     186       0.3314487  1.446607 0.0057064461 0.04766950 0.03701573
+# GO:0007159 GO:0007159      leukocyte cell-cell adhesion     335       0.2955485  1.381506 0.0037782543 0.03815146 0.02962490
+# GO:0001776 GO:0001776             leukocyte homeostasis      99      -0.3891370 -1.552210 0.0037570540 0.03812616 0.02960525
+# GO:0002685 GO:0002685 regulation of leukocyte migration     185       0.3418586  1.489716 0.0020160142 0.02593948 0.02014220
+# GO:0070661 GO:0070661           leukocyte proliferation     273       0.3247110  1.493837 0.0009132421 0.01545176 0.01199841
+df$mycolor <- ifelse(df$NES<0, "cornflowerblue","indianred2")
+
+df <- df[order(df$pvalue, decreasing = T),] #revert the order of the rows
+df$Label <-stringr::str_trunc(df$Description, 50, "right") #keep max 50 character in a string (nchar("string") to count characters) #if I run this line before cutting the 20 pathways it will give an error due to duplicated factors.
+df$Label <- factor(df$Label, levels = c(df$Label))
+
+# Use limits of the x-axis range according to the range of p.values:
+max_x <- round(max(-log10(df$p.adjust)), digits = 0) + 0.5
+xlimits <- c(0, max_x)
+xbreaks <- seq_along(0:max_x)
+
+# Create the plot:
+p <- ggplot(df, aes(x = Label, y = -log10(p.adjust), fill = mycolor)) +
+  geom_segment(aes(x = Label, xend = Label, y = 0, yend = -log10(p.adjust)),
+               color = df$mycolor, lwd = 1) +
+  geom_point(pch = 21,  bg = df$mycolor, aes(size=df$setSize), color=df$mycolor) + 
+  scale_size(name = "Number\nof genes") + 
+  scale_y_continuous(name=expression("-"*"log"[10]*"(p-value)"), 
+                     limits=xlimits,
+                     breaks=xbreaks) +
+  scale_x_discrete(name="") +
+  theme_bw(base_size=10, base_family = "Helvetica") +
+  theme(axis.text=element_text(size=12, colour = "black"),
+        axis.title=element_text(size=14)) +
+  ggtitle("Leukocyte-related GO pathways") +
+  coord_flip()
+
+p
 
 #### ---- Exercise 4
 
@@ -415,6 +450,9 @@ KEGG_NK_Th<-gseKEGG(gl_kegg_list,
                     minGSSize = 30,
                     eps=0,
                     seed=T)
+# Reading KEGG annotation online: "https://rest.kegg.jp/link/hsa/pathway"...
+# Reading KEGG annotation online: "https://rest.kegg.jp/list/pathway/hsa"...
+# Reading KEGG annotation online: "https://rest.kegg.jp/conv/ncbi-geneid/hsa"...
 
 # Explore the object:
 class(KEGG_NK_Th)
@@ -423,10 +461,16 @@ View(KEGG_NK_Th@result)
 
 # Up-regulated gene sets:
 summary(KEGG_NK_Th@result$NES>0)
+#    Mode   FALSE    TRUE 
+# logical       8      19 
 
 KEGG_NK_Th@result[grep("immune",KEGG_NK_Th@result$Description), ]
 
 KEGG_NK_Th@result[grep("Natural killer",KEGG_NK_Th@result$Description), ]
+#                ID                               Description setSize enrichmentScore     NES       pvalue     p.adjust
+# hsa04650 hsa04650 Natural killer cell mediated cytotoxicity      97        0.614284 2.49564 5.483815e-12 4.825757e-10
+# qvalue rank                   leading_edge
+# hsa04650 3.867532e-10 1873 tags=52%, list=13%, signal=45%
 
 # How many built-in KEGG pathways are there?
 length(KEGG_NK_Th@geneSets)
@@ -456,18 +500,18 @@ pathview(gene.data  = genePW,
          species    = "hsa",
          gene.idtype = "SYMBOL")
 
-
 # Import hallmark, convert to term2gene and run GSEA:
 term2gene_h <- msigdbr(species = "Homo sapiens", category = "H")
 # Or alternatively:
-# term2gene_h<-read.gmt("h.all.v2023.2.Hs.symbols.gmt/h.all.v7.1.symbols.gmt")
+# term2gene_h<-read.gmt("h.all.v2023.2.Hs.symbols.gmt")
 
 head(term2gene_h)
 length(unique(term2gene_h$gs_name)) # 50
 
 # Run GSEA with the function that allows to use custom gene sets, 
 # provide the named vector of t statistics
-h_NK_vs_Th<-GSEA(gl, TERM2GENE = term2gene_h[,c("gs_name", "gene_symbol")],
+h_NK_vs_Th<-GSEA(gl, 
+                 TERM2GENE = term2gene_h[,c("gs_name", "gene_symbol")],
                  eps=0,
                  seed=T)
 
@@ -484,19 +528,59 @@ dotplot(h_NK_vs_Th, x="NES", orderBy="p.adjust")
 gseaplot2(h_NK_vs_Th, geneSetID = "HALLMARK_MTORC1_SIGNALING",
           title="HALLMARK_MTORC1_SIGNALING")
 
-
 ### ---- KEGG with msigdbr download:
 msigdbr_collections() # 
 # C2     "CP:KEGG"      
 kegg_pw<-msigdbr(species = "human", category = "C2", subcategory = "CP:KEGG")
 
 head(kegg_pw[,c("gs_name", "gene_symbol")])
+# # A tibble: 6 × 2
+# gs_name               gene_symbol
+# <chr>                 <chr>      
+#   1 KEGG_ABC_TRANSPORTERS ABCA1      
+# 2 KEGG_ABC_TRANSPORTERS ABCA10     
+# 3 KEGG_ABC_TRANSPORTERS ABCA12     
+# 4 KEGG_ABC_TRANSPORTERS ABCA13     
+# 5 KEGG_ABC_TRANSPORTERS ABCA2      
+# 6 KEGG_ABC_TRANSPORTERS ABCA3      
 
-kegg_gsea<-GSEA(gl, eps = 0,TERM2GENE = kegg_pw[,c("gs_name", "gene_symbol")])
+# Run with GSEA function: 
+kegg_gsea<-GSEA(gl, eps = 0, TERM2GENE = kegg_pw[,c("gs_name", "gene_symbol")], seed = TRUE)
 head(kegg_gsea@result[,c(2:6)])
-kegg_gsea@result[grep("NATURAL_KILLER", kegg_gsea@result$Description),]
-View(kegg_gsea@result)
+#                                                                                   Description setSize enrichmentScore       NES       pvalue
+# KEGG_RIBOSOME                                                                   KEGG_RIBOSOME      86      -0.9016245 -3.534228 9.828038e-49
+# KEGG_NATURAL_KILLER_CELL_MEDIATED_CYTOTOXICITY KEGG_NATURAL_KILLER_CELL_MEDIATED_CYTOTOXICITY     104       0.6183274  2.509621 7.254908e-13
+# KEGG_REGULATION_OF_ACTIN_CYTOSKELETON                   KEGG_REGULATION_OF_ACTIN_CYTOSKELETON     170       0.4547466  1.980859 2.337476e-07
+# KEGG_CHEMOKINE_SIGNALING_PATHWAY                             KEGG_CHEMOKINE_SIGNALING_PATHWAY     161       0.4463380  1.928426 4.354445e-07
+# KEGG_FC_GAMMA_R_MEDIATED_PHAGOCYTOSIS                   KEGG_FC_GAMMA_R_MEDIATED_PHAGOCYTOSIS      87       0.5343886  2.100787 1.599037e-06
+# KEGG_B_CELL_RECEPTOR_SIGNALING_PATHWAY                 KEGG_B_CELL_RECEPTOR_SIGNALING_PATHWAY      70       0.5299578  1.993277 8.000155e-06
 
+kegg_gsea@result[grep("NATURAL_KILLER", kegg_gsea@result$Description), c(2:6)]
+#                                     Description setSize enrichmentScore      NES       pvalue
+#  KEGG_NATURAL_KILLER_CELL_MEDIATED_CYTOTOXICITY     104       0.6183274 2.509621 7.254908e-13
+
+
+### --- Bonus code: msigdbr C5 GO:BP collection for yeast:
+gmt <- msigdbr::msigdbr(species = "Saccharomyces cerevisiae", category = "C5", subcategory = "GO:BP")
+
+# We obtained the GO:BP gene sets, the yeast gene symbols, and yeast ensembl_id:
+head(gmt[,c("gs_name", "gene_symbol", "ensembl_gene")], n=10)
+# A tibble: 10 × 3
+# gs_name                                          gene_symbol ensembl_gene
+# <chr>                                            <chr>       <chr>       
+#   1 GOBP_10_FORMYLTETRAHYDROFOLATE_METABOLIC_PROCESS ADE3        YGR204W     
+# 2 GOBP_10_FORMYLTETRAHYDROFOLATE_METABOLIC_PROCESS ADE3        YGR204W     
+# 3 GOBP_10_FORMYLTETRAHYDROFOLATE_METABOLIC_PROCESS MIS1        YBR084W     
+# 4 GOBP_2FE_2S_CLUSTER_ASSEMBLY                     BOL2        YGL220W     
+# 5 GOBP_2FE_2S_CLUSTER_ASSEMBLY                     GRX4        YER174C     
+# 6 GOBP_2FE_2S_CLUSTER_ASSEMBLY                     GRX5        YPL059W     
+# 7 GOBP_2FE_2S_CLUSTER_ASSEMBLY                     JAC1        YGL018C     
+# 8 GOBP_2FE_2S_CLUSTER_ASSEMBLY                     NFS1        YCL017C     
+# 9 GOBP_2_OXOGLUTARATE_METABOLIC_PROCESS            ARO8        YGL202W     
+# 10 GOBP_2_OXOGLUTARATE_METABOLIC_PROCESS            ADH4        YGL256W    
+
+# If your DE genes are also labeled with gene symbol, create the 2 column-format (TERM2GENE argument) required by clusterProfiler for the GSEA() function for example:
+y_gmt <- gmt[,c("gs_name", "gene_symbol")]
 
 ###### --- Bonus code: Conversion with biomaRt
 BiocManager::install("biomaRt")
@@ -545,7 +629,7 @@ head(ensembl_human_to_mouse)
 # 6 ENSG00000000938                FGR                                    Fgr
 
 
-# code for p-value heatmap using ggplot2:
+# Bonus code: for p-value heatmap using ggplot2:
 
 # Create a data frame that contains the p-value for every gene set for every 
 # cell type comparison. You need to include the values also for the non-significant
@@ -603,7 +687,6 @@ ggsave(plot = p, filename = "heatmap_p_value_ORA.png",
 
 
 
-
 #### ---- Extra exercise for credits
 # - Perform GSEA of the NK vs Th data using the Reactome gene sets downloaded on the 
 # MSigDB website.
@@ -618,4 +701,12 @@ ggsave(plot = p, filename = "heatmap_p_value_ORA.png",
 # file "reactomeGSEA_NK_vs_Th_results.rds"
 # - count the number of significant adjusted p-values
 # - use barplot() and gseaplot() for the visualization of the results
+
+
+
+
+
+
+
+
 

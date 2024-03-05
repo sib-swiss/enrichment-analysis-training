@@ -5,7 +5,6 @@ The following code was added thanks to questions from course participants of pas
 
 ## Gene label conversions
 
-
 It is often useful to convert different types of gene labels even further. Here is an example for gene label conversion 
 and gene information extraction using [biomaRt](https://bioconductor.org/packages/release/bioc/html/biomaRt.html). A lot of information for each gene can be obtained, such as chromosome location,
 description, biotype, or the symbols of mouse homologs of human genes, etc.
@@ -72,7 +71,7 @@ head(ensembl_human_to_mouse)
 
 ## msigdbr package
 
-The [msigdbr](https://cran.r-project.org/web/packages/msigdbr/index.html) package hosted on CRAN allows to access gene set collections hosted on MSigDB directly within R. Check out its vignette to view how to download collections for other species such as mouse, etc. The function ```msigdbr_species()``` allows you to list available species. 
+The [msigdbr](https://cran.r-project.org/web/packages/msigdbr/index.html) package hosted on CRAN allows to access gene set collections hosted on MSigDB directly within R. Check out its vignette to view how to download collections for other species such as mouse, zebra fish, horse, etc. The function ```msigdbr_species()``` allows you to list available species. 
 
 For example, to download the Hallmark collection with human gene symbols within R:
 ```r
@@ -111,8 +110,96 @@ msigdbr_species()
 #> 19 Sus scrofa                      pig, pigs, swine, wild boar                  
 #> 20 Xenopus tropicalis              tropical clawed frog, western clawed frog
 
+```
+
+For example, we can download the Gene Ontology Biological Process (GO:BP) collection with yeast gene symbols. To first check the available collections with msigdbr, use ``msigdbr_collections()```. 
+
+```r
+print(msigdbr_collections(), n=20)
+# A tibble: 23 × 3
+#    gs_cat gs_subcat         num_genesets
+#    <chr>  <chr>                    <int>
+#  1 C1     ""                         299
+#  2 C2     "CGP"                     3384
+#  3 C2     "CP"                        29
+#  4 C2     "CP:BIOCARTA"              292
+#  5 C2     "CP:KEGG"                  186
+#  6 C2     "CP:PID"                   196
+#  7 C2     "CP:REACTOME"             1615
+#  8 C2     "CP:WIKIPATHWAYS"          664
+#  9 C3     "MIR:MIRDB"               2377
+# 10 C3     "MIR:MIR_Legacy"           221
+# 11 C3     "TFT:GTRD"                 518
+# 12 C3     "TFT:TFT_Legacy"           610
+# 13 C4     "CGN"                      427
+# 14 C4     "CM"                       431
+# 15 C5     "GO:BP"                   7658
+# 16 C5     "GO:CC"                   1006
+# 17 C5     "GO:MF"                   1738
+# 18 C5     "HPO"                     5071
+# 19 C6     ""                         189
+# 20 C7     "IMMUNESIGDB"             4872
+
+# Obtain the C5 category and GO:BP subcategory for yeast:
+
+gmt <- msigdbr::msigdbr(species = "Saccharomyces cerevisiae", category = "C5", subcategory = "GO:BP")
+
+# We obtained the GO:BP gene sets, the yeast gene symbols, and yeast ensembl_id:
+head(gmt[,c("gs_name", "gene_symbol", "ensembl_gene")], n=10)
+# A tibble: 10 × 3
+# gs_name                                          gene_symbol ensembl_gene
+# <chr>                                            <chr>       <chr>       
+#   1 GOBP_10_FORMYLTETRAHYDROFOLATE_METABOLIC_PROCESS ADE3        YGR204W     
+# 2 GOBP_10_FORMYLTETRAHYDROFOLATE_METABOLIC_PROCESS ADE3        YGR204W     
+# 3 GOBP_10_FORMYLTETRAHYDROFOLATE_METABOLIC_PROCESS MIS1        YBR084W     
+# 4 GOBP_2FE_2S_CLUSTER_ASSEMBLY                     BOL2        YGL220W     
+# 5 GOBP_2FE_2S_CLUSTER_ASSEMBLY                     GRX4        YER174C     
+# 6 GOBP_2FE_2S_CLUSTER_ASSEMBLY                     GRX5        YPL059W     
+# 7 GOBP_2FE_2S_CLUSTER_ASSEMBLY                     JAC1        YGL018C     
+# 8 GOBP_2FE_2S_CLUSTER_ASSEMBLY                     NFS1        YCL017C     
+# 9 GOBP_2_OXOGLUTARATE_METABOLIC_PROCESS            ARO8        YGL202W     
+# 10 GOBP_2_OXOGLUTARATE_METABOLIC_PROCESS            ADH4        YGL256W    
+
+# If your DE genes are also labeled with gene symbol, create the 2 column-format (TERM2GENE argument) required by clusterProfiler for the GSEA() function for example:
+y_gmt <- gmt[,c("gs_name", "gene_symbol")]
 
 ```
+
+We can also use the msigdbr package to download the KEGG collection, in case the ```gseKEGG()``` function of the clusterProfiler package is blocked by firewall issues.
+
+```r
+### ---- KEGG with msigdbr download:
+msigdbr_collections() # 
+# C2     "CP:KEGG"      
+kegg_pw<-msigdbr(species = "human", category = "C2", subcategory = "CP:KEGG")
+
+head(kegg_pw[,c("gs_name", "gene_symbol")])
+# # A tibble: 6 × 2
+# gs_name               gene_symbol
+# <chr>                 <chr>      
+#   1 KEGG_ABC_TRANSPORTERS ABCA1      
+# 2 KEGG_ABC_TRANSPORTERS ABCA10     
+# 3 KEGG_ABC_TRANSPORTERS ABCA12     
+# 4 KEGG_ABC_TRANSPORTERS ABCA13     
+# 5 KEGG_ABC_TRANSPORTERS ABCA2      
+# 6 KEGG_ABC_TRANSPORTERS ABCA3      
+
+# Run with GSEA function: 
+kegg_gsea<-GSEA(gl, eps = 0, TERM2GENE = kegg_pw[,c("gs_name", "gene_symbol")], seed = TRUE)
+head(kegg_gsea@result[,c(2:6)])
+#                                                                                   Description setSize enrichmentScore       NES       pvalue
+# KEGG_RIBOSOME                                                                   KEGG_RIBOSOME      86      -0.9016245 -3.534228 9.828038e-49
+# KEGG_NATURAL_KILLER_CELL_MEDIATED_CYTOTOXICITY KEGG_NATURAL_KILLER_CELL_MEDIATED_CYTOTOXICITY     104       0.6183274  2.509621 7.254908e-13
+# KEGG_REGULATION_OF_ACTIN_CYTOSKELETON                   KEGG_REGULATION_OF_ACTIN_CYTOSKELETON     170       0.4547466  1.980859 2.337476e-07
+# KEGG_CHEMOKINE_SIGNALING_PATHWAY                             KEGG_CHEMOKINE_SIGNALING_PATHWAY     161       0.4463380  1.928426 4.354445e-07
+# KEGG_FC_GAMMA_R_MEDIATED_PHAGOCYTOSIS                   KEGG_FC_GAMMA_R_MEDIATED_PHAGOCYTOSIS      87       0.5343886  2.100787 1.599037e-06
+# KEGG_B_CELL_RECEPTOR_SIGNALING_PATHWAY                 KEGG_B_CELL_RECEPTOR_SIGNALING_PATHWAY      70       0.5299578  1.993277 8.000155e-06
+
+kegg_gsea@result[grep("NATURAL_KILLER", kegg_gsea@result$Description), c(2:6)]
+#                                     Description setSize enrichmentScore      NES       pvalue
+#  KEGG_NATURAL_KILLER_CELL_MEDIATED_CYTOTOXICITY     104       0.6183274 2.509621 7.254908e-13
+```
+
 
 ## Code for barplots with ggplot2
 
@@ -132,7 +219,7 @@ GO_NK_Th@result %>%
 
 ```
   <figure>
-  <img src="../assets/images/barplot_p_value.png" width="300"/>
+  <img src="../assets/images/barplot_p_value.png" width="500"/>
   </figure>
 
 
@@ -151,7 +238,7 @@ sorted_GO_NK_Th %>%
   theme(legend.position = "none")
 ```
   <figure>
-  <img src="../assets/images/barplot_NES.png" width="300"/>
+  <img src="../assets/images/barplot_NES.png" width="700"/>
   </figure>
 
 
@@ -229,8 +316,7 @@ You will obtain the following heatmap:
 
 ## Code for a lollipop plot with ggplot2
 
-In this lollipop of GSEA results of leukocyte-related GO pathways, the color will represent up- (red) or down-regulated (blue) gene sets, the dot size represents the setSize. The length of the gene set description is truncated to 50 characters. We use the GSEA results that we obtained after selecting the leukocyte-related GO pathways at the end of exercise 3
-
+In this lollipop of GSEA results of leukocyte-related GO pathways, the color will represent up- (red) or down-regulated (blue) gene sets, the dot size represents the setSize. The length of the gene set description is truncated to 50 characters. We use the GSEA results that we obtained after selecting the leukocyte-related GO pathways at the end of exercise 3.
 
 ```r
 # Bonus: lollipop plot of p-values of leukocyte-related GO pathways. The 
