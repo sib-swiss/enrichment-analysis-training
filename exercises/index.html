@@ -552,6 +552,7 @@ found in your RNA seq dataset. Check how many genes in the RNA-seq data set are 
 <span class="nf">unlist</span><span class="p">(</span><span class="nf">table</span><span class="p">(</span><span class="n">Th_not_DE</span><span class="o">$</span><span class="n">symbol</span> <span class="o">%in%</span> <span class="n">adaptive</span><span class="o">$</span><span class="n">gene</span><span class="p">))[[</span><span class="m">1</span><span class="p">]]),</span> 
 <span class="n">ncol</span><span class="o">=</span><span class="m">2</span><span class="p">,</span> <span class="n">byrow</span> <span class="o">=</span> <span class="bp">F</span><span class="p">)</span>
 <span class="n">cont.table</span>
+
 <span class="c1"># 3: by using the 2 rows (reversed) of the table() function:</span>
 <span class="n">cont.table</span><span class="o">&lt;-</span><span class="nf">matrix</span><span class="p">(</span><span class="nf">c</span><span class="p">(</span><span class="nf">rev</span><span class="p">(</span><span class="nf">unlist</span><span class="p">(</span><span class="nf">table</span><span class="p">(</span><span class="n">Th_up</span><span class="o">$</span><span class="n">symbol</span> <span class="o">%in%</span> <span class="n">adaptive</span><span class="o">$</span><span class="n">gene</span><span class="p">))),</span> 
 <span class="nf">rev</span><span class="p">(</span><span class="nf">unlist</span><span class="p">(</span><span class="nf">table</span><span class="p">(</span><span class="n">Th_not_DE</span><span class="o">$</span><span class="n">symbol</span> <span class="o">%in%</span> <span class="n">adaptive</span><span class="o">$</span><span class="n">gene</span><span class="p">)))),</span> 
@@ -733,10 +734,14 @@ The first option is a barplot. It can be a barplot of p-values of top over-repre
         <span class="n">col</span><span class="o">=</span><span class="s">&quot;lightgreen&quot;</span><span class="p">)</span> 
 <span class="nf">abline</span><span class="p">(</span><span class="n">v</span><span class="o">=-</span><span class="nf">log10</span><span class="p">(</span><span class="m">0.05</span><span class="p">))</span>
 </code></pre></div>
+<figure>
+  <img src="../assets/images/barplot1.png" width="700"/>
+  </figure>
+
 <p>In publications, we often see barplots of normalized enrichment scores (NES), showing which gene sets are up-regulated and which are down-regulated.</p>
 <p>Now that you know how to use the barplot() function, how would you create a barplot of NES of the top 10 up-regulated and the top 10 down-regulated genes sets,
  with red bars for the up-regulated gene sets and blue bars for the down-regulated gene sets?</p>
-<details class="done"><summary>Answer</summary><div class="highlight"><pre><span></span><code>    <span class="c1"># Barplot of NES of the top GO gene sets, with different color for up- or down-reg gene sets:</span>
+<details class="done"><summary>Answer</summary><p><div class="highlight"><pre><span></span><code>    <span class="c1"># Barplot of NES of the top GO gene sets, with different color for up- or down-reg gene sets:</span>
     <span class="n">sorted_GO_NK_Th</span><span class="o">&lt;-</span> <span class="n">GO_NK_Th</span><span class="o">@</span><span class="n">result</span><span class="p">[</span><span class="nf">order</span><span class="p">(</span><span class="n">GO_NK_Th</span><span class="o">@</span><span class="n">result</span><span class="o">$</span><span class="n">NES</span><span class="p">,</span> <span class="n">decreasing</span> <span class="o">=</span> <span class="bp">F</span><span class="p">),]</span>
     <span class="n">sorted_GO_NK_Th</span><span class="o">$</span><span class="n">color</span><span class="o">&lt;-</span><span class="nf">ifelse</span><span class="p">(</span><span class="n">sorted_GO_NK_Th</span><span class="o">$</span><span class="n">NES</span><span class="o">&lt;</span><span class="m">0</span><span class="p">,</span> <span class="s">&quot;red&quot;</span><span class="p">,</span> <span class="s">&quot;darkblue&quot;</span><span class="p">)</span>
 
@@ -748,6 +753,9 @@ The first option is a barplot. It can be a barplot of p-values of top over-repre
         <span class="n">col</span><span class="o">=</span><span class="n">sorted_GO_NK_Th</span><span class="o">$</span><span class="n">color</span><span class="p">[</span><span class="nf">c</span><span class="p">(</span><span class="m">1</span><span class="o">:</span><span class="m">10</span><span class="p">,</span> <span class="p">(</span><span class="nf">nrow</span><span class="p">(</span><span class="n">sorted_GO_NK_Th</span><span class="p">)</span><span class="m">-9</span><span class="p">)</span><span class="o">:</span><span class="nf">nrow</span><span class="p">(</span><span class="n">sorted_GO_NK_Th</span><span class="p">))])</span> 
     <span class="nf">abline</span><span class="p">(</span><span class="n">v</span><span class="o">=</span><span class="m">0</span><span class="p">)</span>
 </code></pre></div>
+  <figure>
+<img src="../assets/images/barplot2.png" width="700"/>
+</figure></p>
 </details>
 <p>With results of an over-representation analysis, where the output is of class &ldquo;enrichResult&rdquo;, the barplot() function can be used directly. You can either show the significant gene sets, or a custom selection of them.</p>
 <div class="highlight"><pre><span></span><code><span class="c1"># Use the GO_enrich analysis performed above, of the over-representation analysis </span>
@@ -787,15 +795,24 @@ The first option is a barplot. It can be a barplot of p-values of top over-repre
 
 <p>Finally, clusterProfiler provides several visualization methods that can be used directly on objects of class &ldquo;gseaResult&rdquo; or &ldquo;enrichResult. These functions are implemented in the enrichplot package that was developped to go with clusterProfiler. Examples are the dotplot, the gene-concept network (cnetplot), the enrichment map (emapplot) and the ridge plots.
 Feel free to consult the <a href="http://yulab-smu.top/biomedical-knowledge-mining-book/enrichplot.html">chapter on visualization of the nice clusterProfiler book</a> to see all the possible options and test others than the ones listed here!</p>
-<div class="highlight"><pre><span></span><code><span class="c1"># Dotplot on enrichResult and gseaResult objects:</span>
+<p><div class="highlight"><pre><span></span><code><span class="c1"># Dotplot on enrichResult and gseaResult objects:</span>
 <span class="n">enrichplot</span><span class="o">::</span><span class="nf">dotplot</span><span class="p">(</span><span class="n">GO_enrich</span><span class="p">,</span> <span class="n">orderBy</span><span class="o">=</span><span class="s">&quot;p.adjust&quot;</span><span class="p">)</span>
 <span class="n">enrichplot</span><span class="o">::</span><span class="nf">dotplot</span><span class="p">(</span><span class="n">GO_NK_Th</span><span class="p">,</span> <span class="n">orderBy</span><span class="o">=</span><span class="s">&quot;p.adjust&quot;</span><span class="p">)</span>
-
-<span class="c1"># Gene concept network:</span>
+</code></pre></div>
+<br />
+<figure>
+  <img src="../assets/images/enrichplot1.png" width="700"/>
+  </figure>
+</p>
+<div class="highlight"><pre><span></span><code><span class="c1"># Gene concept network:</span>
 <span class="nf">cnetplot</span><span class="p">(</span><span class="n">GO_enrich</span><span class="p">,</span> <span class="n">categorySize</span><span class="o">=</span><span class="s">&quot;pvalue&quot;</span><span class="p">)</span>
 <span class="nf">cnetplot</span><span class="p">(</span><span class="n">GO_NK_Th</span><span class="p">,</span> <span class="n">showCategory</span> <span class="o">=</span> <span class="m">3</span><span class="p">)</span>
+</code></pre></div>
+<figure>
+  <img src="../assets/images/cnetplot1.png" width="700"/>
+  </figure>
 
-<span class="c1"># The enrichment map:</span>
+<div class="highlight"><pre><span></span><code><span class="c1"># The enrichment map:</span>
 <span class="n">ego2</span> <span class="o">&lt;-</span> <span class="nf">pairwise_termsim</span><span class="p">(</span><span class="n">GO_NK_Th</span><span class="p">)</span>
 <span class="nf">emapplot</span><span class="p">(</span><span class="n">ego2</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s">&quot;p.adjust&quot;</span><span class="p">)</span>
 
@@ -816,6 +833,11 @@ Feel free to consult the <a href="http://yulab-smu.top/biomedical-knowledge-mini
 <span class="n">GO_NK_Th_selection</span> <span class="o">&lt;-</span> <span class="n">GO_NK_Th</span><span class="p">[</span><span class="nf">grep</span><span class="p">(</span><span class="s">&quot;leukocyte&quot;</span><span class="p">,</span><span class="n">GO_NK_Th</span><span class="o">@</span><span class="n">result</span><span class="o">$</span><span class="n">Description</span><span class="p">),</span> <span class="n">asis</span><span class="o">=</span><span class="bp">T</span><span class="p">]</span>
 <span class="nf">ridgeplot</span><span class="p">(</span><span class="n">GO_NK_Th_selection</span><span class="p">)</span>
 </code></pre></div>
+<figure>
+  <img src="../assets/images/ridgeplot1.png" width="700"/>
+  </figure>
+
+<p>Please see the <a href="https://sib-swiss.github.io/enrichment-analysis-training/bonus_code/">Bonus code</a> page for an example of a lollipop plot with ggplot2. </p>
 <h2 id="exercise-4-the-last-one-enrichment-of-other-collections-of-gene-sets">Exercise 4 (the last one!) - Enrichment of other collections of gene sets</h2>
 <p>We will now perform GSEA of other collections of gene sets, such as KEGG or Hallmark.
 For GSEA of the KEGG gene sets, the gene IDs have to be NCBI Entrez gene IDs. ClusterProfiler provides the bitr() function to convert gene label types.</p>
