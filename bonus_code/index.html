@@ -507,7 +507,7 @@ description, biotype, or the symbols of mouse homologs of human genes, etc.</p>
 <span class="c1"># 6 ENSG00000000938                FGR                                    Fgr</span>
 </code></pre></div>
 <h2 id="msigdbr-package">msigdbr package</h2>
-<p>The <a href="https://cran.r-project.org/web/packages/msigdbr/index.html">msigdbr</a> package hosted on CRAN allows to access gene set collections hosted on MSigDB directly within R. Check out its vignette to view how to download collections for other species such as mouse, etc. The function <code>msigdbr_species()</code> allows you to list available species. </p>
+<p>The <a href="https://cran.r-project.org/web/packages/msigdbr/index.html">msigdbr</a> package hosted on CRAN allows to access gene set collections hosted on MSigDB directly within R. Check out its vignette to view how to download collections for other species such as mouse, zebra fish, horse, etc. The function <code>msigdbr_species()</code> allows you to list available species. </p>
 <p>For example, to download the Hallmark collection with human gene symbols within R:
 <div class="highlight"><pre><span></span><code><span class="n">gmt</span> <span class="o">&lt;-</span> <span class="n">msigdbr</span><span class="o">::</span><span class="nf">msigdbr</span><span class="p">(</span><span class="n">species</span> <span class="o">=</span> <span class="s">&quot;human&quot;</span><span class="p">,</span> <span class="n">category</span> <span class="o">=</span> <span class="s">&quot;H&quot;</span><span class="p">)</span>
 
@@ -540,6 +540,87 @@ description, biotype, or the symbols of mouse homologs of human genes, etc.</p>
 <span class="c1">#&gt; 19 Sus scrofa                      pig, pigs, swine, wild boar                  </span>
 <span class="c1">#&gt; 20 Xenopus tropicalis              tropical clawed frog, western clawed frog</span>
 </code></pre></div>
+<p>For example, we can download the Gene Ontology Biological Process (GO:BP) collection with yeast gene symbols. To first check the available collections with msigdbr, use ``msigdbr_collections()```. </p>
+<div class="highlight"><pre><span></span><code><span class="nf">print</span><span class="p">(</span><span class="nf">msigdbr_collections</span><span class="p">(),</span> <span class="n">n</span><span class="o">=</span><span class="m">20</span><span class="p">)</span>
+<span class="c1"># A tibble: 23 × 3</span>
+<span class="c1">#    gs_cat gs_subcat         num_genesets</span>
+<span class="c1">#    &lt;chr&gt;  &lt;chr&gt;                    &lt;int&gt;</span>
+<span class="c1">#  1 C1     &quot;&quot;                         299</span>
+<span class="c1">#  2 C2     &quot;CGP&quot;                     3384</span>
+<span class="c1">#  3 C2     &quot;CP&quot;                        29</span>
+<span class="c1">#  4 C2     &quot;CP:BIOCARTA&quot;              292</span>
+<span class="c1">#  5 C2     &quot;CP:KEGG&quot;                  186</span>
+<span class="c1">#  6 C2     &quot;CP:PID&quot;                   196</span>
+<span class="c1">#  7 C2     &quot;CP:REACTOME&quot;             1615</span>
+<span class="c1">#  8 C2     &quot;CP:WIKIPATHWAYS&quot;          664</span>
+<span class="c1">#  9 C3     &quot;MIR:MIRDB&quot;               2377</span>
+<span class="c1"># 10 C3     &quot;MIR:MIR_Legacy&quot;           221</span>
+<span class="c1"># 11 C3     &quot;TFT:GTRD&quot;                 518</span>
+<span class="c1"># 12 C3     &quot;TFT:TFT_Legacy&quot;           610</span>
+<span class="c1"># 13 C4     &quot;CGN&quot;                      427</span>
+<span class="c1"># 14 C4     &quot;CM&quot;                       431</span>
+<span class="c1"># 15 C5     &quot;GO:BP&quot;                   7658</span>
+<span class="c1"># 16 C5     &quot;GO:CC&quot;                   1006</span>
+<span class="c1"># 17 C5     &quot;GO:MF&quot;                   1738</span>
+<span class="c1"># 18 C5     &quot;HPO&quot;                     5071</span>
+<span class="c1"># 19 C6     &quot;&quot;                         189</span>
+<span class="c1"># 20 C7     &quot;IMMUNESIGDB&quot;             4872</span>
+
+<span class="c1"># Obtain the C5 category and GO:BP subcategory for yeast:</span>
+
+<span class="n">gmt</span> <span class="o">&lt;-</span> <span class="n">msigdbr</span><span class="o">::</span><span class="nf">msigdbr</span><span class="p">(</span><span class="n">species</span> <span class="o">=</span> <span class="s">&quot;Saccharomyces cerevisiae&quot;</span><span class="p">,</span> <span class="n">category</span> <span class="o">=</span> <span class="s">&quot;C5&quot;</span><span class="p">,</span> <span class="n">subcategory</span> <span class="o">=</span> <span class="s">&quot;GO:BP&quot;</span><span class="p">)</span>
+
+<span class="c1"># We obtained the GO:BP gene sets, the yeast gene symbols, and yeast ensembl_id:</span>
+<span class="nf">head</span><span class="p">(</span><span class="n">gmt</span><span class="p">[,</span><span class="nf">c</span><span class="p">(</span><span class="s">&quot;gs_name&quot;</span><span class="p">,</span> <span class="s">&quot;gene_symbol&quot;</span><span class="p">,</span> <span class="s">&quot;ensembl_gene&quot;</span><span class="p">)],</span> <span class="n">n</span><span class="o">=</span><span class="m">10</span><span class="p">)</span>
+<span class="c1"># A tibble: 10 × 3</span>
+<span class="c1"># gs_name                                          gene_symbol ensembl_gene</span>
+<span class="c1"># &lt;chr&gt;                                            &lt;chr&gt;       &lt;chr&gt;       </span>
+<span class="c1">#   1 GOBP_10_FORMYLTETRAHYDROFOLATE_METABOLIC_PROCESS ADE3        YGR204W     </span>
+<span class="c1"># 2 GOBP_10_FORMYLTETRAHYDROFOLATE_METABOLIC_PROCESS ADE3        YGR204W     </span>
+<span class="c1"># 3 GOBP_10_FORMYLTETRAHYDROFOLATE_METABOLIC_PROCESS MIS1        YBR084W     </span>
+<span class="c1"># 4 GOBP_2FE_2S_CLUSTER_ASSEMBLY                     BOL2        YGL220W     </span>
+<span class="c1"># 5 GOBP_2FE_2S_CLUSTER_ASSEMBLY                     GRX4        YER174C     </span>
+<span class="c1"># 6 GOBP_2FE_2S_CLUSTER_ASSEMBLY                     GRX5        YPL059W     </span>
+<span class="c1"># 7 GOBP_2FE_2S_CLUSTER_ASSEMBLY                     JAC1        YGL018C     </span>
+<span class="c1"># 8 GOBP_2FE_2S_CLUSTER_ASSEMBLY                     NFS1        YCL017C     </span>
+<span class="c1"># 9 GOBP_2_OXOGLUTARATE_METABOLIC_PROCESS            ARO8        YGL202W     </span>
+<span class="c1"># 10 GOBP_2_OXOGLUTARATE_METABOLIC_PROCESS            ADH4        YGL256W    </span>
+
+<span class="c1"># If your DE genes are also labeled with gene symbol, create the 2 column-format (TERM2GENE argument) required by clusterProfiler for the GSEA() function for example:</span>
+<span class="n">y_gmt</span> <span class="o">&lt;-</span> <span class="n">gmt</span><span class="p">[,</span><span class="nf">c</span><span class="p">(</span><span class="s">&quot;gs_name&quot;</span><span class="p">,</span> <span class="s">&quot;gene_symbol&quot;</span><span class="p">)]</span>
+</code></pre></div>
+<p>We can also use the msigdbr package to download the KEGG collection, in case the <code>gseKEGG()</code> function of the clusterProfiler package is blocked by firewall issues.</p>
+<div class="highlight"><pre><span></span><code><span class="c1">### ---- KEGG with msigdbr download:</span>
+<span class="nf">msigdbr_collections</span><span class="p">()</span> <span class="c1"># </span>
+<span class="c1"># C2     &quot;CP:KEGG&quot;      </span>
+<span class="n">kegg_pw</span><span class="o">&lt;-</span><span class="nf">msigdbr</span><span class="p">(</span><span class="n">species</span> <span class="o">=</span> <span class="s">&quot;human&quot;</span><span class="p">,</span> <span class="n">category</span> <span class="o">=</span> <span class="s">&quot;C2&quot;</span><span class="p">,</span> <span class="n">subcategory</span> <span class="o">=</span> <span class="s">&quot;CP:KEGG&quot;</span><span class="p">)</span>
+
+<span class="nf">head</span><span class="p">(</span><span class="n">kegg_pw</span><span class="p">[,</span><span class="nf">c</span><span class="p">(</span><span class="s">&quot;gs_name&quot;</span><span class="p">,</span> <span class="s">&quot;gene_symbol&quot;</span><span class="p">)])</span>
+<span class="c1"># # A tibble: 6 × 2</span>
+<span class="c1"># gs_name               gene_symbol</span>
+<span class="c1"># &lt;chr&gt;                 &lt;chr&gt;      </span>
+<span class="c1">#   1 KEGG_ABC_TRANSPORTERS ABCA1      </span>
+<span class="c1"># 2 KEGG_ABC_TRANSPORTERS ABCA10     </span>
+<span class="c1"># 3 KEGG_ABC_TRANSPORTERS ABCA12     </span>
+<span class="c1"># 4 KEGG_ABC_TRANSPORTERS ABCA13     </span>
+<span class="c1"># 5 KEGG_ABC_TRANSPORTERS ABCA2      </span>
+<span class="c1"># 6 KEGG_ABC_TRANSPORTERS ABCA3      </span>
+
+<span class="c1"># Run with GSEA function: </span>
+<span class="n">kegg_gsea</span><span class="o">&lt;-</span><span class="nf">GSEA</span><span class="p">(</span><span class="n">gl</span><span class="p">,</span> <span class="n">eps</span> <span class="o">=</span> <span class="m">0</span><span class="p">,</span> <span class="n">TERM2GENE</span> <span class="o">=</span> <span class="n">kegg_pw</span><span class="p">[,</span><span class="nf">c</span><span class="p">(</span><span class="s">&quot;gs_name&quot;</span><span class="p">,</span> <span class="s">&quot;gene_symbol&quot;</span><span class="p">)],</span> <span class="n">seed</span> <span class="o">=</span> <span class="kc">TRUE</span><span class="p">)</span>
+<span class="nf">head</span><span class="p">(</span><span class="n">kegg_gsea</span><span class="o">@</span><span class="n">result</span><span class="p">[,</span><span class="nf">c</span><span class="p">(</span><span class="m">2</span><span class="o">:</span><span class="m">6</span><span class="p">)])</span>
+<span class="c1">#                                                                                   Description setSize enrichmentScore       NES       pvalue</span>
+<span class="c1"># KEGG_RIBOSOME                                                                   KEGG_RIBOSOME      86      -0.9016245 -3.534228 9.828038e-49</span>
+<span class="c1"># KEGG_NATURAL_KILLER_CELL_MEDIATED_CYTOTOXICITY KEGG_NATURAL_KILLER_CELL_MEDIATED_CYTOTOXICITY     104       0.6183274  2.509621 7.254908e-13</span>
+<span class="c1"># KEGG_REGULATION_OF_ACTIN_CYTOSKELETON                   KEGG_REGULATION_OF_ACTIN_CYTOSKELETON     170       0.4547466  1.980859 2.337476e-07</span>
+<span class="c1"># KEGG_CHEMOKINE_SIGNALING_PATHWAY                             KEGG_CHEMOKINE_SIGNALING_PATHWAY     161       0.4463380  1.928426 4.354445e-07</span>
+<span class="c1"># KEGG_FC_GAMMA_R_MEDIATED_PHAGOCYTOSIS                   KEGG_FC_GAMMA_R_MEDIATED_PHAGOCYTOSIS      87       0.5343886  2.100787 1.599037e-06</span>
+<span class="c1"># KEGG_B_CELL_RECEPTOR_SIGNALING_PATHWAY                 KEGG_B_CELL_RECEPTOR_SIGNALING_PATHWAY      70       0.5299578  1.993277 8.000155e-06</span>
+
+<span class="n">kegg_gsea</span><span class="o">@</span><span class="n">result</span><span class="p">[</span><span class="nf">grep</span><span class="p">(</span><span class="s">&quot;NATURAL_KILLER&quot;</span><span class="p">,</span> <span class="n">kegg_gsea</span><span class="o">@</span><span class="n">result</span><span class="o">$</span><span class="n">Description</span><span class="p">),</span> <span class="nf">c</span><span class="p">(</span><span class="m">2</span><span class="o">:</span><span class="m">6</span><span class="p">)]</span>
+<span class="c1">#                                     Description setSize enrichmentScore      NES       pvalue</span>
+<span class="c1">#  KEGG_NATURAL_KILLER_CELL_MEDIATED_CYTOTOXICITY     104       0.6183274 2.509621 7.254908e-13</span>
+</code></pre></div>
 <h2 id="code-for-barplots-with-ggplot2">Code for barplots with ggplot2</h2>
 <p>Barplot of the 10 most significant gene sets:</p>
 <p><div class="highlight"><pre><span></span><code><span class="nf">library</span><span class="p">(</span><span class="n">tidyverse</span><span class="p">)</span>
@@ -555,7 +636,7 @@ description, biotype, or the symbols of mouse homologs of human genes, etc.</p>
 </code></pre></div>
 <br />
 <figure>
-  <img src="../assets/images/barplot_p_value.png" width="300"/>
+  <img src="../assets/images/barplot_p_value.png" width="500"/>
   </figure>
 </p>
 <p>Barplot of NES colored according to direction:
@@ -572,7 +653,7 @@ description, biotype, or the symbols of mouse homologs of human genes, etc.</p>
 </code></pre></div>
 <br />
 <figure>
-  <img src="../assets/images/barplot_NES.png" width="300"/>
+  <img src="../assets/images/barplot_NES.png" width="700"/>
   </figure>
 </p>
 <h2 id="code-for-a-heatmap-of-p-values-with-ggplot2">Code for a heatmap of p-values with ggplot2</h2>
@@ -643,7 +724,7 @@ required for ggplot2.</p>
   </figure>
 
 <h2 id="code-for-a-lollipop-plot-with-ggplot2">Code for a lollipop plot with ggplot2</h2>
-<p>In this lollipop of GSEA results of leukocyte-related GO pathways, the color will represent up- (red) or down-regulated (blue) gene sets, the dot size represents the setSize. The length of the gene set description is truncated to 50 characters. We use the GSEA results that we obtained after selecting the leukocyte-related GO pathways at the end of exercise 3</p>
+<p>In this lollipop of GSEA results of leukocyte-related GO pathways, the color will represent up- (red) or down-regulated (blue) gene sets, the dot size represents the setSize. The length of the gene set description is truncated to 50 characters. We use the GSEA results that we obtained after selecting the leukocyte-related GO pathways at the end of exercise 3.</p>
 <div class="highlight"><pre><span></span><code><span class="c1"># Bonus: lollipop plot of p-values of leukocyte-related GO pathways. The </span>
 <span class="c1"># color will represent up- (red) or down-regulated (blue) gene sets, </span>
 <span class="c1"># the dot size represents the setSize.</span>
