@@ -140,6 +140,7 @@ Finally, use the `fisher.test()` function to determine whether the adaptive immu
     unlist(table(Th_not_DE$symbol %in% adaptive$gene))[[1]]), 
     ncol=2, byrow = F)
     cont.table
+    
     # 3: by using the 2 rows (reversed) of the table() function:
     cont.table<-matrix(c(rev(unlist(table(Th_up$symbol %in% adaptive$gene))), 
     rev(unlist(table(Th_not_DE$symbol %in% adaptive$gene)))), 
@@ -357,6 +358,10 @@ barplot(rev(-log10(GO_NK_Th@result$p.adjust[1:10])),
 abline(v=-log10(0.05))
 ```
 
+  <figure>
+  <img src="../assets/images/barplot1.png" width="700"/>
+  </figure>
+
 In publications, we often see barplots of normalized enrichment scores (NES), showing which gene sets are up-regulated and which are down-regulated.
 
 Now that you know how to use the barplot() function, how would you create a barplot of NES of the top 10 up-regulated and the top 10 down-regulated genes sets,
@@ -377,6 +382,10 @@ Now that you know how to use the barplot() function, how would you create a barp
         abline(v=0)
       	
 	```
+	  <figure>
+    <img src="../assets/images/barplot2.png" width="700"/>
+    </figure>
+
 
 With results of an over-representation analysis, where the output is of class "enrichResult", the barplot() function can be used directly. You can either show the significant gene sets, or a custom selection of them.
 
@@ -432,11 +441,23 @@ Feel free to consult the [chapter on visualization of the nice clusterProfiler b
 # Dotplot on enrichResult and gseaResult objects:
 enrichplot::dotplot(GO_enrich, orderBy="p.adjust")
 enrichplot::dotplot(GO_NK_Th, orderBy="p.adjust")
+```
+  <figure>
+  <img src="../assets/images/enrichplot1.png" width="700"/>
+  </figure>
 
+```r
 # Gene concept network:
 cnetplot(GO_enrich, categorySize="pvalue")
 cnetplot(GO_NK_Th, showCategory = 3)
+```
 
+  <figure>
+  <img src="../assets/images/cnetplot1.png" width="700"/>
+  </figure>
+
+
+```r
 # The enrichment map:
 ego2 <- pairwise_termsim(GO_NK_Th)
 emapplot(ego2, color="p.adjust")
@@ -458,6 +479,12 @@ ridgeplot(GO_NK_Th_selection)
 GO_NK_Th_selection <- GO_NK_Th[grep("leukocyte",GO_NK_Th@result$Description), asis=T]
 ridgeplot(GO_NK_Th_selection)
 ```
+
+  <figure>
+  <img src="../assets/images/ridgeplot1.png" width="700"/>
+  </figure>
+
+Please see the [Bonus code](https://sib-swiss.github.io/enrichment-analysis-training/bonus_code/) page for an example of a lollipop plot with ggplot2. 
 
 
 ## Exercise 4 (the last one!) - Enrichment of other collections of gene sets

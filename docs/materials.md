@@ -1,5 +1,9 @@
 ## Material
 
+Slides of introductory video on DEG and p-value correction:
+
+[Download intro slides](assets/pdf/DEG_pvalue_corr_intro_video_slides.pdf){: .md-button }
+
 Slides of lectures:
 
 [Download slides](assets/pdf/EA_slides.pdf){: .md-button }

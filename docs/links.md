@@ -45,11 +45,14 @@
 
 [http://bioconductor.org/packages/release/bioc/html/rrvgo.html](http://bioconductor.org/packages/release/bioc/html/rrvgo.html)
 
-
 A [recent publication](https://academic.oup.com/nar/article/49/D1/D325/6027811) of the **Gene Ontology** consortium. They try to improve taxon constraints, i.e. to better define
 which terms are relevant for some species but not for others (such as leukocyte-related terms that should be constrained to vertebrates.
 
 A [recent publication (2020)](https://www.frontiersin.org/articles/10.3389/fgene.2020.00654/full) on gene set analysis challenges, opportunities and future research. 
+
+** Importance of the ranking metrics in GSEA**
+
+Paper on the ["Ranking metrics in gene set enrichment analysis: do they matter?"](https://bmcbioinformatics.biomedcentral.com/articles/10.1186/s12859-017-1674-0)
 
 **Tools for species other than human or mouse**.
 Bioconductor contains "org.db" packages with genome/gene annotation for many organisms, for example
