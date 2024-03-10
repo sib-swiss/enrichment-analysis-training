@@ -60,6 +60,11 @@
     <label class="md-overlay" for="__drawer"></label>
     <div data-md-component="skip">
       
+        
+        <a href="#tools-for-rnaseq-de-analysis" class="md-skip">
+          Skip to content
+        </a>
+      
     </div>
     <div data-md-component="announce">
       
@@ -257,9 +262,65 @@
       
       
       
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          Useful links
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
       <a href="./" class="md-nav__link md-nav__link--active">
         Useful links
       </a>
+      
+        
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#tools-for-rnaseq-de-analysis" class="md-nav__link">
+    Tools for RNAseq DE analysis
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#additional-tools-for-enrichment-analysis" class="md-nav__link">
+    Additional tools for enrichment analysis
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#considerations-and-challenges-of-enrichment-analysis" class="md-nav__link">
+    Considerations and challenges of enrichment analysis
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#tools-for-species-other-than-human-or-mouse" class="md-nav__link">
+    Tools for species other than human or mouse
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#proteomics" class="md-nav__link">
+    Proteomics
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
       
     </li>
   
@@ -271,6 +332,64 @@
                 </div>
               </div>
             
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#tools-for-rnaseq-de-analysis" class="md-nav__link">
+    Tools for RNAseq DE analysis
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#additional-tools-for-enrichment-analysis" class="md-nav__link">
+    Additional tools for enrichment analysis
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#considerations-and-challenges-of-enrichment-analysis" class="md-nav__link">
+    Considerations and challenges of enrichment analysis
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#tools-for-species-other-than-human-or-mouse" class="md-nav__link">
+    Tools for species other than human or mouse
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#proteomics" class="md-nav__link">
+    Proteomics
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
             
           
           <div class="md-content" data-md-component="content">
@@ -284,7 +403,8 @@
                 
                   <h1>Useful links</h1>
                 
-                <p><strong>limma</strong> for differential gene expression analysis of microarray or RNA seq data, also includes functions for enrichment analysis</p>
+                <h2 id="tools-for-rnaseq-de-analysis">Tools for RNAseq DE analysis</h2>
+<p><strong>limma</strong> for differential gene expression analysis of microarray or RNA seq data, also includes functions for enrichment analysis</p>
 <p><a href="https://www.bioconductor.org/packages/devel/bioc/vignettes/limma/inst/doc/usersguide.pdf">https://www.bioconductor.org/packages/devel/bioc/vignettes/limma/inst/doc/usersguide.pdf</a></p>
 <p><strong>edgeR</strong> for differential gene expression analysis of RNA seq data</p>
 <p><a href="https://www.bioconductor.org/packages/release/bioc/vignettes/edgeR/inst/doc/edgeRUsersGuide.pdf">https://www.bioconductor.org/packages/release/bioc/vignettes/edgeR/inst/doc/edgeRUsersGuide.pdf</a></p>
@@ -292,14 +412,15 @@
 <p><a href="http://bioconductor.org/packages/devel/bioc/vignettes/DESeq2/inst/doc/DESeq2.html">http://bioconductor.org/packages/devel/bioc/vignettes/DESeq2/inst/doc/DESeq2.html</a></p>
 <p><strong>From reads to genes to pathways</strong> Pipeline for DGE analysis and pathway analysis</p>
 <p><a href="https://f1000research.com/articles/5-1438">https://f1000research.com/articles/5-1438</a> </p>
+<p><strong>bioconductor</strong>: Introduction and structure</p>
+<p><a href="https://ivanek.github.io/analysisOfGenomicsDataWithR/02_IntroToBioc_html.html">https://ivanek.github.io/analysisOfGenomicsDataWithR/02_IntroToBioc_html.html</a></p>
+<h2 id="additional-tools-for-enrichment-analysis">Additional tools for enrichment analysis</h2>
 <p><strong>clusterProfiler</strong> e-Book</p>
 <p><a href="https://yulab-smu.github.io/clusterProfiler-book/">https://yulab-smu.github.io/clusterProfiler-book/</a></p>
-<p><strong>fgsea</strong> package with fgsea() function called by clusterProfiler</p>
+<p><strong>fgsea</strong> package with the <code>fgsea()</code> function called by clusterProfiler</p>
 <p><a href="https://bioconductor.org/packages/release/bioc/html/fgsea.html">https://bioconductor.org/packages/release/bioc/html/fgsea.html</a></p>
 <p><strong>GOsummaries</strong> bioconductor package, to visualise Gene Ontology (GO) enrichment analysis results on gene lists arising from different analyses such clustering or PCA. The significant GO categories are visualised as word clouds that can be combined with different plots summarising the underlying data.</p>
 <p><a href="https://www.bioconductor.org/packages/release/bioc/html/GOsummaries.html">https://www.bioconductor.org/packages/release/bioc/html/GOsummaries.html</a></p>
-<p><strong>bioconductor</strong> Introduction and structure</p>
-<p><a href="https://ivanek.github.io/analysisOfGenomicsDataWithR/02_IntroToBioc_html.html">https://ivanek.github.io/analysisOfGenomicsDataWithR/02_IntroToBioc_html.html</a></p>
 <p><strong>online tool</strong> for overrepresentation analysis</p>
 <p><a href="http://www.pantherdb.org/">http://www.pantherdb.org/</a></p>
 <p><strong>online tool</strong> for gene set enrichment analysis</p>
@@ -309,15 +430,25 @@
 <p><a href="http://bioconductor.org/packages/release/bioc/html/rrvgo.html">http://bioconductor.org/packages/release/bioc/html/rrvgo.html</a></p>
 <p>A <a href="https://academic.oup.com/nar/article/49/D1/D325/6027811">recent publication</a> of the <strong>Gene Ontology</strong> consortium. They try to improve taxon constraints, i.e. to better define
 which terms are relevant for some species but not for others (such as leukocyte-related terms that should be constrained to vertebrates.</p>
+<p><a href="https://www.ebi.ac.uk/chebi/init.do"><strong>ChEBI</strong></a>: A freely available dictionary of molecular entities focused on ‘small’ chemical compounds. Can be used as a database for GSEA in metabolomics studies. </p>
+<h2 id="considerations-and-challenges-of-enrichment-analysis">Considerations and challenges of enrichment analysis</h2>
 <p>A <a href="https://www.frontiersin.org/articles/10.3389/fgene.2020.00654/full">recent publication (2020)</a> on gene set analysis challenges, opportunities and future research. </p>
-<p><strong> Importance of the ranking metrics in GSEA</strong></p>
-<p>Paper on the <a href="https://bmcbioinformatics.biomedcentral.com/articles/10.1186/s12859-017-1674-0">&ldquo;Ranking metrics in gene set enrichment analysis: do they matter?&rdquo;</a></p>
-<p><strong>Tools for species other than human or mouse</strong>.
-Bioconductor contains &ldquo;org.db&rdquo; packages with genome/gene annotation for many organisms, for example
+<p><strong>Importance of the ranking metrics in GSEA</strong>: Paper on the <a href="https://bmcbioinformatics.biomedcentral.com/articles/10.1186/s12859-017-1674-0">&ldquo;Ranking metrics in gene set enrichment analysis: do they matter?&rdquo;</a></p>
+<p><a href="https://academic.oup.com/bib/article/23/3/bbac143/6572658"><strong>Mubeen et al, 2022</strong></a>: <em>On the influence of several factors on pathway enrichment analysis</em></p>
+<p><a href="https://journals.plos.org/ploscompbiol/article?id=10.1371/journal.pcbi.1009935"><strong>Wijesooriya et al, 2022</strong></a>: <em>Urgent need for consistent standards in functional enrichment analysis</em></p>
+<h2 id="tools-for-species-other-than-human-or-mouse">Tools for species other than human or mouse</h2>
+<p><strong> OrgDB</strong> packages: Bioconductor contains &ldquo;org.db&rdquo; packages with genome/gene annotation for many organisms, for example
 for <a href="https://bioconductor.org/packages/release/data/annotation/html/org.Dm.eg.db.html">Drosophila</a> or <a href="https://bioconductor.org/packages/release/data/annotation/html/org.At.tair.db.html">Arabidopsis</a>.</p>
-<p>For fungi, <a href="https://fungidb.org/fungidb/app/search/pathway/PathwaysByGeneList">FungiDB</a> provides identification of metabolic pathways based on list of genes</p>
-<p>PlantGSAD: a gene set database for plants <a href="https://academic.oup.com/nar/article/50/D1/D1456/6371972?login=true">https://academic.oup.com/nar/article/50/D1/D1456/6371972?login=true</a></p>
-<p>Eventually this repository by <a href="https://bmcbioinformatics.biomedcentral.com/articles/10.1186/s12859-020-3408-y">Zhang et al</a></p>
+<p>For <strong>fungi</strong>, <a href="https://fungidb.org/fungidb/app/search/pathway/PathwaysByGeneList">FungiDB</a> provides identification of metabolic pathways based on a-user selected list of genes</p>
+<p><strong>PlantGSAD</strong>: a gene set database for plants <a href="https://academic.oup.com/nar/article/50/D1/D1456/6371972?login=true">https://academic.oup.com/nar/article/50/D1/D1456/6371972?login=true</a></p>
+<p>Eventually this tool by <a href="https://bmcbioinformatics.biomedcentral.com/articles/10.1186/s12859-020-3408-y">Zhang et al</a>: <em>AllEnricher: a comprehensive gene set function enrichment tool for both model and non-model species</em> </p>
+<p>A <a href="https://bio-protocol.org/en/bpdetail?id=3912&amp;type=0"><em>pipeline for non-model species</em></a> using Scots pine as an example: The authors describe how to assemble the transcriptome from RNA sequencing data, how to annotate genes, and suggest GO enrichment analysis. </p>
+<p><a href="https://academic.oup.com/nar/article/47/D1/D309/5173662"><strong>eggNOGG</strong></a>: <em>A hierarchical, functionally and phylogenetically annotated orthology resource based on 5090 organisms and 2502 viruses</em>. Describes a public database of orthology relationships, gene evolutionary histories and functional annotations.</p>
+<!-- [**A blog post**](https://archetypalecology.wordpress.com/2021/01/27/how-to-perform-kegg-and-go-enrichment-analysis-of-non-model-species-using-r/) on performing KEGG and GO enrichment analysis on non-model species, after eggNOGG. -->
+
+<h2 id="proteomics">Proteomics</h2>
+<p><a href="https://bmcbioinformatics.biomedcentral.com/articles/10.1186/1471-2105-13-S16-S13"><strong>Bessarabova et al, 2012</strong></a>: <em>Knowledge-based analysis of proteomics data</em>. Not the most recent paper but a nice overview. </p>
+<p><a href="https://pubmed.ncbi.nlm.nih.gov/34236662/"><strong>Combes et al, 2021</strong></a>: <em>GO Enrichment Analysis for Differential Proteomics Using ProteoRE</em>. </p>
                 
               
               
