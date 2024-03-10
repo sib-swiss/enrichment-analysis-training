@@ -73,9 +73,9 @@ for [Drosophila](https://bioconductor.org/packages/release/data/annotation/html/
 
 For **fungi**, [FungiDB](https://fungidb.org/fungidb/app/search/pathway/PathwaysByGeneList) provides identification of metabolic pathways based on a-user selected list of genes
 
-**PlantGSAD**: a gene set database for plants [https://academic.oup.com/nar/article/50/D1/D1456/6371972?login=true](https://academic.oup.com/nar/article/50/D1/D1456/6371972?login=true)
+**PlantGSAD**, a gene set database for plants:  [https://academic.oup.com/nar/article/50/D1/D1456/6371972?login=true](https://academic.oup.com/nar/article/50/D1/D1456/6371972?login=true)
 
-Eventually this tool by [Zhang et al](https://bmcbioinformatics.biomedcentral.com/articles/10.1186/s12859-020-3408-y): *AllEnricher: a comprehensive gene set function enrichment tool for both model and non-model species* 
+Eventually the AllEnricher tool by [Zhang et al](https://bmcbioinformatics.biomedcentral.com/articles/10.1186/s12859-020-3408-y): *AllEnricher: a comprehensive gene set function enrichment tool for both model and non-model species* 
 
 A [*pipeline for non-model species*](https://bio-protocol.org/en/bpdetail?id=3912&type=0) using Scots pine as an example: The authors describe how to assemble the transcriptome from RNA sequencing data, how to annotate genes, and suggest GO enrichment analysis. 
 
