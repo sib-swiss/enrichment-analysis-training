@@ -711,7 +711,8 @@ every gene set.</p>
 <span class="n">GO_enrich</span><span class="o">&lt;-</span><span class="nf">enrichGO</span><span class="p">(</span><span class="n">gene</span><span class="o">=</span><span class="n">nk_up_genes</span><span class="p">,</span>
                     <span class="n">OrgDb</span> <span class="o">=</span> <span class="n">org.Hs.eg.db</span><span class="p">,</span>
                     <span class="n">keyType</span> <span class="o">=</span> <span class="s">&quot;SYMBOL&quot;</span><span class="p">,</span>
-                    <span class="n">minGSSize</span> <span class="o">=</span> <span class="m">30</span><span class="p">,</span> <span class="c1">#</span>
+                    <span class="n">ont</span><span class="o">=</span><span class="s">&quot;BP&quot;</span><span class="p">,</span> 
+                    <span class="n">minGSSize</span> <span class="o">=</span> <span class="m">30</span><span class="p">,</span> 
                     <span class="n">universe</span><span class="o">=</span><span class="n">NK_vs_Th</span><span class="o">$</span><span class="n">symbol</span><span class="p">)</span> <span class="c1"># may bug with barplot below if universe is added, depending on version</span>
 <span class="nf">View</span><span class="p">(</span><span class="n">GO_enrich</span><span class="o">@</span><span class="n">result</span><span class="p">)</span>
 
