@@ -711,7 +711,7 @@ every gene set.</p>
 <span class="n">GO_enrich</span><span class="o">&lt;-</span><span class="nf">enrichGO</span><span class="p">(</span><span class="n">gene</span><span class="o">=</span><span class="n">nk_up_genes</span><span class="p">,</span>
                     <span class="n">OrgDb</span> <span class="o">=</span> <span class="n">org.Hs.eg.db</span><span class="p">,</span>
                     <span class="n">keyType</span> <span class="o">=</span> <span class="s">&quot;SYMBOL&quot;</span><span class="p">,</span>
-                    <span class="n">ont</span><span class="o">=</span><span class="s">&quot;BP&quot;</span><span class="p">,</span> 
+                    <span class="n">ont</span><span class="o">=</span><span class="s">&quot;BP&quot;</span><span class="p">,</span> <span class="c1"># the default is ont=&quot;MF&quot;</span>
                     <span class="n">minGSSize</span> <span class="o">=</span> <span class="m">30</span><span class="p">,</span> 
                     <span class="n">universe</span><span class="o">=</span><span class="n">NK_vs_Th</span><span class="o">$</span><span class="n">symbol</span><span class="p">)</span> <span class="c1"># may bug with barplot below if universe is added, depending on version</span>
 <span class="nf">View</span><span class="p">(</span><span class="n">GO_enrich</span><span class="o">@</span><span class="n">result</span><span class="p">)</span>
@@ -773,7 +773,8 @@ The first option is a barplot. It can be a barplot of p-values of top over-repre
 <span class="c1"># &#39;height&#39; must be a vector or a matrix</span>
 
 <span class="c1"># Select only 2 out of the significant gene sets:</span>
-<span class="n">ego_selection</span> <span class="o">=</span> <span class="n">GO_enrich</span><span class="p">[</span><span class="n">GO_enrich</span><span class="o">$</span><span class="n">ID</span> <span class="o">==</span> <span class="s">&quot;GO:0019864&quot;</span> <span class="o">|</span> <span class="n">GO_enrich</span><span class="o">$</span><span class="n">ID</span> <span class="o">==</span> <span class="s">&quot;GO:0045159&quot;</span><span class="p">,</span> <span class="n">asis</span><span class="o">=</span><span class="bp">T</span><span class="p">]</span>
+<span class="c1"># ego_selection = GO_enrich[GO_enrich$ID == &quot;GO:0019864&quot; | GO_enrich$ID == &quot;GO:0045159&quot;, asis=T] # doesn&#39;t select any gene set</span>
+<span class="n">ego_selection</span> <span class="o">=</span> <span class="n">GO_enrich</span><span class="p">[</span><span class="n">GO_enrich</span><span class="o">@</span><span class="n">result</span><span class="o">$</span><span class="n">ID</span> <span class="o">==</span> <span class="s">&quot;GO:0042287&quot;</span> <span class="o">|</span> <span class="n">GO_enrich</span><span class="o">@</span><span class="n">result</span><span class="o">$</span><span class="n">ID</span> <span class="o">==</span> <span class="s">&quot;GO:0004713&quot;</span><span class="p">,</span> <span class="n">asis</span><span class="o">=</span><span class="bp">T</span><span class="p">]</span> 
 <span class="n">graphics</span><span class="o">::</span><span class="nf">barplot</span><span class="p">(</span><span class="n">ego_selection</span><span class="p">)</span>
 </code></pre></div>
 <p>Here, we used the barplot function of the graphics package, but you can of course use ggplot2 functions. Please see the <a href="https://sib-swiss.github.io/enrichment-analysis-training/bonus_code/#code-for-barplots-with-ggplot2">Bonus code</a> page for examples of barplots with ggplot2 (and tidyverse) functions. </p>
