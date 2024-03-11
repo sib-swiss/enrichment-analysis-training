@@ -331,7 +331,7 @@ nk_up_genes<-subset(NK_vs_Th, NK_vs_Th$logFC>0&NK_vs_Th$p.adj<=0.05)$symbol
 GO_enrich<-enrichGO(gene=nk_up_genes,
                     OrgDb = org.Hs.eg.db,
                     keyType = "SYMBOL",
-                    ont="BP", 
+                    ont="BP", # the default is ont="MF"
                     minGSSize = 30, 
                     universe=NK_vs_Th$symbol) # may bug with barplot below if universe is added, depending on version
 View(GO_enrich@result)
@@ -409,7 +409,8 @@ graphics::barplot(GO_NK_Th) # this is a gseaResult object
 # 'height' must be a vector or a matrix
 
 # Select only 2 out of the significant gene sets:
-ego_selection = GO_enrich[GO_enrich$ID == "GO:0019864" | GO_enrich$ID == "GO:0045159", asis=T]
+# ego_selection = GO_enrich[GO_enrich$ID == "GO:0019864" | GO_enrich$ID == "GO:0045159", asis=T] # doesn't select any gene set
+ego_selection = GO_enrich[GO_enrich@result$ID == "GO:0042287" | GO_enrich@result$ID == "GO:0004713", asis=T] 
 graphics::barplot(ego_selection)
 
 ```
