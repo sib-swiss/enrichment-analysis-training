@@ -320,7 +320,7 @@ nk_up_genes<-subset(NK_vs_Th, NK_vs_Th$logFC>0&NK_vs_Th$p.adj<=0.05)$symbol
 GO_enrich<-enrichGO(gene=nk_up_genes,
                     OrgDb = org.Hs.eg.db,
                     keyType = "SYMBOL",
-                    maxGSSize = 30) #
+                    minGSSize = 30, #
                     universe=NK_vs_Th$symbol) # may bug with barplot below if universe is added, depending on version
 View(GO_enrich@result)
 
