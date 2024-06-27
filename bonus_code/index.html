@@ -360,18 +360,18 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#code-for-a-heatmap-of-p-values-with-ggplot2" class="md-nav__link">
+  <a href="#code-for-a-lollipop-plot-with-ggplot2" class="md-nav__link">
     <span class="md-ellipsis">
-      Code for a heatmap of p-values with ggplot2
+      Code for a lollipop plot with ggplot2
     </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#code-for-a-lollipop-plot-with-ggplot2" class="md-nav__link">
+  <a href="#code-for-a-heatmap-of-p-values-with-ggplot2" class="md-nav__link">
     <span class="md-ellipsis">
-      Code for a lollipop plot with ggplot2
+      Code for a heatmap of p-values with ggplot2
     </span>
   </a>
   
@@ -484,18 +484,18 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#code-for-a-heatmap-of-p-values-with-ggplot2" class="md-nav__link">
+  <a href="#code-for-a-lollipop-plot-with-ggplot2" class="md-nav__link">
     <span class="md-ellipsis">
-      Code for a heatmap of p-values with ggplot2
+      Code for a lollipop plot with ggplot2
     </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#code-for-a-lollipop-plot-with-ggplot2" class="md-nav__link">
+  <a href="#code-for-a-heatmap-of-p-values-with-ggplot2" class="md-nav__link">
     <span class="md-ellipsis">
-      Code for a lollipop plot with ggplot2
+      Code for a heatmap of p-values with ggplot2
     </span>
   </a>
   
@@ -750,6 +750,58 @@ description, biotype, or the symbols of mouse homologs of human genes, etc.</p>
   <img src="../assets/images/barplot_NES.png" width="700"/>
   </figure>
 </p>
+<h2 id="code-for-a-lollipop-plot-with-ggplot2">Code for a lollipop plot with ggplot2</h2>
+<p>In this lollipop of GSEA results of leukocyte-related GO pathways, the color will represent up- (red) or down-regulated (blue) gene sets, the dot size represents the setSize. The length of the gene set description is truncated to 50 characters. We use the GSEA results that we obtained after selecting the leukocyte-related GO pathways at the end of exercise 3.</p>
+<div class="highlight"><pre><span></span><code><span class="c1"># Bonus: lollipop plot of p-values of leukocyte-related GO pathways. The </span>
+<span class="c1"># color will represent up- (red) or down-regulated (blue) gene sets, </span>
+<span class="c1"># the dot size represents the setSize.</span>
+<span class="c1"># The length of the gene set description is truncated to 50 characters:</span>
+
+<span class="c1"># We use the GSEA results that we obtained after selecting the leukocyte-related GO pathways at the end of exercise 3</span>
+<span class="n">df</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">GO_NK_Th_selection</span><span class="o">@</span><span class="n">result</span>
+<span class="nf">head</span><span class="p">(</span><span class="n">df</span><span class="p">[,</span><span class="m">1</span><span class="o">:</span><span class="m">8</span><span class="p">])</span>
+<span class="c1">#                    ID                       Description setSize enrichmentScore       NES       pvalue   p.adjust     qvalue</span>
+<span class="c1"># GO:0097529 GO:0097529       myeloid leukocyte migration     182       0.3358543  1.459329 0.0060333962 0.04957978 0.03849908</span>
+<span class="c1"># GO:0030595 GO:0030595              leukocyte chemotaxis     186       0.3314487  1.446607 0.0057064461 0.04766950 0.03701573</span>
+<span class="c1"># GO:0007159 GO:0007159      leukocyte cell-cell adhesion     335       0.2955485  1.381506 0.0037782543 0.03815146 0.02962490</span>
+<span class="c1"># GO:0001776 GO:0001776             leukocyte homeostasis      99      -0.3891370 -1.552210 0.0037570540 0.03812616 0.02960525</span>
+<span class="c1"># GO:0002685 GO:0002685 regulation of leukocyte migration     185       0.3418586  1.489716 0.0020160142 0.02593948 0.02014220</span>
+<span class="c1"># GO:0070661 GO:0070661           leukocyte proliferation     273       0.3247110  1.493837 0.0009132421 0.01545176 0.01199841</span>
+
+<span class="n">df</span><span class="o">$</span><span class="n">mycolor</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="nf">ifelse</span><span class="p">(</span><span class="n">df</span><span class="o">$</span><span class="n">NES</span><span class="o">&lt;</span><span class="m">0</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;cornflowerblue&quot;</span><span class="p">,</span><span class="s">&quot;indianred2&quot;</span><span class="p">)</span>
+
+<span class="n">df</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">df</span><span class="p">[</span><span class="nf">order</span><span class="p">(</span><span class="n">df</span><span class="o">$</span><span class="n">pvalue</span><span class="p">,</span><span class="w"> </span><span class="n">decreasing</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="bp">T</span><span class="p">),]</span><span class="w"> </span><span class="c1">#revert the order of the rows</span>
+<span class="n">df</span><span class="o">$</span><span class="n">Label</span><span class="w"> </span><span class="o">&lt;-</span><span class="n">stringr</span><span class="o">::</span><span class="nf">str_trunc</span><span class="p">(</span><span class="n">df</span><span class="o">$</span><span class="n">Description</span><span class="p">,</span><span class="w"> </span><span class="m">50</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;right&quot;</span><span class="p">)</span><span class="w"> </span><span class="c1"># keep max 50 character in a string (nchar(&quot;string&quot;) to count characters)</span>
+<span class="n">df</span><span class="o">$</span><span class="n">Label</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="nf">factor</span><span class="p">(</span><span class="n">df</span><span class="o">$</span><span class="n">Label</span><span class="p">,</span><span class="w"> </span><span class="n">levels</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nf">c</span><span class="p">(</span><span class="n">df</span><span class="o">$</span><span class="n">Label</span><span class="p">))</span>
+
+<span class="c1"># Use limits of the x-axis range according to the range of p.values:</span>
+<span class="n">max_x</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="nf">round</span><span class="p">(</span><span class="nf">max</span><span class="p">(</span><span class="o">-</span><span class="nf">log10</span><span class="p">(</span><span class="n">df</span><span class="o">$</span><span class="n">p.adjust</span><span class="p">)),</span><span class="w"> </span><span class="n">digits</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">0</span><span class="p">)</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="m">0.5</span>
+<span class="n">xlimits</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="nf">c</span><span class="p">(</span><span class="m">0</span><span class="p">,</span><span class="w"> </span><span class="n">max_x</span><span class="p">)</span>
+<span class="n">xbreaks</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="nf">seq_along</span><span class="p">(</span><span class="m">0</span><span class="o">:</span><span class="n">max_x</span><span class="p">)</span>
+
+<span class="c1"># Create the plot:</span>
+<span class="n">p</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="nf">ggplot</span><span class="p">(</span><span class="n">df</span><span class="p">,</span><span class="w"> </span><span class="nf">aes</span><span class="p">(</span><span class="n">x</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Label</span><span class="p">,</span><span class="w"> </span><span class="n">y</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">-</span><span class="nf">log10</span><span class="p">(</span><span class="n">p.adjust</span><span class="p">),</span><span class="w"> </span><span class="n">fill</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">mycolor</span><span class="p">))</span><span class="w"> </span><span class="o">+</span>
+<span class="w">  </span><span class="nf">geom_segment</span><span class="p">(</span><span class="nf">aes</span><span class="p">(</span><span class="n">x</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Label</span><span class="p">,</span><span class="w"> </span><span class="n">xend</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Label</span><span class="p">,</span><span class="w"> </span><span class="n">y</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">0</span><span class="p">,</span><span class="w"> </span><span class="n">yend</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">-</span><span class="nf">log10</span><span class="p">(</span><span class="n">p.adjust</span><span class="p">)),</span>
+<span class="w">               </span><span class="n">color</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">df</span><span class="o">$</span><span class="n">mycolor</span><span class="p">,</span><span class="w"> </span><span class="n">lwd</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">1</span><span class="p">)</span><span class="w"> </span><span class="o">+</span>
+<span class="w">  </span><span class="nf">geom_point</span><span class="p">(</span><span class="n">pch</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">21</span><span class="p">,</span><span class="w">  </span><span class="n">bg</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">df</span><span class="o">$</span><span class="n">mycolor</span><span class="p">,</span><span class="w"> </span><span class="nf">aes</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="n">df</span><span class="o">$</span><span class="n">setSize</span><span class="p">),</span><span class="w"> </span><span class="n">color</span><span class="o">=</span><span class="n">df</span><span class="o">$</span><span class="n">mycolor</span><span class="p">)</span><span class="w"> </span><span class="o">+</span><span class="w"> </span>
+<span class="w">  </span><span class="nf">scale_size</span><span class="p">(</span><span class="n">name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;Number\nof genes&quot;</span><span class="p">)</span><span class="w"> </span><span class="o">+</span><span class="w"> </span>
+<span class="w">  </span><span class="nf">scale_y_continuous</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="nf">expression</span><span class="p">(</span><span class="s">&quot;-&quot;</span><span class="o">*</span><span class="s">&quot;log&quot;</span><span class="p">[</span><span class="m">10</span><span class="p">]</span><span class="o">*</span><span class="s">&quot;(p-value)&quot;</span><span class="p">),</span><span class="w"> </span>
+<span class="w">                     </span><span class="n">limits</span><span class="o">=</span><span class="n">xlimits</span><span class="p">,</span>
+<span class="w">                     </span><span class="n">breaks</span><span class="o">=</span><span class="n">xbreaks</span><span class="p">)</span><span class="w"> </span><span class="o">+</span>
+<span class="w">  </span><span class="nf">scale_x_discrete</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s">&quot;&quot;</span><span class="p">)</span><span class="w"> </span><span class="o">+</span>
+<span class="w">  </span><span class="nf">theme_bw</span><span class="p">(</span><span class="n">base_size</span><span class="o">=</span><span class="m">10</span><span class="p">,</span><span class="w"> </span><span class="n">base_family</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;Helvetica&quot;</span><span class="p">)</span><span class="w"> </span><span class="o">+</span>
+<span class="w">  </span><span class="nf">theme</span><span class="p">(</span><span class="n">axis.text</span><span class="o">=</span><span class="nf">element_text</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="m">12</span><span class="p">,</span><span class="w"> </span><span class="n">colour</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;black&quot;</span><span class="p">),</span>
+<span class="w">        </span><span class="n">axis.title</span><span class="o">=</span><span class="nf">element_text</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="m">14</span><span class="p">))</span><span class="w"> </span><span class="o">+</span>
+<span class="w">  </span><span class="nf">ggtitle</span><span class="p">(</span><span class="s">&quot;Leukocyte-related GO pathways&quot;</span><span class="p">)</span><span class="w"> </span><span class="o">+</span>
+<span class="w">  </span><span class="nf">coord_flip</span><span class="p">()</span>
+
+<span class="n">p</span>
+</code></pre></div>
+<p>You will obtain the following lollipop plot :</p>
+<figure>
+  <img src="../assets/images/lollipop.png" width="700"/>
+  </figure>
+
 <h2 id="code-for-a-heatmap-of-p-values-with-ggplot2">Code for a heatmap of p-values with ggplot2</h2>
 <p>For heatmaps, ggplot2 can also be used. Here is an example for a heatmap of the p-values of 6 different gene sets (gs), and the
 p-value for each gene set was calculated in two comparisons, so we compared the enrichment in genes differentially expressed
@@ -815,58 +867,6 @@ required for ggplot2.</p>
 <p>You will obtain the following heatmap:</p>
 <figure>
   <img src="../assets/images/heatmap_p_value_ORA.png" width="300"/>
-  </figure>
-
-<h2 id="code-for-a-lollipop-plot-with-ggplot2">Code for a lollipop plot with ggplot2</h2>
-<p>In this lollipop of GSEA results of leukocyte-related GO pathways, the color will represent up- (red) or down-regulated (blue) gene sets, the dot size represents the setSize. The length of the gene set description is truncated to 50 characters. We use the GSEA results that we obtained after selecting the leukocyte-related GO pathways at the end of exercise 3.</p>
-<div class="highlight"><pre><span></span><code><span class="c1"># Bonus: lollipop plot of p-values of leukocyte-related GO pathways. The </span>
-<span class="c1"># color will represent up- (red) or down-regulated (blue) gene sets, </span>
-<span class="c1"># the dot size represents the setSize.</span>
-<span class="c1"># The length of the gene set description is truncated to 50 characters:</span>
-
-<span class="c1"># We use the GSEA results that we obtained after selecting the leukocyte-related GO pathways at the end of exercise 3</span>
-<span class="n">df</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">GO_NK_Th_selection</span><span class="o">@</span><span class="n">result</span>
-<span class="nf">head</span><span class="p">(</span><span class="n">df</span><span class="p">[,</span><span class="m">1</span><span class="o">:</span><span class="m">8</span><span class="p">])</span>
-<span class="c1">#                    ID                       Description setSize enrichmentScore       NES       pvalue   p.adjust     qvalue</span>
-<span class="c1"># GO:0097529 GO:0097529       myeloid leukocyte migration     182       0.3358543  1.459329 0.0060333962 0.04957978 0.03849908</span>
-<span class="c1"># GO:0030595 GO:0030595              leukocyte chemotaxis     186       0.3314487  1.446607 0.0057064461 0.04766950 0.03701573</span>
-<span class="c1"># GO:0007159 GO:0007159      leukocyte cell-cell adhesion     335       0.2955485  1.381506 0.0037782543 0.03815146 0.02962490</span>
-<span class="c1"># GO:0001776 GO:0001776             leukocyte homeostasis      99      -0.3891370 -1.552210 0.0037570540 0.03812616 0.02960525</span>
-<span class="c1"># GO:0002685 GO:0002685 regulation of leukocyte migration     185       0.3418586  1.489716 0.0020160142 0.02593948 0.02014220</span>
-<span class="c1"># GO:0070661 GO:0070661           leukocyte proliferation     273       0.3247110  1.493837 0.0009132421 0.01545176 0.01199841</span>
-
-<span class="n">df</span><span class="o">$</span><span class="n">mycolor</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="nf">ifelse</span><span class="p">(</span><span class="n">df</span><span class="o">$</span><span class="n">NES</span><span class="o">&lt;</span><span class="m">0</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;cornflowerblue&quot;</span><span class="p">,</span><span class="s">&quot;indianred2&quot;</span><span class="p">)</span>
-
-<span class="n">df</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">df</span><span class="p">[</span><span class="nf">order</span><span class="p">(</span><span class="n">df</span><span class="o">$</span><span class="n">pvalue</span><span class="p">,</span><span class="w"> </span><span class="n">decreasing</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="bp">T</span><span class="p">),]</span><span class="w"> </span><span class="c1">#revert the order of the rows</span>
-<span class="n">df</span><span class="o">$</span><span class="n">Label</span><span class="w"> </span><span class="o">&lt;-</span><span class="n">stringr</span><span class="o">::</span><span class="nf">str_trunc</span><span class="p">(</span><span class="n">df</span><span class="o">$</span><span class="n">Description</span><span class="p">,</span><span class="w"> </span><span class="m">50</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;right&quot;</span><span class="p">)</span><span class="w"> </span><span class="c1"># keep max 50 character in a string (nchar(&quot;string&quot;) to count characters)</span>
-<span class="n">df</span><span class="o">$</span><span class="n">Label</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="nf">factor</span><span class="p">(</span><span class="n">df</span><span class="o">$</span><span class="n">Label</span><span class="p">,</span><span class="w"> </span><span class="n">levels</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nf">c</span><span class="p">(</span><span class="n">df</span><span class="o">$</span><span class="n">Label</span><span class="p">))</span>
-
-<span class="c1"># Use limits of the x-axis range according to the range of p.values:</span>
-<span class="n">max_x</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="nf">round</span><span class="p">(</span><span class="nf">max</span><span class="p">(</span><span class="o">-</span><span class="nf">log10</span><span class="p">(</span><span class="n">df</span><span class="o">$</span><span class="n">p.adjust</span><span class="p">)),</span><span class="w"> </span><span class="n">digits</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">0</span><span class="p">)</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="m">0.5</span>
-<span class="n">xlimits</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="nf">c</span><span class="p">(</span><span class="m">0</span><span class="p">,</span><span class="w"> </span><span class="n">max_x</span><span class="p">)</span>
-<span class="n">xbreaks</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="nf">seq_along</span><span class="p">(</span><span class="m">0</span><span class="o">:</span><span class="n">max_x</span><span class="p">)</span>
-
-<span class="c1"># Create the plot:</span>
-<span class="n">p</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="nf">ggplot</span><span class="p">(</span><span class="n">df</span><span class="p">,</span><span class="w"> </span><span class="nf">aes</span><span class="p">(</span><span class="n">x</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Label</span><span class="p">,</span><span class="w"> </span><span class="n">y</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">-</span><span class="nf">log10</span><span class="p">(</span><span class="n">p.adjust</span><span class="p">),</span><span class="w"> </span><span class="n">fill</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">mycolor</span><span class="p">))</span><span class="w"> </span><span class="o">+</span>
-<span class="w">  </span><span class="nf">geom_segment</span><span class="p">(</span><span class="nf">aes</span><span class="p">(</span><span class="n">x</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Label</span><span class="p">,</span><span class="w"> </span><span class="n">xend</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Label</span><span class="p">,</span><span class="w"> </span><span class="n">y</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">0</span><span class="p">,</span><span class="w"> </span><span class="n">yend</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">-</span><span class="nf">log10</span><span class="p">(</span><span class="n">p.adjust</span><span class="p">)),</span>
-<span class="w">               </span><span class="n">color</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">df</span><span class="o">$</span><span class="n">mycolor</span><span class="p">,</span><span class="w"> </span><span class="n">lwd</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">1</span><span class="p">)</span><span class="w"> </span><span class="o">+</span>
-<span class="w">  </span><span class="nf">geom_point</span><span class="p">(</span><span class="n">pch</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">21</span><span class="p">,</span><span class="w">  </span><span class="n">bg</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">df</span><span class="o">$</span><span class="n">mycolor</span><span class="p">,</span><span class="w"> </span><span class="nf">aes</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="n">df</span><span class="o">$</span><span class="n">setSize</span><span class="p">),</span><span class="w"> </span><span class="n">color</span><span class="o">=</span><span class="n">df</span><span class="o">$</span><span class="n">mycolor</span><span class="p">)</span><span class="w"> </span><span class="o">+</span><span class="w"> </span>
-<span class="w">  </span><span class="nf">scale_size</span><span class="p">(</span><span class="n">name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;Number\nof genes&quot;</span><span class="p">)</span><span class="w"> </span><span class="o">+</span><span class="w"> </span>
-<span class="w">  </span><span class="nf">scale_y_continuous</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="nf">expression</span><span class="p">(</span><span class="s">&quot;-&quot;</span><span class="o">*</span><span class="s">&quot;log&quot;</span><span class="p">[</span><span class="m">10</span><span class="p">]</span><span class="o">*</span><span class="s">&quot;(p-value)&quot;</span><span class="p">),</span><span class="w"> </span>
-<span class="w">                     </span><span class="n">limits</span><span class="o">=</span><span class="n">xlimits</span><span class="p">,</span>
-<span class="w">                     </span><span class="n">breaks</span><span class="o">=</span><span class="n">xbreaks</span><span class="p">)</span><span class="w"> </span><span class="o">+</span>
-<span class="w">  </span><span class="nf">scale_x_discrete</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s">&quot;&quot;</span><span class="p">)</span><span class="w"> </span><span class="o">+</span>
-<span class="w">  </span><span class="nf">theme_bw</span><span class="p">(</span><span class="n">base_size</span><span class="o">=</span><span class="m">10</span><span class="p">,</span><span class="w"> </span><span class="n">base_family</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;Helvetica&quot;</span><span class="p">)</span><span class="w"> </span><span class="o">+</span>
-<span class="w">  </span><span class="nf">theme</span><span class="p">(</span><span class="n">axis.text</span><span class="o">=</span><span class="nf">element_text</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="m">12</span><span class="p">,</span><span class="w"> </span><span class="n">colour</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;black&quot;</span><span class="p">),</span>
-<span class="w">        </span><span class="n">axis.title</span><span class="o">=</span><span class="nf">element_text</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="m">14</span><span class="p">))</span><span class="w"> </span><span class="o">+</span>
-<span class="w">  </span><span class="nf">ggtitle</span><span class="p">(</span><span class="s">&quot;Leukocyte-related GO pathways&quot;</span><span class="p">)</span><span class="w"> </span><span class="o">+</span>
-<span class="w">  </span><span class="nf">coord_flip</span><span class="p">()</span>
-
-<span class="n">p</span>
-</code></pre></div>
-<p>You will obtain the following lollipop plot :</p>
-<figure>
-  <img src="../assets/images/lollipop.png" width="700"/>
   </figure>
 
 <h2 id="small-information-on-a-typical-rnaseq-workflow">Small information on a typical RNAseq workflow</h2>
