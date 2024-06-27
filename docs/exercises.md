@@ -237,16 +237,16 @@ ggplot(NK_vs_Th, aes(x = logFC,  #
 ## Exercise 2 - Gene set enrichment analysis (GSEA)
 
 
-Next, we will use functions of the clusterProfiler package to perform a gene set enrichment analysis (GSEA) of Gene Ontology terms. For this, we first need
-to create a vector with the t-statistic of each gene, assign the gene symbol to each t-statistic in the vector (i.e. names), then sort the vector.
+Next, we will use functions of the clusterProfiler package to perform a gene set enrichment analysis (GSEA) of Gene Ontology terms. For this, we first need to create a vector with the t-statistic of each gene, assign the gene symbol to each t-statistic in the vector (i.e. names), then sort the vector.
 
 !!! warning
-		A single gene can be labeled with different types of gene labels: Ensembl IDs, NCBI Entrez IDs, gene symbols, UniProt IDs, etc. 
+    A single gene can be labeled with different types of gene labels: Ensembl IDs, NCBI Entrez IDs, gene symbols, UniProt IDs, etc. 
 		Therefore, first check whether the way the genes are labeled is supported by clusterProfiler using:
 		```r
-		idType(OrgDb = "org.Hs.eg.db") # to determine allowed gene id type
+		  idType(OrgDb = "org.Hs.eg.db") # to determine allowed gene id type
 		```
-Create the named and sorted vector of t-statistics (i.e. for the geneList argument of the gseGO() function). 
+
+Create the named and sorted vector of t-statistics (i.e. for the geneList argument of the `gseGO()` function). 
 
 ```r
 gl<-NK_vs_Th$t
