@@ -242,6 +242,64 @@ sorted_GO_NK_Th %>%
   </figure>
 
 
+## Code for a lollipop plot with ggplot2
+
+In this lollipop of GSEA results of leukocyte-related GO pathways, the color will represent up- (red) or down-regulated (blue) gene sets, the dot size represents the setSize. The length of the gene set description is truncated to 50 characters. We use the GSEA results that we obtained after selecting the leukocyte-related GO pathways at the end of exercise 3.
+
+```r
+# Bonus: lollipop plot of p-values of leukocyte-related GO pathways. The 
+# color will represent up- (red) or down-regulated (blue) gene sets, 
+# the dot size represents the setSize.
+# The length of the gene set description is truncated to 50 characters:
+
+# We use the GSEA results that we obtained after selecting the leukocyte-related GO pathways at the end of exercise 3
+df <- GO_NK_Th_selection@result
+head(df[,1:8])
+#                    ID                       Description setSize enrichmentScore       NES       pvalue   p.adjust     qvalue
+# GO:0097529 GO:0097529       myeloid leukocyte migration     182       0.3358543  1.459329 0.0060333962 0.04957978 0.03849908
+# GO:0030595 GO:0030595              leukocyte chemotaxis     186       0.3314487  1.446607 0.0057064461 0.04766950 0.03701573
+# GO:0007159 GO:0007159      leukocyte cell-cell adhesion     335       0.2955485  1.381506 0.0037782543 0.03815146 0.02962490
+# GO:0001776 GO:0001776             leukocyte homeostasis      99      -0.3891370 -1.552210 0.0037570540 0.03812616 0.02960525
+# GO:0002685 GO:0002685 regulation of leukocyte migration     185       0.3418586  1.489716 0.0020160142 0.02593948 0.02014220
+# GO:0070661 GO:0070661           leukocyte proliferation     273       0.3247110  1.493837 0.0009132421 0.01545176 0.01199841
+
+df$mycolor <- ifelse(df$NES<0, "cornflowerblue","indianred2")
+
+df <- df[order(df$pvalue, decreasing = T),] #revert the order of the rows
+df$Label <-stringr::str_trunc(df$Description, 50, "right") # keep max 50 character in a string (nchar("string") to count characters)
+df$Label <- factor(df$Label, levels = c(df$Label))
+
+# Use limits of the x-axis range according to the range of p.values:
+max_x <- round(max(-log10(df$p.adjust)), digits = 0) + 0.5
+xlimits <- c(0, max_x)
+xbreaks <- seq_along(0:max_x)
+
+# Create the plot:
+p <- ggplot(df, aes(x = Label, y = -log10(p.adjust), fill = mycolor)) +
+  geom_segment(aes(x = Label, xend = Label, y = 0, yend = -log10(p.adjust)),
+               color = df$mycolor, lwd = 1) +
+  geom_point(pch = 21,  bg = df$mycolor, aes(size=df$setSize), color=df$mycolor) + 
+  scale_size(name = "Number\nof genes") + 
+  scale_y_continuous(name=expression("-"*"log"[10]*"(p-value)"), 
+                     limits=xlimits,
+                     breaks=xbreaks) +
+  scale_x_discrete(name="") +
+  theme_bw(base_size=10, base_family = "Helvetica") +
+  theme(axis.text=element_text(size=12, colour = "black"),
+        axis.title=element_text(size=14)) +
+  ggtitle("Leukocyte-related GO pathways") +
+  coord_flip()
+
+p
+```
+
+You will obtain the following lollipop plot :
+  
+  <figure>
+  <img src="../assets/images/lollipop.png" width="700"/>
+  </figure>
+
+
 ## Code for a heatmap of p-values with ggplot2
 
 For heatmaps, ggplot2 can also be used. Here is an example for a heatmap of the p-values of 6 different gene sets (gs), and the
@@ -312,63 +370,6 @@ You will obtain the following heatmap:
   
   <figure>
   <img src="../assets/images/heatmap_p_value_ORA.png" width="300"/>
-  </figure>
-
-## Code for a lollipop plot with ggplot2
-
-In this lollipop of GSEA results of leukocyte-related GO pathways, the color will represent up- (red) or down-regulated (blue) gene sets, the dot size represents the setSize. The length of the gene set description is truncated to 50 characters. We use the GSEA results that we obtained after selecting the leukocyte-related GO pathways at the end of exercise 3.
-
-```r
-# Bonus: lollipop plot of p-values of leukocyte-related GO pathways. The 
-# color will represent up- (red) or down-regulated (blue) gene sets, 
-# the dot size represents the setSize.
-# The length of the gene set description is truncated to 50 characters:
-
-# We use the GSEA results that we obtained after selecting the leukocyte-related GO pathways at the end of exercise 3
-df <- GO_NK_Th_selection@result
-head(df[,1:8])
-#                    ID                       Description setSize enrichmentScore       NES       pvalue   p.adjust     qvalue
-# GO:0097529 GO:0097529       myeloid leukocyte migration     182       0.3358543  1.459329 0.0060333962 0.04957978 0.03849908
-# GO:0030595 GO:0030595              leukocyte chemotaxis     186       0.3314487  1.446607 0.0057064461 0.04766950 0.03701573
-# GO:0007159 GO:0007159      leukocyte cell-cell adhesion     335       0.2955485  1.381506 0.0037782543 0.03815146 0.02962490
-# GO:0001776 GO:0001776             leukocyte homeostasis      99      -0.3891370 -1.552210 0.0037570540 0.03812616 0.02960525
-# GO:0002685 GO:0002685 regulation of leukocyte migration     185       0.3418586  1.489716 0.0020160142 0.02593948 0.02014220
-# GO:0070661 GO:0070661           leukocyte proliferation     273       0.3247110  1.493837 0.0009132421 0.01545176 0.01199841
-
-df$mycolor <- ifelse(df$NES<0, "cornflowerblue","indianred2")
-
-df <- df[order(df$pvalue, decreasing = T),] #revert the order of the rows
-df$Label <-stringr::str_trunc(df$Description, 50, "right") # keep max 50 character in a string (nchar("string") to count characters)
-df$Label <- factor(df$Label, levels = c(df$Label))
-
-# Use limits of the x-axis range according to the range of p.values:
-max_x <- round(max(-log10(df$p.adjust)), digits = 0) + 0.5
-xlimits <- c(0, max_x)
-xbreaks <- seq_along(0:max_x)
-
-# Create the plot:
-p <- ggplot(df, aes(x = Label, y = -log10(p.adjust), fill = mycolor)) +
-  geom_segment(aes(x = Label, xend = Label, y = 0, yend = -log10(p.adjust)),
-               color = df$mycolor, lwd = 1) +
-  geom_point(pch = 21,  bg = df$mycolor, aes(size=df$setSize), color=df$mycolor) + 
-  scale_size(name = "Number\nof genes") + 
-  scale_y_continuous(name=expression("-"*"log"[10]*"(p-value)"), 
-                     limits=xlimits,
-                     breaks=xbreaks) +
-  scale_x_discrete(name="") +
-  theme_bw(base_size=10, base_family = "Helvetica") +
-  theme(axis.text=element_text(size=12, colour = "black"),
-        axis.title=element_text(size=14)) +
-  ggtitle("Leukocyte-related GO pathways") +
-  coord_flip()
-
-p
-```
-
-You will obtain the following lollipop plot :
-  
-  <figure>
-  <img src="../assets/images/lollipop.png" width="700"/>
   </figure>
 
 

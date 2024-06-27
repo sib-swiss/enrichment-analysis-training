@@ -272,11 +272,11 @@ Explore the new object that was created. What is its structure? What does it con
 		GO_NK_Th@result[GO_NK_Th@result$Description=="adaptive immune response",]
 		summary(GO_NK_Th@result$p.adjust<0.05&GO_NK_Th@result$NES<0)
       # Mode     FALSE    TRUE 
-      # logical    290      61
+      # logical    320      63 
       
       summary(GO_NK_Th@result$p.adjust<0.05&GO_NK_Th@result$NES>0)
       #     Mode   FALSE    TRUE 
-      # logical       61     290 
+      # logical       63     320 
 
 	```
 
@@ -331,9 +331,10 @@ nk_up_genes<-subset(NK_vs_Th, NK_vs_Th$logFC>0&NK_vs_Th$p.adj<=0.05)$symbol
 GO_enrich<-enrichGO(gene=nk_up_genes,
                     OrgDb = org.Hs.eg.db,
                     keyType = "SYMBOL",
-                    # ont="BP", # the default is ont="MF"
-                    minGSSize = 30, 
-                    universe=NK_vs_Th$symbol) # may bug with barplot below if universe is added, depending on version
+                    # ont="BP",
+                    ont="MF", # ont="MF" is the default
+                    minGSSize = 30,
+ universe=NK_vs_Th$symbol) # may bug with barplot below if added, depending on version
 View(GO_enrich@result)
 
 # Check the class of the objects created:
@@ -409,9 +410,8 @@ graphics::barplot(GO_NK_Th) # this is a gseaResult object
 # 'height' must be a vector or a matrix
 
 # Select only 2 out of the significant gene sets:
-# ego_selection = GO_enrich[GO_enrich$ID == "GO:0019864" | GO_enrich$ID == "GO:0045159", asis=T] # doesn't select any gene set
-ego_selection = GO_enrich[GO_enrich@result$ID == "GO:0042287" | GO_enrich@result$ID == "GO:0004713", asis=T] 
-graphics::barplot(ego_selection)
+ego_selection = GO_enrich[GO_enrich@result$ID == "GO:0042287" | GO_enrich@result$ID == "GO:0004713", asis=T]
+barplot(ego_selection)
 
 ```
 
