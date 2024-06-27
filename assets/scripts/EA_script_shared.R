@@ -1,13 +1,13 @@
 # ------------------------------------------------
 # Enrichment analysis, SIB course
 # ------------------------------------------------
-#  Tested on R version 4.3.2 (2023-10-31)
+# :8724 # R version 4.4.1 
 
 # load the packages needed for the R exercise
-library(clusterProfiler) #  v 4.10.0
-library(enrichplot) # v 1.22.0
+library(clusterProfiler) #  v 4.12.0
+library(enrichplot) # v 1.24.0
 library(pathview)
-library(org.Hs.eg.db) # v 3.18.0
+library(org.Hs.eg.db) # v 3.19.1
 library(ggplot2)
 library(ggrepel)
 library(msigdbr) # v 7.5.1
@@ -22,7 +22,7 @@ library(tidyverse) # for bonus code/dplyr/pipe
 ??stats::adjust
 
 # set the working directory to where the data files are located:
-setwd()
+setwd("/export/scratch/twyss/SIB_training/EA_062024/data/")
 # set seed
 set.seed(1234)
 
@@ -71,7 +71,7 @@ table(Th_up$symbol %in% adaptive$gene)
 length(which(Th_up$symbol %in% adaptive$gene))
 
 ## -- Number of genes up-regulated in NK (i.e. down in Th)
-Th_down<-subset(NK_vs_Th, NK_vs_Th$p.adj<=0.05&NK_vs_Th$logFC>0)
+Th_down<-subset(NK_vs_Th, NK_vs_Th$p.adj<=0.05 & NK_vs_Th$logFC>0)
 table(Th_down$symbol %in% adaptive$gene)
 # FALSE  TRUE 
 #. 1875    82 
@@ -89,7 +89,6 @@ summary(Th_not_DE$symbol %in% adaptive$gene)
 #              up not_up
 # in_set        .      .
 # not_in_set    .      .
-
 
 # 3: reversed rows of table outputs:
 cont.table<-matrix(c(rev(unlist(table(Th_up$symbol %in% adaptive$gene))), 
@@ -123,7 +122,7 @@ fisher.test(cont.table)
 # with enricher(), hypergeometric test implementation in clusterProfiler:
 # Obtain the genes up-regulated in NK:
 
-nk_up_genes<-subset(NK_vs_Th, NK_vs_Th$logFC>0&NK_vs_Th$p.adj<=0.05)$symbol
+nk_up_genes<-subset(NK_vs_Th, NK_vs_Th$logFC>0 & NK_vs_Th$p.adj<=0.05)$symbol
 
 # Help: hypergeometric test (like one-sided Fisher test = greater)
 ?enricher
@@ -139,6 +138,7 @@ hyper_3genesets<-enricher(gene=nk_up_genes,
                           universe = NK_vs_Th$symbol,
                           TERM2GENE = genesets3,
                           maxGSSize = 1000)
+class(hyper_3genesets)
 View(hyper_3genesets@result)
 
 # Bonus: volcano plot of DE genes:
@@ -163,13 +163,14 @@ ggplot(NK_vs_Th, aes(x = logFC,  #
   geom_vline(xintercept = 0, linetype="dashed")
 
 
-## Bonus: over-representation analysis of genes up-regulated in Th cells:
+## not shown Bonus: over-representation analysis of genes up-regulated in Th cells:
 up_reg_th <- NK_vs_Th$symbol[NK_vs_Th$logFC < 0 & NK_vs_Th$p.adj < 0.05 ]  
 hyper_3genesets_Th<-enricher(gene=up_reg_th,
                              universe = NK_vs_Th$symbol,
                              TERM2GENE = genesets3,
                              maxGSSize = 1000)
 View(hyper_3genesets_Th@result)
+
 
 # --------------- Exercise 2
 # GSEA: prepare gene symbol-named vector of sorted t-statistics
@@ -199,12 +200,12 @@ View(GO_NK_Th@result)
 
 # Is the adaptive immune response gene set significant?
 GO_NK_Th@result[GO_NK_Th@result$Description=="adaptive immune response",]
-summary(GO_NK_Th@result$p.adjust<0.05&GO_NK_Th@result$NES<0)
+summary(GO_NK_Th@result$p.adjust<0.05 & GO_NK_Th@result$NES<0)
 # Mode       FALSE    TRUE 
-# logical     290      61 
-summary(GO_NK_Th@result$p.adjust<0.05&GO_NK_Th@result$NES>0)
+# logical     320      63 
+summary(GO_NK_Th@result$p.adjust<0.05 & GO_NK_Th@result$NES>0)
 #     Mode   FALSE    TRUE 
-# logical       61     290  
+# logical       63     320   
 
 # Simplify:
 ?simplify()
@@ -212,11 +213,13 @@ summary(GO_NK_Th@result$p.adjust<0.05&GO_NK_Th@result$NES>0)
 # Already ran:
 GO_NK_Th_simplify <- clusterProfiler::simplify(GO_NK_Th)
 View(GO_NK_Th_simplify@result)
-GO_NK_Th_simplify@result[GO_NK_Th_simplify@result$Description=="adaptive immune response",]
+GO_NK_Th_simplify@result[GO_NK_Th_simplify@result$Description == "adaptive immune response",]
 
 # you can export the results to a csv file (to summarize results using Revigo, see presentation)
 write.csv(GO_NK_Th@result, "GO_GSEA_NK_vs_Th.csv",
           row.names = F, quote = F)
+# save the gseaResult object:
+saveRDS(GO_NK_Th, "GO_NK_Th.rds")
 
 # How to obtain the list of leading edge genes for a gene set:
 unlist(strsplit(GO_NK_Th@result[GO_NK_Th@result$Description=="adaptive immune response",11],
@@ -236,8 +239,10 @@ nk_up_genes<-subset(NK_vs_Th, NK_vs_Th$logFC>0&NK_vs_Th$p.adj<=0.05)$symbol
 GO_enrich<-enrichGO(gene=nk_up_genes,
                     OrgDb = org.Hs.eg.db,
                     keyType = "SYMBOL",
-                    minGSSize = 30, # ,
-                    universe=NK_vs_Th$symbol) # may bug with barplot below if added depending on version
+                    # ont="BP",
+                    ont="MF",
+                    minGSSize = 30, 
+                    universe=NK_vs_Th$symbol) # may bug with barplot below if added, depending on version
 
 View(GO_enrich@result)
 range(unlist(lapply(GO_enrich@geneSets, length)))
@@ -280,7 +285,7 @@ graphics::barplot(GO_NK_Th) # this is a gseaResult object
 # Error in barplot.default(GO_NK_Th) : 
 # 'height' must be a vector or a matrix
 
-# Select only 2 out of the significant gene sets:
+# Select only 2 out of the significant gene sets: if ont="MF" was selected:
 ego_selection = GO_enrich[GO_enrich@result$ID == "GO:0042287" | GO_enrich@result$ID == "GO:0004713", asis=T]
 barplot(ego_selection)
 
@@ -316,6 +321,7 @@ p2
 # dplyr::mutate(GO_enrich, qscore = -log(p.adjust, base=10)) %>% 
 #   barplot(x="qscore")
 
+
 # Barcode plot (i.e. gsea plot)
 # You need the ID of the GO gene set to plot:
 GO_NK_Th@result[1:10,1:6]
@@ -342,6 +348,7 @@ ego2 <- pairwise_termsim(GO_NK_Th)
 emapplot(ego2, color="p.adjust")
 
 # The ridge plots:
+?ridgeplot
 # Distribution of t-statistic for genes included in significant gene sets or in selected gene sets:
 ridgeplot(GO_NK_Th)
 
@@ -361,7 +368,7 @@ ridgeplot(GO_NK_Th_selection)
 # Terms that contain the keyword "leukocyte"
 GO_NK_Th_selection <- GO_NK_Th[grep("leukocyte",GO_NK_Th@result$Description), asis=T]
 ridgeplot(GO_NK_Th_selection)
-?ridgeplot
+
 
 # Bonus: lollipop plot of p-values of leukocyte-related GO pathways. The 
 # color will represent up- (red) or down-regulated (blue) gene sets, 
@@ -423,7 +430,8 @@ keytypes(org.Hs.eg.db)
 # convert from= "ENSEMBL" to "SYMBOL" and "ENTREZID"
 gene_convert <- bitr(as.character(NK_vs_Th$ensembl_gene_id), 
                      fromType="ENSEMBL", 
-                     toType=c("SYMBOL", "ENTREZID"), OrgDb="org.Hs.eg.db")
+                     toType=c("SYMBOL", "ENTREZID"), OrgDb="org.Hs.eg.db",
+                     drop=TRUE)
 head(gene_convert)
 dim(gene_convert)
 
@@ -462,7 +470,7 @@ View(KEGG_NK_Th@result)
 # Up-regulated gene sets:
 summary(KEGG_NK_Th@result$NES>0)
 #    Mode   FALSE    TRUE 
-# logical       8      19 
+# logical      7      21 
 
 KEGG_NK_Th@result[grep("immune",KEGG_NK_Th@result$Description), ]
 
@@ -528,6 +536,7 @@ dotplot(h_NK_vs_Th, x="NES", orderBy="p.adjust")
 gseaplot2(h_NK_vs_Th, geneSetID = "HALLMARK_MTORC1_SIGNALING",
           title="HALLMARK_MTORC1_SIGNALING")
 
+
 ### ---- KEGG with msigdbr download:
 msigdbr_collections() # 
 # C2     "CP:KEGG"      
@@ -555,7 +564,7 @@ head(kegg_gsea@result[,c(2:6)])
 # KEGG_FC_GAMMA_R_MEDIATED_PHAGOCYTOSIS                   KEGG_FC_GAMMA_R_MEDIATED_PHAGOCYTOSIS      87       0.5343886  2.100787 1.599037e-06
 # KEGG_B_CELL_RECEPTOR_SIGNALING_PATHWAY                 KEGG_B_CELL_RECEPTOR_SIGNALING_PATHWAY      70       0.5299578  1.993277 8.000155e-06
 
-kegg_gsea@result[grep("NATURAL_KILLER", kegg_gsea@result$Description), c(2:6)]
+kegg_gsea@result[grep("NATURAL_KILLER", kegg_gsea@result$Description), c(2:6,11)]
 #                                     Description setSize enrichmentScore      NES       pvalue
 #  KEGG_NATURAL_KILLER_CELL_MEDIATED_CYTOTOXICITY     104       0.6183274 2.509621 7.254908e-13
 
@@ -629,7 +638,7 @@ head(ensembl_human_to_mouse)
 # 6 ENSG00000000938                FGR                                    Fgr
 
 
-# Bonus code: for p-value heatmap using ggplot2:
+### --- Bonus code: for p-value heatmap using ggplot2:
 
 # Create a data frame that contains the p-value for every gene set for every 
 # cell type comparison. You need to include the values also for the non-significant
@@ -701,12 +710,4 @@ ggsave(plot = p, filename = "heatmap_p_value_ORA.png",
 # file "reactomeGSEA_NK_vs_Th_results.rds"
 # - count the number of significant adjusted p-values
 # - use barplot() and gseaplot() for the visualization of the results
-
-
-
-
-
-
-
-
 
