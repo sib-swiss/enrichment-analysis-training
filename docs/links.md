@@ -89,6 +89,7 @@ A [*pipeline for non-model species*](https://bio-protocol.org/en/bpdetail?id=391
 
 [**Combes et al, 2021**](https://pubmed.ncbi.nlm.nih.gov/34236662/): *GO Enrichment Analysis for Differential Proteomics Using ProteoRE*. 
 
+**Proteomics data analysis in R**: [https://pnnl-comp-mass-spec.github.io/proteomics-data-analysis-tutorial/](https://pnnl-comp-mass-spec.github.io/proteomics-data-analysis-tutorial/). Chapter 8 contains code for ORA and GSEA with clusterProfiler, but also with fgsea. 
 
 
 
