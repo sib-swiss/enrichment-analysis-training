@@ -62,7 +62,7 @@ length(which(NK_vs_Th$symbol %in% adaptive$gene)) # 513
 
 # Extract the number of genes up-regulated in Th (i.e. down-regulated in NK):
 Th_up<-subset(NK_vs_Th, 
-              NK_vs_Th$p.adj<=0.05&NK_vs_Th$logFC<0)
+              NK_vs_Th$p.adj<=0.05 & NK_vs_Th$logFC<0)
 # Are these genes part of the gene set?            
 summary(Th_up$symbol %in% adaptive$gene)
 #    Mode   FALSE    TRUE 
@@ -137,9 +137,24 @@ genesets3<-rbind(adaptive, hair, cell_active)
 hyper_3genesets<-enricher(gene=nk_up_genes,
                           universe = NK_vs_Th$symbol,
                           TERM2GENE = genesets3,
-                          maxGSSize = 1000)
+                          maxGSSize = 1100)
 class(hyper_3genesets)
 View(hyper_3genesets@result)
+
+# geneRatio : ratio of input genes that are annotated in a term
+# BgRatio : ratio of all genes that are annotated in this term
+
+# The richFactor is the ratio of differentially expressed gene numbers annotated in this 
+# pathway to all gene numbers annotated in this pathway term. 
+# The greater the Rich factor, the greater the degree of pathway enrichment.
+173/896 # 0.1930804
+# The fold enrichment is defined as the ratio of the frequency 
+# of input genes annotated in a term to the frequency of all genes annotated to that term, 
+# and it is easy to calculate by dividing geneRatio by BgRatio
+# Info about how much of a gene set was “covered” by the input genes for the ORA
+# zscore: ?
+
+
 
 # Bonus: volcano plot of DE genes:
 # highlight genes of adaptive immune response in a volcano plot:
@@ -180,7 +195,7 @@ idType(OrgDb = "org.Hs.eg.db") # to determine allowed gene id type
 ?gseGO()
 
 gl<-NK_vs_Th$t
-names(gl)<-make.names(NK_vs_Th$symbol, unique = T)
+names(gl)<-make.names(NK_vs_Th$symbol, unique = TRUE)
 gl<-gl[order(gl, decreasing = T)]
 head(gl)
 tail(gl)
@@ -199,7 +214,7 @@ str(GO_NK_Th)
 View(GO_NK_Th@result)
 
 # Is the adaptive immune response gene set significant?
-GO_NK_Th@result[GO_NK_Th@result$Description=="adaptive immune response",]
+GO_NK_Th@result[GO_NK_Th@result$Description == "adaptive immune response", ]
 summary(GO_NK_Th@result$p.adjust<0.05 & GO_NK_Th@result$NES<0)
 # Mode       FALSE    TRUE 
 # logical     320      63 
@@ -252,6 +267,18 @@ class(GO_NK_Th)
 # Bonus: Histogram of the length of GO gene sets:
 hist(unlist(lapply(GO_NK_Th@geneSets, length)), breaks = c(seq(0,500,by=100),seq(1000,20000,by=1000)), xlab="Length of GO gene sets", main="")
 
+## 
+sorted_df = GO_NK_Th@result[order(GO_NK_Th@result$NES, decreasing = F),]
+sorted_df$col = "steelblue"
+sorted_df$col[sorted_df$NES>0] = "red"
+nr = nrow(sorted_df)
+barplot(sorted_df$NES[c(1:10, (nr-9):nr)],
+        horiz = T, names=rev(sorted_df$Description[c(1:10, (nr-9):nr)]),
+        las=2, xlab="NES",
+        cex.names = 0.7,
+        col = sorted_df$col[c(1:10, nr-9:nr)]
+)
+
 # --------------- Exercise 3: visualization
 
 # Barplot of -log10 p-values of top 10 GO gene sets:
@@ -280,6 +307,7 @@ abline(v=0)
 # barplot() can be directly used on enrichResult objects: but not on gseaResult objects
 graphics::barplot(GO_enrich)
 graphics::barplot(GO_enrich, color = "qvalue", x = "GeneRatio")
+graphics::barplot(hyper_3genesets) # significant ones only
 
 graphics::barplot(GO_NK_Th) # this is a gseaResult object
 # Error in barplot.default(GO_NK_Th) : 
@@ -288,6 +316,7 @@ graphics::barplot(GO_NK_Th) # this is a gseaResult object
 # Select only 2 out of the significant gene sets: if ont="MF" was selected:
 ego_selection = GO_enrich[GO_enrich@result$ID == "GO:0042287" | GO_enrich@result$ID == "GO:0004713", asis=T]
 barplot(ego_selection)
+barplot(ego_selection, x="p.adjust")
 
 # Bonus code: barplot with ggplot2
 # Barplot of top 10 significant gene sets:
@@ -319,7 +348,7 @@ p2
 #        device = "png")
 
 # dplyr::mutate(GO_enrich, qscore = -log(p.adjust, base=10)) %>% 
-#   barplot(x="qscore")
+#    barplot(x="qscore")
 
 
 # Barcode plot (i.e. gsea plot)
@@ -333,17 +362,33 @@ gseaplot(GO_NK_Th, geneSetID = "GO:0002181",
 gseaplot(GO_NK_Th, geneSetID = "GO:0002443",
          title="GO:0002443 - leukocyte mediated immunity")
 
+# customize second plot:
+p <- gseaplot(GO_NK_Th, geneSetID = "GO:0002443",
+              title="GO:0002443 - leukocyte mediated immunity") 
+p[[2]] # default bottom plot 
+p[[2]] + theme_minimal() + ggtitle("My pathway") # customized bottom plot 
+
+# replace the bottom plot by my custom plot: 
+p[[2]] <- p[[2]] + theme_minimal() + ggtitle("My pathway") + 
+  xlab("Ranked list")
+p 
+
+
+# One that has a less strong NES (1.3)
+gseaplot(GO_NK_Th, geneSetID = "GO:0032870",
+         title="GO:0032870 - cellular response to hormone stimulus")
+
 # Dotplot on enrichResult and gseaResult objects:
 enrichplot::dotplot(GO_enrich, orderBy="p.adjust")
 enrichplot::dotplot(GO_NK_Th, orderBy="p.adjust")
 enrichplot::dotplot(GO_NK_Th, x="Count")
 
-# Gene concept network:
+# Gene concept network: overlap of genes among gene sets
 cnetplot(GO_enrich, categorySize="pvalue") # 3 significant gene sets
 cnetplot(GO_NK_Th, showCategory = 3)
 cnetplot(GO_NK_Th, showCategory = 3, foldChange = gl)
 
-# The enrichment map:
+# The enrichment map: similarity among gene sets
 ego2 <- pairwise_termsim(GO_NK_Th)
 emapplot(ego2, color="p.adjust")
 
@@ -368,7 +413,7 @@ ridgeplot(GO_NK_Th_selection)
 # Terms that contain the keyword "leukocyte"
 GO_NK_Th_selection <- GO_NK_Th[grep("leukocyte",GO_NK_Th@result$Description), asis=T]
 ridgeplot(GO_NK_Th_selection)
-
+dotplot(GO_NK_Th_selection)
 
 # Bonus: lollipop plot of p-values of leukocyte-related GO pathways. The 
 # color will represent up- (red) or down-regulated (blue) gene sets, 
@@ -450,6 +495,8 @@ gl_kegg_list<-as.numeric(as.character(gl_kegg$t))
 names(gl_kegg_list)<-as.character(gl_kegg$ENTREZID)
 gl_kegg_list<-sort(gl_kegg_list, decreasing = T)
 
+# gl_kegg_list<-gl_kegg_list[-c(which(duplicated(names(gl_kegg_list))))]
+
 # run GSEA of KEGG:
 # Already ran:
 KEGG_NK_Th<-gseKEGG(gl_kegg_list, 
@@ -470,7 +517,7 @@ View(KEGG_NK_Th@result)
 # Up-regulated gene sets:
 summary(KEGG_NK_Th@result$NES>0)
 #    Mode   FALSE    TRUE 
-# logical      7      21 
+# logical      7      20
 
 KEGG_NK_Th@result[grep("immune",KEGG_NK_Th@result$Description), ]
 
@@ -506,7 +553,10 @@ pathview(gene.data  = genePW,
 pathview(gene.data  = genePW,
          pathway.id = "hsa04650",
          species    = "hsa",
-         gene.idtype = "SYMBOL")
+         gene.idtype = "SYMBOL",
+         low = list(gene = "lightblue", cpd = "magenta"), 
+         mid = list(gene = "gray", cpd = "gray"), 
+         high = list(gene = "red", cpd = "yellow"))
 
 # Import hallmark, convert to term2gene and run GSEA:
 term2gene_h <- msigdbr(species = "Homo sapiens", category = "H")
@@ -553,9 +603,15 @@ head(kegg_pw[,c("gs_name", "gene_symbol")])
 # 5 KEGG_ABC_TRANSPORTERS ABCA2      
 # 6 KEGG_ABC_TRANSPORTERS ABCA3      
 
+# Create TERM2NAME to associate pathway id and description:
+kegg_TERM2NAME<-kegg_pw[,c("gs_exact_source", "gs_name")]
+colnames(kegg_TERM2NAME)<-c("ID", "Description")
+
 # Run with GSEA function: 
-kegg_gsea<-GSEA(gl, eps = 0, TERM2GENE = kegg_pw[,c("gs_name", "gene_symbol")], seed = TRUE)
-head(kegg_gsea@result[,c(2:6)])
+kegg_gsea<-GSEA(gl, eps = 0, TERM2GENE = kegg_pw[,c("gs_name", "gene_symbol")],
+                TERM2NAME = kegg_TERM2NAME,
+                seed = TRUE)
+head(kegg_gsea@result[,c(1:6)])
 #                                                                                   Description setSize enrichmentScore       NES       pvalue
 # KEGG_RIBOSOME                                                                   KEGG_RIBOSOME      86      -0.9016245 -3.534228 9.828038e-49
 # KEGG_NATURAL_KILLER_CELL_MEDIATED_CYTOTOXICITY KEGG_NATURAL_KILLER_CELL_MEDIATED_CYTOTOXICITY     104       0.6183274  2.509621 7.254908e-13
@@ -696,18 +752,10 @@ ggsave(plot = p, filename = "heatmap_p_value_ORA.png",
 
 
 
-#### ---- Extra exercise for credits
-# - Perform GSEA of the NK vs Th data using the Reactome gene sets downloaded on the 
-# MSigDB website.
-# - How many gene sets are significantly enriched? Generate an ordered barplot of 
-# the NES of all significant gene sets, and generate a barcode plot for the gene set with the lowest NES
 
-# Steps
-# - import the reactome gene sets in the file c2.cp.reactome.v7.1.symbols.gmt using read.gmt()
-# Use GSEA providing a sorted named vector of t-statistics and the reactome gene sets, 
-# use minGSSize=30
-# NOTE: if the GSEA fails, use readRDS to import the pre-computed results contained in the 
-# file "reactomeGSEA_NK_vs_Th_results.rds"
-# - count the number of significant adjusted p-values
-# - use barplot() and gseaplot() for the visualization of the results
+
+
+
+
+
 
