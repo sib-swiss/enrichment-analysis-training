@@ -10,7 +10,8 @@ library(pathview)
 library(org.Hs.eg.db) # v 3.19.1
 library(ggplot2)
 library(ggrepel)
-library(msigdbr) # v 7.5.1
+library(msigdbr) # v 7.5.1 # changed to v10 on Mar 24, 2025
+# install.packages('msigdbdf', repos = 'https://igordot.r-universe.dev')
 
 library(tidyverse) # for bonus code/dplyr/pipe
 
@@ -207,6 +208,15 @@ GO_NK_Th<-gseGO(gl, ont="BP",
                 minGSSize=30,
                 eps=0,
                 seed=T)
+# using 'fgsea' for GSEA analysis, please cite Korotkevich et al (2019).
+# preparing geneSet collections...
+# GSEA analysis...
+# leading edge analysis...
+# done...
+# Warning message:
+#   In preparePathwaysAndStats(pathways, stats, minSize, maxSize, gseaParam,  :
+#                                There are ties in the preranked stats (0.07% of the list).
+#                              The order of those tied genes will be arbitrary, which may produce unexpected results.
 
 # To have a glance at the results table
 class(GO_NK_Th)
@@ -267,7 +277,7 @@ class(GO_NK_Th)
 # Bonus: Histogram of the length of GO gene sets:
 hist(unlist(lapply(GO_NK_Th@geneSets, length)), breaks = c(seq(0,500,by=100),seq(1000,20000,by=1000)), xlab="Length of GO gene sets", main="")
 
-## 
+## Bonus: Barplot of NES:
 sorted_df = GO_NK_Th@result[order(GO_NK_Th@result$NES, decreasing = F),]
 sorted_df$col = "steelblue"
 sorted_df$col[sorted_df$NES>0] = "red"
@@ -373,15 +383,14 @@ p[[2]] <- p[[2]] + theme_minimal() + ggtitle("My pathway") +
   xlab("Ranked list")
 p 
 
-
 # One that has a less strong NES (1.3)
 gseaplot(GO_NK_Th, geneSetID = "GO:0032870",
          title="GO:0032870 - cellular response to hormone stimulus")
 
 # Dotplot on enrichResult and gseaResult objects:
-enrichplot::dotplot(GO_enrich, orderBy="p.adjust")
+enrichplot::dotplot(GO_enrich, orderBy="p.adjust") # genes up-reg in NK, GO MF
 enrichplot::dotplot(GO_NK_Th, orderBy="p.adjust")
-enrichplot::dotplot(GO_NK_Th, x="Count")
+enrichplot::dotplot(GO_NK_Th, x="NES", size="p.adjust")
 
 # Gene concept network: overlap of genes among gene sets
 cnetplot(GO_enrich, categorySize="pvalue") # 3 significant gene sets
@@ -471,7 +480,7 @@ p
 
 # Check allowed gene ID types:
 ?gseKEGG
-keytypes(org.Hs.eg.db)
+keytypes(org.Hs.eg.db) # same as idType()
 # convert from= "ENSEMBL" to "SYMBOL" and "ENTREZID"
 gene_convert <- bitr(as.character(NK_vs_Th$ensembl_gene_id), 
                      fromType="ENSEMBL", 
@@ -493,7 +502,9 @@ head(gl_kegg)
 
 gl_kegg_list<-as.numeric(as.character(gl_kegg$t))
 names(gl_kegg_list)<-as.character(gl_kegg$ENTREZID)
+# names(gl_kegg_list)<-make.names(as.character(gl_kegg$ENTREZID), unique=T)
 gl_kegg_list<-sort(gl_kegg_list, decreasing = T)
+gl_kegg_list<-gl_kegg_list[-c(which(duplicated(names(gl_kegg_list))))]
 
 # gl_kegg_list<-gl_kegg_list[-c(which(duplicated(names(gl_kegg_list))))]
 
@@ -517,15 +528,14 @@ View(KEGG_NK_Th@result)
 # Up-regulated gene sets:
 summary(KEGG_NK_Th@result$NES>0)
 #    Mode   FALSE    TRUE 
-# logical      7      20
+# logical      7      21
 
 KEGG_NK_Th@result[grep("immune",KEGG_NK_Th@result$Description), ]
 
 KEGG_NK_Th@result[grep("Natural killer",KEGG_NK_Th@result$Description), ]
-#                ID                               Description setSize enrichmentScore     NES       pvalue     p.adjust
-# hsa04650 hsa04650 Natural killer cell mediated cytotoxicity      97        0.614284 2.49564 5.483815e-12 4.825757e-10
-# qvalue rank                   leading_edge
-# hsa04650 3.867532e-10 1873 tags=52%, list=13%, signal=45%
+#               ID                               Description setSize enrichmentScore        NES       pvalue     p.adjust       qvalue rank
+# hsa04650 hsa04650 Natural killer cell mediated cytotoxicity      98       0.6195255  2.476641 2.930695e-12 2.647394e-10 2.190309e-10 1869
+# 
 
 # How many built-in KEGG pathways are there?
 length(KEGG_NK_Th@geneSets)
@@ -544,6 +554,7 @@ genePW<-NK_vs_Th$logFC_0
 names(genePW)<-NK_vs_Th$symbol
 
 # Create pathview map for Ribosome = hsa03010
+?pathview
 pathview(gene.data  = genePW,
          pathway.id = "hsa03010",
          species    = "hsa",
@@ -559,7 +570,10 @@ pathview(gene.data  = genePW,
          high = list(gene = "red", cpd = "yellow"))
 
 # Import hallmark, convert to term2gene and run GSEA:
-term2gene_h <- msigdbr(species = "Homo sapiens", category = "H")
+msigdbr_species() 
+msigdbr_collections()
+
+term2gene_h <- msigdbr(species = "Homo sapiens", collection = "H") # category deprecated
 # Or alternatively:
 # term2gene_h<-read.gmt("h.all.v2023.2.Hs.symbols.gmt")
 
@@ -755,7 +769,17 @@ ggsave(plot = p, filename = "heatmap_p_value_ORA.png",
 
 
 
+#### ---- Extra exercise for credits
+# - Perform GSEA of the NK vs Th data using the Reactome gene sets downloaded on the 
+# MSigDB website.
+# - How many gene sets are significantly enriched? Generate an ordered barplot of 
+# the NES of all significant gene sets, and generate a barcode plot for the gene set with the lowest NES
 
-
-
-
+# Steps
+# - import the reactome gene sets in the file c2.cp.reactome.v7.1.symbols.gmt using read.gmt()
+# Use GSEA providing a sorted named vector of t-statistics and the reactome gene sets, 
+# use minGSSize=30
+# NOTE: if the GSEA fails, use readRDS to import the pre-computed results contained in the 
+# file "reactomeGSEA_NK_vs_Th_results.rds"
+# - count the number of significant adjusted p-values
+# - use barplot() and gseaplot() for the visualization of the results
