@@ -1039,7 +1039,7 @@ the structure of this file, open the .gmt file that we provided using Excel or a
 Alternatively, we can import the Hallmark gene sets using <code>msigdbr</code>. What is the format of the object that is created? Use the GSEA() function, by providing the named and sorted
 vector of t-statistics we used above with gseGO(). Why do we use this one and not the one created for gseKEGG()?</p>
 <div class="highlight"><pre><span></span><code><span class="c1"># Import hallmark, convert to term2gene and run GSEA:</span>
-<span class="n">term2gene_h</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="nf">msigdbr</span><span class="p">(</span><span class="n">species</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;Homo sapiens&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">category</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;H&quot;</span><span class="p">)</span>
+<span class="n">term2gene_h</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="nf">msigdbr</span><span class="p">(</span><span class="n">species</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;Homo sapiens&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">collection</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;H&quot;</span><span class="p">)</span>
 <span class="c1"># Or alternatively:</span>
 <span class="c1"># term2gene_h&lt;-read.gmt(&quot;h.all.v2023.2.Hs.symbols.gmt&quot;)</span>
 
@@ -1086,7 +1086,7 @@ MSigDB website <a href="http://www.gsea-msigdb.org/gsea/msigdb/download_file.jsp
 </ul>
 <p><strong>Steps</strong></p>
 <ul>
-<li>Import the reactome gene sets using <code>msigdbr()</code> with arguments <code>category="C2"</code> and <code>subcategory="CP:REACTOME"</code>, or import from the provided file <code>c2.cp.reactome.v2023.1.Hs.symbols.gmt</code> using <code>read.gmt()</code>.  </li>
+<li>Import the reactome gene sets using <code>msigdbr()</code> with arguments <code>collection="C2"</code> and <code>subcollection="CP:REACTOME"</code>, or import from the provided file <code>c2.cp.reactome.v2023.1.Hs.symbols.gmt</code> using <code>read.gmt()</code>.  </li>
 <li>Use the <code>GSEA()</code> function providing a sorted named vector of t-statistics and the reactome gene sets, and use argument <code>minGSSize=30</code>.  </li>
 <li>Count the number of significant adjusted p-values.  </li>
 <li>Use <code>barplot()</code> and <code>gseaplot()</code> for the visualization of the results.  </li>
