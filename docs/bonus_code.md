@@ -75,7 +75,7 @@ The [msigdbr](https://cran.r-project.org/web/packages/msigdbr/index.html) packag
 
 For example, to download the Hallmark collection with human gene symbols within R:
 ```r
-gmt <- msigdbr::msigdbr(species = "human", category = "H")
+gmt <- msigdbr::msigdbr(species = "human", collection = "H")
 
 # Create the 2 column-format (TERM2GENE argument) required by clusterProfiler:
 h_gmt <- gmt[,c("gs_name", "gene_symbol")]
@@ -140,9 +140,9 @@ print(msigdbr_collections(), n=20)
 # 19 C6     ""                         189
 # 20 C7     "IMMUNESIGDB"             4872
 
-# Obtain the C5 category and GO:BP subcategory for yeast:
+# Obtain the C5 collection and GO:BP subcollection for yeast:
 
-gmt <- msigdbr::msigdbr(species = "Saccharomyces cerevisiae", category = "C5", subcategory = "GO:BP")
+gmt <- msigdbr::msigdbr(species = "Saccharomyces cerevisiae", collection = "C5", subcollection = "GO:BP")
 
 # We obtained the GO:BP gene sets, the yeast gene symbols, and yeast ensembl_id:
 head(gmt[,c("gs_name", "gene_symbol", "ensembl_gene")], n=10)
@@ -171,7 +171,7 @@ We can also use the msigdbr package to download the KEGG collection, in case the
 ### ---- KEGG with msigdbr download:
 msigdbr_collections() # 
 # C2     "CP:KEGG"      
-kegg_pw<-msigdbr(species = "human", category = "C2", subcategory = "CP:KEGG")
+kegg_pw<-msigdbr(species = "human", collection = "C2", subcollection = "CP:KEGG")
 
 head(kegg_pw[,c("gs_name", "gene_symbol")])
 # # A tibble: 6 × 2

@@ -611,7 +611,7 @@ vector of t-statistics we used above with gseGO(). Why do we use this one and no
 
 ```r
 # Import hallmark, convert to term2gene and run GSEA:
-term2gene_h <- msigdbr(species = "Homo sapiens", category = "H")
+term2gene_h <- msigdbr(species = "Homo sapiens", collection = "H")
 # Or alternatively:
 # term2gene_h<-read.gmt("h.all.v2023.2.Hs.symbols.gmt")
 
@@ -664,7 +664,7 @@ MSigDB website [here](http://www.gsea-msigdb.org/gsea/msigdb/download_file.jsp?f
 
 **Steps**
 
-* Import the reactome gene sets using `msigdbr()` with arguments `category="C2"` and `subcategory="CP:REACTOME"`, or import from the provided file `c2.cp.reactome.v2023.1.Hs.symbols.gmt` using `read.gmt()`.  
+* Import the reactome gene sets using `msigdbr()` with arguments `collection="C2"` and `subcollection="CP:REACTOME"`, or import from the provided file `c2.cp.reactome.v2023.1.Hs.symbols.gmt` using `read.gmt()`.  
 * Use the `GSEA()` function providing a sorted named vector of t-statistics and the reactome gene sets, and use argument `minGSSize=30`.  
 * Count the number of significant adjusted p-values.  
 * Use `barplot()` and `gseaplot()` for the visualization of the results.  
