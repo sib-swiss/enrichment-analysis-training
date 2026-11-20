@@ -562,10 +562,14 @@ How can you search for a particular gene within this table?</p>
 </code></pre></div>
 <p>This table contains the typical information obtained after differential gene expression analysis. For each gene, you have log<sub>2</sub> fold change values and significance information via the raw p-value and adjusted p-value. A positive log<sub>2</sub> fold change value indicates that the gene is more expressed in NK cells than in Th cells, while a negative log<sub>2</sub> fold change value indicates that the gene is less expressed in NK cells than in Th cells.
 The p-value is usually computed automatically by R packages designed for differential gene expression analysis such as edgeR, limma or DESeq2. If you ever need to perform p-value adjustment, there is a function that is part of the stats package called p.adjust(), that allows you to perform p-value
-adjustment for any list of p-values. Look at the help of the function and try to understand the arguments that can be used. 
+adjustment for any list of p-values. Look at the help of the function and try to understand the arguments that can be used. </p>
 <div class="highlight"><pre><span></span><code><span class="o">?</span><span class="n">p.adjust</span>
-</code></pre></div></p>
-<p>We can compare the raw p-value and adjusted p-value for any gene. Raw p-values that are close to 0.05 will often become higher than 0.05 after adjustment, while very small p-values more likely remain below 0.05 after adjustment. Search for 2 genes in the data.frame, CPS1 and GZMB, and verify the effect of adjustment on their p-values. Are both genes still significant after adjustment?</p>
+</code></pre></div>
+<p>We can compare the raw p-value and adjusted p-value for any gene. 
+Raw p-values that are close to 0.05 will often become higher than 0.05 after adjustment, while very small p-values more likely remain below 0.05 after adjustment. 
+Search for 2 genes in the data.frame, <em>CPS1</em> and <em>GZMB</em>, and verify the effect 
+of adjustment on their p-values. Are both genes still significant after adjustment?
+Are they up- or down-regulated in NK compared to Th cells?</p>
 <details class="done">
 <summary>Answer</summary>
 <div class="highlight"><pre><span></span><code><span class="n">NK_vs_Th</span><span class="p">[</span><span class="nf">which</span><span class="p">(</span><span class="n">NK_vs_Th</span><span class="o">$</span><span class="n">symbol</span><span class="o">==</span><span class="s">&quot;CPS1&quot;</span><span class="p">),]</span>
@@ -578,6 +582,7 @@ adjustment for any list of p-values. Look at the help of the function and try to
 Import the list of genes included in this gene set, and determine, using a Fisher test, whether the genes up-regulated in Th cells (i.e. down-regulated in NK cells) are enriched in the adaptive immune response. </p>
 <div class="highlight"><pre><span></span><code><span class="c1"># Import the adaptive immune response gene set (gmt file)</span>
 <span class="n">adaptive</span><span class="o">&lt;-</span><span class="n">clusterProfiler</span><span class="o">::</span><span class="nf">read.gmt</span><span class="p">(</span><span class="s">&quot;data/GOBP_ADAPTIVE_IMMUNE_RESPONSE.v7.5.1.gmt&quot;</span><span class="p">)</span>
+<span class="nf">head</span><span class="p">(</span><span class="n">adaptive</span><span class="p">)</span>
 <span class="nf">nrow</span><span class="p">(</span><span class="n">adaptive</span><span class="p">)</span><span class="w"> </span><span class="c1"># 719</span>
 <span class="nf">View</span><span class="p">(</span><span class="n">adaptive</span><span class="p">)</span>
 </code></pre></div>
@@ -589,20 +594,14 @@ found in your RNA seq dataset. Check how many genes in the RNA-seq data set are 
 <details class="done">
 <summary>Answer</summary>
 <div class="highlight"><pre><span></span><code><span class="c1"># Extract the number of genes up-regulated in Th (i.e. down-regulated in NK):</span>
-<span class="n">Th_up</span><span class="o">&lt;-</span><span class="nf">subset</span><span class="p">(</span><span class="n">NK_vs_Th</span><span class="p">,</span><span class="w"> </span>
-<span class="n">NK_vs_Th</span><span class="o">$</span><span class="n">p.adj</span><span class="o">&lt;=</span><span class="m">0.05</span><span class="o">&amp;</span><span class="n">NK_vs_Th</span><span class="o">$</span><span class="n">logFC</span><span class="o">&lt;</span><span class="m">0</span><span class="p">)</span>
-<span class="c1"># Are these genes part of the gene set?            </span>
-<span class="nf">summary</span><span class="p">(</span><span class="n">Th_up</span><span class="o">$</span><span class="n">symbol</span><span class="w"> </span><span class="o">%in%</span><span class="w"> </span><span class="n">adaptive</span><span class="o">$</span><span class="n">gene</span><span class="p">)</span>
-<span class="c1">#    Mode   FALSE    TRUE </span>
-<span class="c1"># logical    1753     142 </span>
-<span class="nf">table</span><span class="p">(</span><span class="n">Th_up</span><span class="o">$</span><span class="n">symbol</span><span class="w"> </span><span class="o">%in%</span><span class="w"> </span><span class="n">adaptive</span><span class="o">$</span><span class="n">gene</span><span class="p">)</span>
+<span class="n">Th_up</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">NK_vs_Th</span><span class="w"> </span><span class="o">|&gt;</span>
+<span class="nf">filter</span><span class="p">(</span><span class="n">p.adj</span><span class="w"> </span><span class="o">&lt;=</span><span class="w"> </span><span class="m">0.05</span><span class="p">,</span><span class="w"> </span><span class="n">logFC</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="m">0</span><span class="p">)</span><span class="w"> </span><span class="o">|&gt;</span>
+<span class="nf">pull</span><span class="p">(</span><span class="n">symbol</span><span class="p">)</span><span class="w"> </span><span class="o">|&gt;</span><span class="w"> </span><span class="nf">unique</span><span class="p">()</span><span class="w">               </span><span class="c1"># extract unique gene symbols only</span>
 
-<span class="c1"># Extract the number of not significant genes:</span>
-<span class="n">Th_not_DE</span><span class="o">&lt;-</span><span class="nf">subset</span><span class="p">(</span><span class="n">NK_vs_Th</span><span class="p">,</span><span class="w"> </span><span class="n">NK_vs_Th</span><span class="o">$</span><span class="n">p.adj</span><span class="o">&gt;</span><span class="m">0.05</span><span class="p">)</span>
 <span class="c1"># Are these genes part of the gene set?            </span>
-<span class="nf">summary</span><span class="p">(</span><span class="n">Th_not_DE</span><span class="o">$</span><span class="n">symbol</span><span class="w"> </span><span class="o">%in%</span><span class="w"> </span><span class="n">adaptive</span><span class="o">$</span><span class="n">gene</span><span class="p">)</span>
+<span class="nf">summary</span><span class="p">(</span><span class="n">Th_up</span><span class="w"> </span><span class="o">%in%</span><span class="w"> </span><span class="n">adaptive</span><span class="o">$</span><span class="n">gene</span><span class="p">)</span>
 <span class="c1">#    Mode   FALSE    TRUE </span>
-<span class="c1"># logical   16344     289</span>
+<span class="c1"># logical    1752     142 </span>
 </code></pre></div>
 </details>
 <p>Next, build a contingency table that has the following format:</p>
@@ -632,107 +631,137 @@ found in your RNA seq dataset. Check how many genes in the RNA-seq data set are 
 </code></pre></div>
 <details class="done">
 <summary>Answer</summary>
-<div class="highlight"><pre><span></span><code><span class="c1"># There are several ways to build the contigency table:</span>
-<span class="c1"># 1: by hand:</span>
-<span class="n">cont.table</span><span class="o">&lt;-</span><span class="nf">matrix</span><span class="p">(</span><span class="nf">c</span><span class="p">(</span><span class="m">142</span><span class="p">,</span><span class="w"> </span><span class="m">1753</span><span class="p">,</span><span class="w"> </span><span class="m">289</span><span class="p">,</span><span class="w"> </span><span class="m">16344</span><span class="p">),</span><span class="w"> </span><span class="n">ncol</span><span class="o">=</span><span class="m">2</span><span class="p">,</span><span class="n">byrow</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="bp">F</span><span class="p">)</span>
+<div class="highlight"><pre><span></span><code><span class="c1"># Build contingency table for Fisher test.</span>
+<span class="c1"># Format:</span>
+<span class="c1">#              up not_up</span>
+<span class="c1"># in_set        .      .</span>
+<span class="c1"># not_in_set    .      .</span>
+
+<span class="c1"># We extract the &quot;universe&quot; of all genes detected because we also</span>
+<span class="c1"># need to count how many of the non-significant genes are part of the gene set</span>
+<span class="n">universe</span><span class="o">&lt;-</span><span class="nf">unique</span><span class="p">(</span><span class="n">NK_vs_Th</span><span class="o">$</span><span class="n">symbol</span><span class="p">)</span>
+
+<span class="n">cont.table</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="nf">table</span><span class="p">(</span>
+<span class="w">  </span><span class="n">in_set</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nf">factor</span><span class="p">(</span><span class="n">universe</span><span class="w"> </span><span class="o">%in%</span><span class="w"> </span><span class="n">adaptive</span><span class="o">$</span><span class="n">gene</span><span class="p">,</span><span class="w"> </span><span class="n">levels</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nf">c</span><span class="p">(</span><span class="kc">TRUE</span><span class="p">,</span><span class="w"> </span><span class="kc">FALSE</span><span class="p">)),</span>
+<span class="w">  </span><span class="n">Th_up</span><span class="w">  </span><span class="o">=</span><span class="w"> </span><span class="nf">factor</span><span class="p">(</span><span class="n">universe</span><span class="w"> </span><span class="o">%in%</span><span class="w"> </span><span class="n">Th_up</span><span class="p">,</span><span class="w">         </span><span class="n">levels</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nf">c</span><span class="p">(</span><span class="kc">TRUE</span><span class="p">,</span><span class="w"> </span><span class="kc">FALSE</span><span class="p">))</span>
+<span class="p">)</span>
+
 <span class="n">cont.table</span>
+<span class="c1">#      Th_up</span>
+<span class="c1"># in_set   TRUE FALSE</span>
+<span class="c1">#   TRUE    142   371</span>
+<span class="c1">#   FALSE  1752 18146</span>
+<span class="m">142</span><span class="o">/</span><span class="p">(</span><span class="m">142+1752</span><span class="p">)</span>
+<span class="m">371</span><span class="o">/</span><span class="p">(</span><span class="m">371+18146</span><span class="p">)</span>
 
-<span class="c1"># 2: by using the individual values of the table() function:</span>
-<span class="n">cont.table</span><span class="o">&lt;-</span><span class="nf">matrix</span><span class="p">(</span><span class="nf">c</span><span class="p">(</span><span class="nf">unlist</span><span class="p">(</span><span class="nf">table</span><span class="p">(</span><span class="n">Th_up</span><span class="o">$</span><span class="n">symbol</span><span class="w"> </span><span class="o">%in%</span><span class="w"> </span><span class="n">adaptive</span><span class="o">$</span><span class="n">gene</span><span class="p">))[[</span><span class="m">2</span><span class="p">]],</span>
-<span class="nf">unlist</span><span class="p">(</span><span class="nf">table</span><span class="p">(</span><span class="n">Th_up</span><span class="o">$</span><span class="n">symbol</span><span class="w"> </span><span class="o">%in%</span><span class="w"> </span><span class="n">adaptive</span><span class="o">$</span><span class="n">gene</span><span class="p">))[[</span><span class="m">1</span><span class="p">]],</span><span class="w"> </span>
-<span class="nf">unlist</span><span class="p">(</span><span class="nf">table</span><span class="p">(</span><span class="n">Th_not_DE</span><span class="o">$</span><span class="n">symbol</span><span class="w"> </span><span class="o">%in%</span><span class="w"> </span><span class="n">adaptive</span><span class="o">$</span><span class="n">gene</span><span class="p">))[[</span><span class="m">2</span><span class="p">]],</span><span class="w"> </span>
-<span class="nf">unlist</span><span class="p">(</span><span class="nf">table</span><span class="p">(</span><span class="n">Th_not_DE</span><span class="o">$</span><span class="n">symbol</span><span class="w"> </span><span class="o">%in%</span><span class="w"> </span><span class="n">adaptive</span><span class="o">$</span><span class="n">gene</span><span class="p">))[[</span><span class="m">1</span><span class="p">]]),</span><span class="w"> </span>
-<span class="n">ncol</span><span class="o">=</span><span class="m">2</span><span class="p">,</span><span class="w"> </span><span class="n">byrow</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="bp">F</span><span class="p">)</span>
-<span class="n">cont.table</span>
-
-<span class="c1"># 3: by using the 2 rows (reversed) of the table() function:</span>
-<span class="n">cont.table</span><span class="o">&lt;-</span><span class="nf">matrix</span><span class="p">(</span><span class="nf">c</span><span class="p">(</span><span class="nf">rev</span><span class="p">(</span><span class="nf">unlist</span><span class="p">(</span><span class="nf">table</span><span class="p">(</span><span class="n">Th_up</span><span class="o">$</span><span class="n">symbol</span><span class="w"> </span><span class="o">%in%</span><span class="w"> </span><span class="n">adaptive</span><span class="o">$</span><span class="n">gene</span><span class="p">))),</span><span class="w"> </span>
-<span class="nf">rev</span><span class="p">(</span><span class="nf">unlist</span><span class="p">(</span><span class="nf">table</span><span class="p">(</span><span class="n">Th_not_DE</span><span class="o">$</span><span class="n">symbol</span><span class="w"> </span><span class="o">%in%</span><span class="w"> </span><span class="n">adaptive</span><span class="o">$</span><span class="n">gene</span><span class="p">)))),</span><span class="w"> </span>
-<span class="n">ncol</span><span class="o">=</span><span class="m">2</span><span class="p">,</span><span class="w"> </span><span class="n">byrow</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="bp">F</span><span class="p">)</span>
-<span class="n">cont.table</span>
-
-<span class="c1"># Add row and colum names so that you know what each number corresponds to:</span>
-<span class="nf">colnames</span><span class="p">(</span><span class="n">cont.table</span><span class="p">)</span><span class="o">&lt;-</span><span class="nf">c</span><span class="p">(</span><span class="s">&quot;up&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;not_up&quot;</span><span class="p">)</span>
-<span class="nf">rownames</span><span class="p">(</span><span class="n">cont.table</span><span class="p">)</span><span class="o">&lt;-</span><span class="nf">c</span><span class="p">(</span><span class="s">&quot;in_set&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;not_in_set&quot;</span><span class="p">)</span>
-<span class="n">cont.table</span>
-<span class="c1">#              up   not_up</span>
-<span class="c1"># in_set      142      289</span>
-<span class="c1"># not_in_set 1753    16344</span>
-
-<span class="c1"># Compare the proportions: </span>
-<span class="m">142</span><span class="o">/</span><span class="p">(</span><span class="m">142+1753</span><span class="p">)</span>
-<span class="m">289</span><span class="o">/</span><span class="p">(</span><span class="m">289+16344</span><span class="p">)</span>
-
-<span class="c1"># Run fisher test:</span>
-<span class="nf">fisher.test</span><span class="p">(</span><span class="n">cont.table</span><span class="p">)</span>
+<span class="nf">fisher.test</span><span class="p">(</span><span class="n">cont.table</span><span class="p">)</span><span class="w"> </span><span class="c1"># 2-sided test</span>
 <span class="c1"># Fisher&#39;s Exact Test for Count Data</span>
-<span class="c1"># data:  cont.table</span>
+<span class="c1"># data:  tab</span>
 <span class="c1"># p-value &lt; 2.2e-16</span>
-<span class="c1"># alternative hypothesis: true odds ratio is not equal to 1</span>
+<span class="c1"># alternative hypothesis: true odds ratio is greater than 1</span>
 <span class="c1"># 95 percent confidence interval:</span>
-<span class="c1">#  3.697701 5.654348</span>
+<span class="c1">#  3.331182      4.853623</span>
 <span class="c1"># sample estimates:</span>
 <span class="c1"># odds ratio </span>
-<span class="c1">#   4.580549 </span>
+<span class="c1">#   3.964225 </span>
 </code></pre></div>
 </details>
-<p>In case you wish to run an over-representation analysis for several gene sets at once, instead of running several independent Fisher tests, you can use the <code>enricher()</code> function of the clusterProfiler package. This function allows you to perform an over-representation analysis of several gene sets at once, using an implementation of the hypergeometric test (a one-sided Fisher&rsquo;s exact test).
+<p>ClusterProfiler provides the <code>enricher()</code> function that implements the Fisher test. This function allows you to perform an over-representation analysis using an implementation of the hypergeometric test (a one-sided Fisher&rsquo;s exact test).
 Check out the help of the function: What arguments do you need to provide? </p>
-<p>Determine whether the genes up-regulated in NK cells are over-represented in 3 gene sets: the adaptive immune response gene set used above, another related to cell activation, and one un-related to immune cells (hair cell differentiation).</p>
 <div class="highlight"><pre><span></span><code><span class="c1"># Help: hypergeometric test (like one-sided Fisher test = greater)</span>
 <span class="o">?</span><span class="nf">enricher</span><span class="p">()</span>
+</code></pre></div>
+<p>We can compare the results of <code>enricher()</code> to the ones of the <code>fisher.test()</code> function.</p>
+<p><strong>Beware</strong>: <code>enricher()</code> intersects the universe/background with the genes found in the gene sets provided
+in the TERM2GENE data frame.
+With a single gene set, the background would shrink to that set, and result in a p-value = 1.
+As a fix, we add a background term that contains every gene of the universe.</p>
+<div class="highlight"><pre><span></span><code><span class="c1"># Create a background term that contains every gene of the universe.</span>
+<span class="n">background</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="nf">data.frame</span><span class="p">(</span><span class="n">term</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&#39;BACKGROUND&#39;</span><span class="p">,</span><span class="w"> </span><span class="n">gene</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">universe</span><span class="p">)</span>
 
-<span class="c1"># Test 3 gene sets among the genes up-regulated in NK cells,</span>
+<span class="n">ora</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="nf">enricher</span><span class="p">(</span><span class="n">gene</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Th_up</span><span class="p">,</span><span class="w"> </span>
+<span class="w">                </span><span class="n">universe</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">universe</span><span class="p">,</span>
+<span class="w">                </span><span class="n">TERM2GENE</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nf">rbind</span><span class="p">(</span><span class="n">adaptive</span><span class="p">,</span><span class="w"> </span><span class="n">background</span><span class="p">),</span>
+<span class="w">                </span><span class="n">maxGSSize</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">25000</span><span class="p">,</span>
+<span class="w">                </span><span class="n">pvalueCutoff</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">1</span><span class="p">)</span>
+<span class="nf">class</span><span class="p">(</span><span class="n">ora</span><span class="p">)</span>
+<span class="nf">View</span><span class="p">(</span><span class="n">ora</span><span class="o">@</span><span class="n">result</span><span class="p">)</span>
+<span class="c1"># GeneRatio : ratio of input genes that are annotated in a term</span>
+<span class="c1"># BgRatio : ratio of all genes that are annotated in this term</span>
+
+<span class="c1"># The richFactor is the ratio of the number of differentially expressed genes annotated in this </span>
+<span class="c1"># pathway to the number of all genes annotated in this pathway term. </span>
+<span class="c1"># The greater the Rich factor, the greater the degree of pathway enrichment.</span>
+<span class="m">142</span><span class="o">/</span><span class="m">513</span><span class="w"> </span><span class="c1"># 0.2768031</span>
+<span class="c1"># The fold enrichment is calculated by dividing GeneRatio by BgRatio, and is defined </span>
+<span class="c1"># as the ratio of the frequency of input genes annotated in a term to the frequency </span>
+<span class="c1"># of all genes annotated to that term.</span>
+<span class="c1"># Info about how much of a gene set was “covered” by the input genes for the ORA</span>
+<span class="c1"># zscore: ?</span>
+
+<span class="n">ora</span><span class="o">@</span><span class="n">result</span><span class="p">[,</span><span class="w"> </span><span class="nf">c</span><span class="p">(</span><span class="s">&#39;ID&#39;</span><span class="p">,</span><span class="w"> </span><span class="s">&#39;GeneRatio&#39;</span><span class="p">,</span><span class="w"> </span><span class="s">&#39;BgRatio&#39;</span><span class="p">,</span><span class="w"> </span><span class="s">&#39;pvalue&#39;</span><span class="p">,</span><span class="w"> </span><span class="s">&#39;p.adjust&#39;</span><span class="p">)]</span>
+</code></pre></div>
+<p>The advantage of the <code>enricher()</code> function is that it allows you to run an over-representation analysis for several gene sets at once, instead of running several independent Fisher tests
+with <code>fisher.test()</code>.</p>
+<p>Determine whether the genes up-regulated in Th cells are over-represented in 3 gene sets: the adaptive immune response gene set used above, another of genes up-regulated in Th cells vs NK from the literature, and one un-related to immune cells (hair cell differentiation).</p>
+<div class="highlight"><pre><span></span><code><span class="c1"># Test 3 gene sets among the genes up-regulated in Th cells,</span>
 <span class="c1"># with enricher()</span>
-<span class="c1"># First, obtain the genes up-regulated in NK:</span>
-
-<span class="n">nk_up_genes</span><span class="o">&lt;-</span><span class="nf">subset</span><span class="p">(</span><span class="n">NK_vs_Th</span><span class="p">,</span><span class="w"> </span><span class="n">NK_vs_Th</span><span class="o">$</span><span class="n">logFC</span><span class="o">&gt;</span><span class="m">0</span><span class="o">&amp;</span><span class="n">NK_vs_Th</span><span class="o">$</span><span class="n">p.adj</span><span class="o">&lt;=</span><span class="m">0.05</span><span class="p">)</span><span class="o">$</span><span class="n">symbol</span>
 
 <span class="c1"># Import 2 other gene sets, 1 un-related to immune cells:</span>
 <span class="n">hair</span><span class="o">&lt;-</span><span class="nf">read.gmt</span><span class="p">(</span><span class="s">&quot;data/GOBP_HAIR_CELL_DIFFERENTIATION.v7.5.1.gmt&quot;</span><span class="p">)</span>
 <span class="nf">dim</span><span class="p">(</span><span class="n">hair</span><span class="p">)</span>
-<span class="n">cell_active</span><span class="o">&lt;-</span><span class="nf">read.gmt</span><span class="p">(</span><span class="s">&quot;data/GOBP_CELL_ACTIVATION.v7.5.1.gmt&quot;</span><span class="p">)</span>
-<span class="nf">dim</span><span class="p">(</span><span class="n">cell_active</span><span class="p">)</span>
+<span class="n">Th_signature</span><span class="o">&lt;-</span><span class="nf">read.gmt</span><span class="p">(</span><span class="s">&quot;data/GSE22886_NAIVE_CD4_TCELL_VS_NKCELL_UP.v2026.2.Hs.gmt&quot;</span><span class="p">)</span>
+<span class="c1"># Source of the Tcell vs NK cell signature:</span>
+<span class="c1"># https://www.gsea-msigdb.org/gsea/msigdb/human/geneset/GSE22886_NAIVE_CD4_TCELL_VS_NKCELL_UP.html</span>
+<span class="c1"># https://pubmed.ncbi.nlm.nih.gov/15789058/</span>
 
-<span class="c1"># Combine the 3 gene sets into a single data.frame for the TERM2GENE argument:</span>
-<span class="n">genesets3</span><span class="o">&lt;-</span><span class="nf">rbind</span><span class="p">(</span><span class="n">adaptive</span><span class="p">,</span><span class="w"> </span><span class="n">hair</span><span class="p">,</span><span class="w"> </span><span class="n">cell_active</span><span class="p">)</span>
+<span class="n">genesets3</span><span class="o">&lt;-</span><span class="nf">rbind</span><span class="p">(</span><span class="n">adaptive</span><span class="p">,</span><span class="w"> </span><span class="n">hair</span><span class="p">,</span><span class="w"> </span><span class="n">Th_signature</span><span class="p">,</span><span class="w"> </span><span class="n">background</span><span class="p">)</span>
 
-<span class="n">hyper_3genesets</span><span class="o">&lt;-</span><span class="nf">enricher</span><span class="p">(</span><span class="n">gene</span><span class="o">=</span><span class="n">nk_up_genes</span><span class="p">,</span>
-<span class="w">                      </span><span class="n">universe</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">NK_vs_Th</span><span class="o">$</span><span class="n">symbol</span><span class="p">,</span>
-<span class="w">                      </span><span class="n">TERM2GENE</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">genesets3</span><span class="p">,</span>
-<span class="w">                      </span><span class="n">maxGSSize</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">1000</span><span class="p">)</span>
-<span class="nf">View</span><span class="p">(</span><span class="n">hyper_3genesets</span><span class="o">@</span><span class="n">result</span><span class="p">)</span>
+<span class="nf">table</span><span class="p">(</span><span class="n">genesets3</span><span class="o">$</span><span class="n">term</span><span class="p">)</span><span class="w"> </span><span class="c1"># check the length of each gene set because of default maxGSSize = 500</span>
+
+<span class="n">ora3</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="nf">enricher</span><span class="p">(</span><span class="n">Th_up</span><span class="p">,</span><span class="w"> </span><span class="n">universe</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">universe</span><span class="p">,</span>
+<span class="w">                 </span><span class="n">TERM2GENE</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">genesets3</span><span class="p">,</span>
+<span class="w">                 </span><span class="n">maxGSSize</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">1100</span><span class="p">,</span>
+<span class="w">                 </span><span class="n">pvalueCutoff</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">1</span><span class="p">,</span><span class="w"> </span>
+<span class="w">                 </span><span class="n">qvalueCutoff</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">1</span><span class="p">)</span>
+<span class="n">ora3</span><span class="o">@</span><span class="n">result</span><span class="p">[,</span><span class="w"> </span><span class="nf">c</span><span class="p">(</span><span class="s">&quot;ID&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;GeneRatio&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;BgRatio&quot;</span><span class="p">,</span><span class="s">&quot;pvalue&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;p.adjust&quot;</span><span class="p">)]</span>
+
+<span class="nf">class</span><span class="p">(</span><span class="n">ora3</span><span class="p">)</span>
+<span class="nf">View</span><span class="p">(</span><span class="n">ora3</span><span class="o">@</span><span class="n">result</span><span class="p">)</span>
 </code></pre></div>
 <p><strong>Bonus</strong> How would you represent the over-representation result for the adaptive immune response? An option might be a volcano plot coloring genes that are part of the gene set 
 and significant using <a href="https://ggplot2.tidyverse.org/">ggplot2</a>.</p>
-<div class="highlight"><pre><span></span><code><span class="nf">library</span><span class="p">(</span><span class="n">ggplot2</span><span class="p">)</span>
-<span class="nf">library</span><span class="p">(</span><span class="n">ggrepel</span><span class="p">)</span>
-
-<span class="n">sig_genes</span><span class="o">&lt;-</span><span class="nf">subset</span><span class="p">(</span><span class="n">NK_vs_Th</span><span class="p">,</span><span class="w"> </span><span class="n">NK_vs_Th</span><span class="o">$</span><span class="n">symbol</span><span class="w"> </span><span class="o">%in%</span><span class="w"> </span><span class="n">adaptive</span><span class="o">$</span><span class="n">gene</span><span class="w"> </span><span class="o">&amp;</span><span class="w"> </span><span class="n">NK_vs_Th</span><span class="o">$</span><span class="n">p.adj</span><span class="o">&lt;=</span><span class="m">0.05</span><span class="p">)</span>
-<span class="n">sig_genes_label</span><span class="o">&lt;-</span><span class="nf">subset</span><span class="p">(</span><span class="n">sig_genes</span><span class="p">,</span><span class="w"> </span><span class="n">sig_genes</span><span class="o">$</span><span class="n">p.adj</span><span class="o">&lt;=</span><span class="m">0.00001</span><span class="p">)</span>
+<div class="highlight"><pre><span></span><code><span class="n">in_set</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">NK_vs_Th</span><span class="w"> </span><span class="o">|&gt;</span><span class="w"> </span><span class="nf">filter</span><span class="p">(</span><span class="n">symbol</span><span class="w"> </span><span class="o">%in%</span><span class="w"> </span><span class="n">adaptive</span><span class="o">$</span><span class="n">gene</span><span class="p">,</span><span class="w"> </span><span class="n">p.adj</span><span class="w"> </span><span class="o">&lt;=</span><span class="w"> </span><span class="m">0.05</span><span class="p">)</span>
+<span class="n">sig_genes_label</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">NK_vs_Th</span><span class="w"> </span><span class="o">|&gt;</span><span class="w"> </span>
+<span class="w">  </span><span class="nf">filter</span><span class="p">(</span><span class="n">symbol</span><span class="w"> </span><span class="o">%in%</span><span class="w"> </span><span class="n">adaptive</span><span class="o">$</span><span class="n">gene</span><span class="p">,</span><span class="w"> </span><span class="n">p.adj</span><span class="w"> </span><span class="o">&lt;=</span><span class="w"> </span><span class="m">0.00001</span><span class="p">)</span>
 
 <span class="nf">ggplot</span><span class="p">(</span><span class="n">NK_vs_Th</span><span class="p">,</span><span class="w"> </span><span class="nf">aes</span><span class="p">(</span><span class="n">x</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">logFC</span><span class="p">,</span><span class="w">  </span><span class="c1"># </span>
 <span class="w">                     </span><span class="n">y</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">-</span><span class="nf">log10</span><span class="p">(</span><span class="n">p.adj</span><span class="p">)))</span><span class="w"> </span><span class="o">+</span>
-<span class="w">        </span><span class="nf">geom_point</span><span class="p">(</span><span class="n">color</span><span class="o">=</span><span class="s">&quot;grey87&quot;</span><span class="p">)</span><span class="w">  </span><span class="o">+</span>
-<span class="w">        </span><span class="nf">ggtitle</span><span class="p">(</span><span class="s">&quot;Genes belonging to the adaptive immune response gene set&quot;</span><span class="p">)</span><span class="w"> </span><span class="o">+</span>
-<span class="w">        </span><span class="nf">theme_bw</span><span class="p">()</span><span class="w"> </span><span class="o">+</span>
-<span class="w">        </span><span class="nf">geom_text_repel</span><span class="p">(</span><span class="n">data</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">sig_genes_label</span><span class="p">,</span><span class="w"> </span>
-<span class="w">                        </span><span class="nf">aes</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="n">logFC</span><span class="p">,</span>
-<span class="w">                            </span><span class="n">y</span><span class="o">=-</span><span class="nf">log10</span><span class="p">(</span><span class="n">p.adj</span><span class="p">),</span><span class="n">label</span><span class="o">=</span><span class="n">symbol</span><span class="p">),</span>
-<span class="w">                        </span><span class="n">max.overlaps</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">20</span><span class="p">)</span><span class="w"> </span><span class="o">+</span>
-<span class="w">        </span><span class="nf">geom_point</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">sig_genes</span><span class="p">,</span><span class="w"> </span><span class="n">col</span><span class="o">=</span><span class="s">&quot;dodgerblue2&quot;</span><span class="p">)</span><span class="w"> </span><span class="o">+</span>
-<span class="w">        </span><span class="nf">theme</span><span class="p">(</span><span class="n">legend.position</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;none&quot;</span><span class="p">)</span><span class="w"> </span><span class="o">+</span>
-<span class="w">        </span><span class="nf">scale_x_continuous</span><span class="p">(</span><span class="n">name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nf">expression</span><span class="p">(</span><span class="s">&quot;log&quot;</span><span class="p">[</span><span class="m">2</span><span class="p">]</span><span class="o">*</span><span class="s">&quot;(fold change), NK vs Th cells&quot;</span><span class="p">))</span><span class="w"> </span><span class="o">+</span>
-<span class="w">        </span><span class="nf">scale_y_continuous</span><span class="p">(</span><span class="n">name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nf">expression</span><span class="p">(</span><span class="s">&quot;-&quot;</span><span class="o">*</span><span class="s">&quot;log&quot;</span><span class="p">[</span><span class="m">10</span><span class="p">]</span><span class="o">*</span><span class="s">&quot;(adj. p-value)&quot;</span><span class="p">))</span><span class="w"> </span><span class="o">+</span>
-<span class="w">        </span><span class="nf">geom_hline</span><span class="p">(</span><span class="n">yintercept</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">-</span><span class="nf">log10</span><span class="p">(</span><span class="m">0.05</span><span class="p">),</span><span class="w"> </span><span class="n">linetype</span><span class="o">=</span><span class="s">&quot;dashed&quot;</span><span class="p">)</span><span class="w"> </span><span class="o">+</span>
-<span class="w">        </span><span class="nf">geom_vline</span><span class="p">(</span><span class="n">xintercept</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">0</span><span class="p">,</span><span class="w"> </span><span class="n">linetype</span><span class="o">=</span><span class="s">&quot;dashed&quot;</span><span class="p">)</span>
+<span class="w">  </span><span class="nf">geom_point</span><span class="p">(</span><span class="n">color</span><span class="o">=</span><span class="s">&quot;grey87&quot;</span><span class="p">)</span><span class="w">  </span><span class="o">+</span>
+<span class="w">  </span><span class="nf">ggtitle</span><span class="p">(</span><span class="s">&quot;Genes belonging to the adaptive immune response gene set&quot;</span><span class="p">)</span><span class="w"> </span><span class="o">+</span>
+<span class="w">  </span><span class="nf">theme_bw</span><span class="p">()</span><span class="w"> </span><span class="o">+</span>
+<span class="w">  </span><span class="nf">geom_text_repel</span><span class="p">(</span><span class="n">data</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">sig_genes_label</span><span class="p">,</span><span class="w"> </span>
+<span class="w">                  </span><span class="nf">aes</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="n">logFC</span><span class="p">,</span>
+<span class="w">                      </span><span class="n">y</span><span class="o">=-</span><span class="nf">log10</span><span class="p">(</span><span class="n">p.adj</span><span class="p">),</span><span class="n">label</span><span class="o">=</span><span class="n">symbol</span><span class="p">),</span>
+<span class="w">                  </span><span class="n">max.overlaps</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">20</span><span class="p">)</span><span class="w"> </span><span class="o">+</span>
+<span class="w">  </span><span class="nf">geom_point</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">in_set</span><span class="p">,</span><span class="w"> </span><span class="n">col</span><span class="o">=</span><span class="s">&quot;dodgerblue2&quot;</span><span class="p">)</span><span class="w"> </span><span class="o">+</span>
+<span class="w">  </span><span class="nf">theme</span><span class="p">(</span><span class="n">legend.position</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;none&quot;</span><span class="p">)</span><span class="w"> </span><span class="o">+</span>
+<span class="w">  </span><span class="nf">scale_x_continuous</span><span class="p">(</span><span class="n">name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nf">expression</span><span class="p">(</span><span class="s">&quot;log&quot;</span><span class="p">[</span><span class="m">2</span><span class="p">]</span><span class="o">*</span><span class="s">&quot;(fold change), NK vs Th cells&quot;</span><span class="p">))</span><span class="w"> </span><span class="o">+</span>
+<span class="w">  </span><span class="nf">scale_y_continuous</span><span class="p">(</span><span class="n">name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nf">expression</span><span class="p">(</span><span class="s">&quot;-&quot;</span><span class="o">*</span><span class="s">&quot;log&quot;</span><span class="p">[</span><span class="m">10</span><span class="p">]</span><span class="o">*</span><span class="s">&quot;(adj. p-value)&quot;</span><span class="p">))</span><span class="w"> </span><span class="o">+</span>
+<span class="w">  </span><span class="nf">geom_hline</span><span class="p">(</span><span class="n">yintercept</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">-</span><span class="nf">log10</span><span class="p">(</span><span class="m">0.05</span><span class="p">),</span><span class="w"> </span><span class="n">linetype</span><span class="o">=</span><span class="s">&quot;dashed&quot;</span><span class="p">)</span><span class="w"> </span><span class="o">+</span>
+<span class="w">  </span><span class="nf">geom_vline</span><span class="p">(</span><span class="n">xintercept</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">0</span><span class="p">,</span><span class="w"> </span><span class="n">linetype</span><span class="o">=</span><span class="s">&quot;dashed&quot;</span><span class="p">)</span>
 </code></pre></div>
 <figure>
   <img src="../assets/images/bonus_volcano.png" width="700"/>
   </figure>
 
 <h2 id="exercise-2-gene-set-enrichment-analysis-gsea">Exercise 2 - Gene set enrichment analysis (GSEA)</h2>
-<p>Next, we will use functions of the clusterProfiler package to perform a gene set enrichment analysis (GSEA) of Gene Ontology terms. For this, we first need to create a vector with the t-statistic of each gene, assign the gene symbol to each t-statistic in the vector (i.e. names), then sort the vector.</p>
+<p>Next, we will use functions of the clusterProfiler package to perform a gene set enrichment analysis (GSEA) of Gene Ontology terms. 
+Look up the help of the <code>gseGO()</code> function. </p>
+<p><div class="highlight"><pre><span></span><code><span class="o">?</span><span class="n">gseGO</span>
+</code></pre></div>
+We need a <code>geneList</code> argument. 
+For this, we need to create a vector with the t-statistic of each gene, assign the gene symbol to each t-statistic in the vector (i.e. names), then sort the vector.</p>
 <div class="admonition warning">
 <p class="admonition-title">Warning</p>
 <p>A single gene can be labeled with different types of gene labels: Ensembl IDs, NCBI Entrez IDs, gene symbols, UniProt IDs, etc. 
@@ -740,58 +769,89 @@ and significant using <a href="https://ggplot2.tidyverse.org/">ggplot2</a>.</p>
     <div class="highlight"><pre><span></span><code><span class="w">  </span><span class="nf">idType</span><span class="p">(</span><span class="n">OrgDb</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;org.Hs.eg.db&quot;</span><span class="p">)</span><span class="w"> </span><span class="c1"># to determine allowed gene id type</span>
 </code></pre></div></p>
 </div>
-<p>Create the named and sorted vector of t-statistics (i.e. for the geneList argument of the <code>gseGO()</code> function). </p>
-<div class="highlight"><pre><span></span><code><span class="n">gl</span><span class="o">&lt;-</span><span class="n">NK_vs_Th</span><span class="o">$</span><span class="n">t</span>
-<span class="nf">names</span><span class="p">(</span><span class="n">gl</span><span class="p">)</span><span class="o">&lt;-</span><span class="nf">make.names</span><span class="p">(</span><span class="n">NK_vs_Th</span><span class="o">$</span><span class="n">symbol</span><span class="p">,</span><span class="w"> </span><span class="n">unique</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="bp">T</span><span class="p">)</span>
-<span class="n">gl</span><span class="o">&lt;-</span><span class="n">gl</span><span class="p">[</span><span class="nf">order</span><span class="p">(</span><span class="n">gl</span><span class="p">,</span><span class="w"> </span><span class="n">decreasing</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="bp">T</span><span class="p">)]</span>
+<p>Create the named and sorted vector of t-statistics, then apply GSEA of the 
+Gene Ontology Biological Process gene sets using the <code>gseGO()</code> function. </p>
+<p><div class="highlight"><pre><span></span><code><span class="c1"># We create a data frame of the DE results that contains </span>
+<span class="c1"># the unique gene symbols (caveat: genes with duplicated gene</span>
+<span class="c1"># symbols may be lost)</span>
+<span class="c1"># The data frame is ranked by descending t-statistic values:</span>
+<span class="n">ranked</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">NK_vs_Th</span><span class="w"> </span><span class="o">|&gt;</span>
+<span class="w">  </span><span class="nf">filter</span><span class="p">(</span><span class="o">!</span><span class="nf">is.na</span><span class="p">(</span><span class="n">symbol</span><span class="p">),</span><span class="w"> </span><span class="n">symbol</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="s">&#39;&#39;</span><span class="p">)</span><span class="w"> </span><span class="o">|&gt;</span>
+<span class="w">  </span><span class="nf">group_by</span><span class="p">(</span><span class="n">symbol</span><span class="p">)</span><span class="w"> </span><span class="o">|&gt;</span>
+<span class="w">  </span><span class="nf">slice_max</span><span class="p">(</span><span class="nf">abs</span><span class="p">(</span><span class="n">t</span><span class="p">),</span><span class="w"> </span><span class="n">n</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">1</span><span class="p">,</span><span class="w"> </span><span class="n">with_ties</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">FALSE</span><span class="p">)</span><span class="w"> </span><span class="o">|&gt;</span>
+<span class="w">  </span><span class="nf">ungroup</span><span class="p">()</span><span class="w"> </span><span class="o">|&gt;</span>
+<span class="w">  </span><span class="nf">arrange</span><span class="p">(</span><span class="nf">desc</span><span class="p">(</span><span class="n">t</span><span class="p">))</span>
+
+<span class="n">gl</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="nf">setNames</span><span class="p">(</span><span class="n">ranked</span><span class="o">$</span><span class="n">t</span><span class="p">,</span><span class="w"> </span><span class="n">ranked</span><span class="o">$</span><span class="n">symbol</span><span class="p">)</span>
+<span class="nf">head</span><span class="p">(</span><span class="n">gl</span><span class="p">)</span>
+<span class="nf">tail</span><span class="p">(</span><span class="n">gl</span><span class="p">)</span>
+<span class="nf">class</span><span class="p">(</span><span class="n">gl</span><span class="p">)</span><span class="w"> </span><span class="c1"># numeric</span>
 
 <span class="n">GO_NK_Th</span><span class="o">&lt;-</span><span class="nf">gseGO</span><span class="p">(</span><span class="n">gl</span><span class="p">,</span><span class="w"> </span><span class="n">ont</span><span class="o">=</span><span class="s">&quot;BP&quot;</span><span class="p">,</span>
 <span class="w">                </span><span class="n">OrgDb</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">org.Hs.eg.db</span><span class="p">,</span>
 <span class="w">                </span><span class="n">keyType</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;SYMBOL&quot;</span><span class="p">,</span>
 <span class="w">                </span><span class="n">minGSSize</span><span class="o">=</span><span class="m">30</span><span class="p">,</span>
+<span class="w">                </span><span class="n">maxGSSize</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">800</span><span class="p">,</span><span class="w"> </span><span class="c1"># adaptive gene set is larger than 500</span>
 <span class="w">                </span><span class="n">eps</span><span class="o">=</span><span class="m">0</span><span class="p">,</span>
 <span class="w">                </span><span class="n">seed</span><span class="o">=</span><span class="bp">T</span><span class="p">)</span>
 </code></pre></div>
-<p>Explore the new object that was created. What is its structure? What does it contain? Is the adaptive immune response gene set significant? How many gene sets are down- or up-regulated?</p>
+Explore the new object that was created. What is its structure? What does it contain? 
+Is the adaptive immune response gene set significant? How many gene sets are down- or up-regulated?</p>
 <details class="done">
 <summary>Answer</summary>
-<div class="highlight"><pre><span></span><code><span class="w">    </span><span class="nf">class</span><span class="p">(</span><span class="n">GO_NK_Th</span><span class="p">)</span>
-<span class="w">    </span><span class="nf">str</span><span class="p">(</span><span class="n">GO_NK_Th</span><span class="p">)</span>
-<span class="w">    </span><span class="nf">View</span><span class="p">(</span><span class="n">GO_NK_Th</span><span class="o">@</span><span class="n">result</span><span class="p">)</span>
+<div class="highlight"><pre><span></span><code><span class="w">  </span><span class="nf">class</span><span class="p">(</span><span class="n">GO_NK_Th</span><span class="p">)</span>
+<span class="w">  </span><span class="nf">str</span><span class="p">(</span><span class="n">GO_NK_Th</span><span class="p">)</span>
 
-<span class="w">    </span><span class="n">GO_NK_Th</span><span class="o">@</span><span class="n">result</span><span class="p">[</span><span class="n">GO_NK_Th</span><span class="o">@</span><span class="n">result</span><span class="o">$</span><span class="n">Description</span><span class="o">==</span><span class="s">&quot;adaptive immune response&quot;</span><span class="p">,]</span>
-<span class="w">    </span><span class="nf">summary</span><span class="p">(</span><span class="n">GO_NK_Th</span><span class="o">@</span><span class="n">result</span><span class="o">$</span><span class="n">p.adjust</span><span class="o">&lt;</span><span class="m">0.05</span><span class="o">&amp;</span><span class="n">GO_NK_Th</span><span class="o">@</span><span class="n">result</span><span class="o">$</span><span class="n">NES</span><span class="o">&lt;</span><span class="m">0</span><span class="p">)</span>
-<span class="w">  </span><span class="c1"># Mode     FALSE    TRUE </span>
-<span class="w">  </span><span class="c1"># logical    320      63 </span>
+<span class="w">  </span><span class="nf">View</span><span class="p">(</span><span class="n">GO_NK_Th</span><span class="o">@</span><span class="n">result</span><span class="p">)</span>
 
-<span class="w">  </span><span class="nf">summary</span><span class="p">(</span><span class="n">GO_NK_Th</span><span class="o">@</span><span class="n">result</span><span class="o">$</span><span class="n">p.adjust</span><span class="o">&lt;</span><span class="m">0.05</span><span class="o">&amp;</span><span class="n">GO_NK_Th</span><span class="o">@</span><span class="n">result</span><span class="o">$</span><span class="n">NES</span><span class="o">&gt;</span><span class="m">0</span><span class="p">)</span>
-<span class="w">  </span><span class="c1">#     Mode   FALSE    TRUE </span>
-<span class="w">  </span><span class="c1"># logical       63     320 </span>
+<span class="w">  </span><span class="c1"># log2err is a column inherited from fgsea (which gseGO() calls).</span>
+<span class="w">  </span><span class="c1"># It reports the expected error (standard deviation) of the base-2 logarithm </span>
+<span class="w">  </span><span class="c1"># of the estimated p-value from the multilevel Monte-Carlo permutation scheme.</span>
+<span class="w">  </span><span class="c1"># How to Interpret log2err:</span>
+<span class="w">  </span><span class="c1"># Precision of pvalue: Smaller values mean the estimated pvalue is more stable</span>
+<span class="w">  </span><span class="c1"># across permutations (for example, log2err around 0.5–1.5 is typical for </span>
+<span class="w">  </span><span class="c1"># strong enrichments in fgsea).</span>
+<span class="w">  </span><span class="c1"># Large log2err: Indicates higher uncertainty in the pvalue </span>
+<span class="w">  </span><span class="c1"># estimate for that GO term.</span>
+<span class="w">  </span><span class="c1"># NA or NaN: Often appears when pvalue calculation had issues—such as </span>
+<span class="w">  </span><span class="c1"># unbalanced positive and negative gene-level statistics or </span>
+<span class="w">  </span><span class="c1"># p-values likely overestimated.</span>
+
+<span class="w">  </span><span class="n">res</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="nf">as.data.frame</span><span class="p">(</span><span class="n">GO_NK_Th</span><span class="p">)</span>
+<span class="w">  </span><span class="n">res</span><span class="w"> </span><span class="o">|&gt;</span><span class="w"> </span><span class="nf">filter</span><span class="p">(</span><span class="n">Description</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="s">&#39;adaptive immune response&#39;</span><span class="p">)</span>
+<span class="w">  </span><span class="nf">table</span><span class="p">(</span><span class="nf">ifelse</span><span class="p">(</span><span class="n">res</span><span class="o">$</span><span class="n">NES</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="m">0</span><span class="p">,</span><span class="w"> </span><span class="s">&#39;higher in NK&#39;</span><span class="p">,</span><span class="w"> </span><span class="s">&#39;higher in Th&#39;</span><span class="p">))</span>
 </code></pre></div>
 </details>
 <p>Among the results, some gene sets seem to be a bit redundant based on the genes they contain (column &ldquo;core_enrichment&rdquo;). We can simplify the results by using the <code>simplify()</code> function of the clusterProfiler package:</p>
 <p><div class="highlight"><pre><span></span><code><span class="c1"># Simplify:</span>
 <span class="o">?</span><span class="n">clusterProfiler</span><span class="o">::</span><span class="n">simplify</span>
+
 <span class="n">GO_NK_Th_simplify</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">clusterProfiler</span><span class="o">::</span><span class="nf">simplify</span><span class="p">(</span><span class="n">GO_NK_Th</span><span class="p">)</span>
 <span class="nf">View</span><span class="p">(</span><span class="n">GO_NK_Th_simplify</span><span class="o">@</span><span class="n">result</span><span class="p">)</span>
-<span class="n">GO_NK_Th_simplify</span><span class="o">@</span><span class="n">result</span><span class="p">[</span><span class="n">GO_NK_Th_simplify</span><span class="o">@</span><span class="n">result</span><span class="o">$</span><span class="n">Description</span><span class="o">==</span><span class="s">&quot;adaptive immune response&quot;</span><span class="p">,]</span>
+
+<span class="n">res</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="nf">as.data.frame</span><span class="p">(</span><span class="n">GO_NK_Th_simplify</span><span class="p">)</span>
+<span class="n">res</span><span class="w"> </span><span class="o">|&gt;</span><span class="w"> </span><span class="nf">filter</span><span class="p">(</span><span class="n">Description</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="s">&#39;adaptive immune response&#39;</span><span class="p">)</span>
+<span class="nf">table</span><span class="p">(</span><span class="nf">ifelse</span><span class="p">(</span><span class="n">res</span><span class="o">$</span><span class="n">NES</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="m">0</span><span class="p">,</span><span class="w"> </span><span class="s">&#39;higher in NK&#39;</span><span class="p">,</span><span class="w"> </span><span class="s">&#39;higher in Th&#39;</span><span class="p">))</span>
 </code></pre></div>
 Finally, you can export the results to a csv file, if you would want to summarize the results using <a href="http://revigo.irb.hr/">Revigo</a> for example (see later in course).
 To obtain the list of leading edge genes, split the corresponding column in the <code>@result</code> by using the slash. And if you want to obtain a full list
 of genes belonging to a particular GO term, this information is also stored in the <code>@geneSets</code> slot.</p>
-<div class="highlight"><pre><span></span><code><span class="c1"># Export results</span>
+<div class="highlight"><pre><span></span><code><span class="c1"># you can export the results to a csv file (to summarize results using Revigo, see presentation)</span>
 <span class="nf">write.csv</span><span class="p">(</span><span class="n">GO_NK_Th</span><span class="o">@</span><span class="n">result</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;GO_GSEA_NK_vs_Th.csv&quot;</span><span class="p">,</span>
 <span class="w">          </span><span class="n">row.names</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="bp">F</span><span class="p">,</span><span class="w"> </span><span class="n">quote</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="bp">F</span><span class="p">)</span>
 
 <span class="c1"># How to obtain the list of leading edge genes for a gene set:</span>
-<span class="nf">unlist</span><span class="p">(</span><span class="nf">strsplit</span><span class="p">(</span><span class="n">GO_NK_Th</span><span class="o">@</span><span class="n">result</span><span class="p">[</span><span class="n">GO_NK_Th</span><span class="o">@</span><span class="n">result</span><span class="o">$</span><span class="n">Description</span><span class="o">==</span><span class="s">&quot;adaptive immune response&quot;</span><span class="p">,</span><span class="m">11</span><span class="p">],</span>
-<span class="w">                </span><span class="s">&quot;\\/&quot;</span><span class="p">))</span>
+<span class="n">leading_edge</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">res</span><span class="w"> </span><span class="o">|&gt;</span>
+<span class="w">  </span><span class="nf">filter</span><span class="p">(</span><span class="n">Description</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="s">&#39;adaptive immune response&#39;</span><span class="p">)</span><span class="w"> </span><span class="o">|&gt;</span>
+<span class="w">  </span><span class="nf">pull</span><span class="p">(</span><span class="n">core_enrichment</span><span class="p">)</span><span class="w"> </span><span class="o">|&gt;</span><span class="w"> </span><span class="nf">strsplit</span><span class="p">(</span><span class="s">&#39;/&#39;</span><span class="p">)</span><span class="w"> </span><span class="o">|&gt;</span><span class="w"> </span><span class="nf">unlist</span><span class="p">()</span>
+<span class="n">leading_edge</span>
 
 <span class="c1"># How to obtain the list of all genes included in a GO term:</span>
 <span class="n">GO_NK_Th</span><span class="o">@</span><span class="n">geneSets</span><span class="o">$</span><span class="n">`GO:0002250`</span>
 </code></pre></div>
 <p>As you will see later in the course, objects of type <code>enrichResult</code> or <code>gseaResult</code> generated by <code>clusterProfiler</code> functions can be used directly in some visualization functions. Therefore, you could save your full output object also to allow for easy visualization later.</p>
-<div class="highlight"><pre><span></span><code><span class="c1"># export full object</span>
+<div class="highlight"><pre><span></span><code><span class="c1"># You can also save the gseaResult object, which is useful to later </span>
+<span class="c1"># apply default plotting methods (see Exercise 3)</span>
 <span class="nf">saveRDS</span><span class="p">(</span><span class="n">GO_NK_Th</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;GO_NK_Th.rds&quot;</span><span class="p">)</span>
 
 <span class="c1"># import a saved object:</span>
@@ -826,61 +886,38 @@ every gene set.</p>
 </code></pre></div>
 <p>This method can also be used if you have a list of genes involved in a disease, such as genes that are mutated in cancer, or lists of genes obtained by other omics methods, such as genes that have a transcription factor binding site in their promoter (ChIP-seq), etc.</p>
 <h2 id="exercise-3-visualization-of-enrichment-results">Exercise 3 - Visualization of enrichment results</h2>
-<p>Once we have performed a GSEA or over-representation analysis, we need of course to show the results and prepare figures for a publication. Several visualizations are possible.
-The first option is a barplot. It can be a barplot of p-values of top over-represented GO terms. P-values are usually -log<sub>10</sub>-transformed, so that the very small p-values are emphasized compared to p-values that are closer to 0.05. The barplot() function comes from the graphics package. </p>
-<div class="highlight"><pre><span></span><code><span class="nf">par</span><span class="p">(</span><span class="n">mar</span><span class="o">=</span><span class="nf">c</span><span class="p">(</span><span class="m">5</span><span class="p">,</span><span class="m">20</span><span class="p">,</span><span class="m">3</span><span class="p">,</span><span class="m">3</span><span class="p">))</span>
-<span class="nf">barplot</span><span class="p">(</span><span class="nf">rev</span><span class="p">(</span><span class="o">-</span><span class="nf">log10</span><span class="p">(</span><span class="n">GO_NK_Th</span><span class="o">@</span><span class="n">result</span><span class="o">$</span><span class="n">p.adjust</span><span class="p">[</span><span class="m">1</span><span class="o">:</span><span class="m">10</span><span class="p">])),</span>
-<span class="w">        </span><span class="n">horiz</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="bp">T</span><span class="p">,</span><span class="w"> </span><span class="n">names</span><span class="o">=</span><span class="nf">rev</span><span class="p">(</span><span class="n">GO_NK_Th</span><span class="o">@</span><span class="n">result</span><span class="o">$</span><span class="n">Description</span><span class="p">[</span><span class="m">1</span><span class="o">:</span><span class="m">10</span><span class="p">]),</span>
-<span class="w">        </span><span class="n">las</span><span class="o">=</span><span class="m">2</span><span class="p">,</span><span class="w"> </span><span class="n">xlab</span><span class="o">=</span><span class="s">&quot;-log10(adj.p-value)&quot;</span><span class="p">,</span>
-<span class="w">        </span><span class="n">cex.names</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">0.7</span><span class="p">,</span>
-<span class="w">        </span><span class="n">col</span><span class="o">=</span><span class="s">&quot;lightgreen&quot;</span><span class="p">)</span><span class="w"> </span>
-<span class="nf">abline</span><span class="p">(</span><span class="n">v</span><span class="o">=-</span><span class="nf">log10</span><span class="p">(</span><span class="m">0.05</span><span class="p">))</span>
-</code></pre></div>
-<figure>
-  <img src="../assets/images/barplot1.png" width="700"/>
-  </figure>
+<p>Once we have performed a GSEA or over-representation analysis, we need of course to show the results and prepare figures for a publication. Several visualizations are possible,
+depending on whether we want to show results for several gene sets at once, or a single gene set.
+Along with the clusterProfiler package, the enrichplot package is installed, and 
+its functions can be used directly on enrichResult or gseaResult objects. </p>
+<p>A dot plot allows to show results for several gene sets at once.</p>
+<div class="highlight"><pre><span></span><code><span class="c1"># Dotplot on enrichResult and gseaResult objects:</span>
+<span class="n">enrichplot</span><span class="o">::</span><span class="nf">dotplot</span><span class="p">(</span><span class="n">ora3</span><span class="p">)</span><span class="w"> </span><span class="c1"># genes up-reg in NK, 3 gene sets of interest, ordered by GeneRatio</span>
+<span class="n">enrichplot</span><span class="o">::</span><span class="nf">dotplot</span><span class="p">(</span><span class="n">ora3</span><span class="p">,</span><span class="w"> </span><span class="n">orderBy</span><span class="o">=</span><span class="s">&quot;p.adjust&quot;</span><span class="p">)</span><span class="w"> </span><span class="c1"># ordered by reverted p.adjust</span>
+<span class="n">enrichplot</span><span class="o">::</span><span class="nf">dotplot</span><span class="p">(</span><span class="n">GO_NK_Th</span><span class="p">,</span><span class="w"> </span><span class="n">x</span><span class="o">=</span><span class="s">&quot;NES&quot;</span><span class="p">)</span><span class="w"> </span><span class="c1"># top 10 shown</span>
+<span class="n">enrichplot</span><span class="o">::</span><span class="nf">dotplot</span><span class="p">(</span><span class="n">GO_NK_Th_simplify</span><span class="p">,</span><span class="w"> </span><span class="n">x</span><span class="o">=</span><span class="s">&quot;NES&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">showCategory</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">15</span><span class="p">)</span>
 
-<p>In publications, we often see barplots of normalized enrichment scores (NES), showing which gene sets are up-regulated and which are down-regulated.</p>
-<p>Now that you know how to use the <code>barplot()</code> function, how would you create a barplot of NES of the top 10 up-regulated and the top 10 down-regulated genes sets,
- with red bars for the up-regulated gene sets and blue bars for the down-regulated gene sets?</p>
-<details class="done">
-<summary>Answer</summary>
-<p><div class="highlight"><pre><span></span><code><span class="w">    </span><span class="c1"># Barplot of NES of the top GO gene sets, with different color for up- or down-reg gene sets:</span>
-<span class="w">    </span><span class="n">sorted_GO_NK_Th</span><span class="o">&lt;-</span><span class="w"> </span><span class="n">GO_NK_Th</span><span class="o">@</span><span class="n">result</span><span class="p">[</span><span class="nf">order</span><span class="p">(</span><span class="n">GO_NK_Th</span><span class="o">@</span><span class="n">result</span><span class="o">$</span><span class="n">NES</span><span class="p">,</span><span class="w"> </span><span class="n">decreasing</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="bp">F</span><span class="p">),]</span>
-<span class="w">    </span><span class="n">sorted_GO_NK_Th</span><span class="o">$</span><span class="n">color</span><span class="o">&lt;-</span><span class="nf">ifelse</span><span class="p">(</span><span class="n">sorted_GO_NK_Th</span><span class="o">$</span><span class="n">NES</span><span class="o">&lt;</span><span class="m">0</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;red&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;darkblue&quot;</span><span class="p">)</span>
-
-<span class="w">    </span><span class="nf">par</span><span class="p">(</span><span class="n">mar</span><span class="o">=</span><span class="nf">c</span><span class="p">(</span><span class="m">5</span><span class="p">,</span><span class="m">20</span><span class="p">,</span><span class="m">3</span><span class="p">,</span><span class="m">3</span><span class="p">))</span>
-<span class="w">    </span><span class="nf">barplot</span><span class="p">(</span><span class="n">sorted_GO_NK_Th</span><span class="o">$</span><span class="n">NES</span><span class="p">[</span><span class="nf">c</span><span class="p">(</span><span class="m">1</span><span class="o">:</span><span class="m">10</span><span class="p">,</span><span class="w"> </span><span class="p">(</span><span class="nf">nrow</span><span class="p">(</span><span class="n">sorted_GO_NK_Th</span><span class="p">)</span><span class="m">-9</span><span class="p">)</span><span class="o">:</span><span class="nf">nrow</span><span class="p">(</span><span class="n">sorted_GO_NK_Th</span><span class="p">))],</span>
-<span class="w">        </span><span class="n">horiz</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="bp">T</span><span class="p">,</span><span class="w"> </span><span class="n">names</span><span class="o">=</span><span class="n">sorted_GO_NK_Th</span><span class="o">$</span><span class="n">Description</span><span class="p">[</span><span class="nf">c</span><span class="p">(</span><span class="m">1</span><span class="o">:</span><span class="m">10</span><span class="p">,</span><span class="w"> </span><span class="p">(</span><span class="nf">nrow</span><span class="p">(</span><span class="n">sorted_GO_NK_Th</span><span class="p">)</span><span class="m">-9</span><span class="p">)</span><span class="o">:</span><span class="nf">nrow</span><span class="p">(</span><span class="n">sorted_GO_NK_Th</span><span class="p">))],</span>
-<span class="w">        </span><span class="n">las</span><span class="o">=</span><span class="m">2</span><span class="p">,</span><span class="w"> </span><span class="n">xlab</span><span class="o">=</span><span class="s">&quot;NES&quot;</span><span class="p">,</span>
-<span class="w">        </span><span class="n">cex.names</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">0.7</span><span class="p">,</span>
-<span class="w">        </span><span class="n">col</span><span class="o">=</span><span class="n">sorted_GO_NK_Th</span><span class="o">$</span><span class="n">color</span><span class="p">[</span><span class="nf">c</span><span class="p">(</span><span class="m">1</span><span class="o">:</span><span class="m">10</span><span class="p">,</span><span class="w"> </span><span class="p">(</span><span class="nf">nrow</span><span class="p">(</span><span class="n">sorted_GO_NK_Th</span><span class="p">)</span><span class="m">-9</span><span class="p">)</span><span class="o">:</span><span class="nf">nrow</span><span class="p">(</span><span class="n">sorted_GO_NK_Th</span><span class="p">))])</span><span class="w"> </span>
-<span class="w">    </span><span class="nf">abline</span><span class="p">(</span><span class="n">v</span><span class="o">=</span><span class="m">0</span><span class="p">)</span>
-</code></pre></div>
-  <figure>
-<img src="../assets/images/barplot2.png" width="700"/>
-</figure></p>
-</details>
-<p>With results of an over-representation analysis, where the output is of class <code>enrichResult</code>, the <code>barplot()</code> function can be used directly. You can either show the significant gene sets, or a custom selection of them.</p>
-<div class="highlight"><pre><span></span><code><span class="c1"># Use the GO_enrich analysis performed above, of the over-representation analysis </span>
-<span class="c1"># of genes up-regulated in NK cells:</span>
-<span class="c1"># barplot() can be directly used on enrichResult objects: but not on gseaResult objects</span>
-<span class="n">graphics</span><span class="o">::</span><span class="nf">barplot</span><span class="p">(</span><span class="n">GO_enrich</span><span class="p">)</span>
-<span class="n">graphics</span><span class="o">::</span><span class="nf">barplot</span><span class="p">(</span><span class="n">GO_enrich</span><span class="p">,</span><span class="w"> </span><span class="n">color</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;qvalue&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">x</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;GeneRatio&quot;</span><span class="p">)</span>
-
-<span class="n">graphics</span><span class="o">::</span><span class="nf">barplot</span><span class="p">(</span><span class="n">GO_NK_Th</span><span class="p">)</span><span class="w"> </span><span class="c1"># this is a gseaResult object</span>
-<span class="c1"># Error in barplot.default(GO_NK_Th) : </span>
-<span class="c1"># &#39;height&#39; must be a vector or a matrix</span>
+<span class="c1"># Split per NES direction</span>
+<span class="n">enrichplot</span><span class="o">::</span><span class="nf">dotplot</span><span class="p">(</span><span class="n">GO_NK_Th_simplify</span><span class="p">,</span><span class="w"> </span><span class="n">showCategory</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">10</span><span class="p">,</span>
+<span class="w">                    </span><span class="n">size</span><span class="o">=</span><span class="s">&quot;p.adjust&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">color</span><span class="o">=</span><span class="s">&quot;NES&quot;</span><span class="p">,</span>
+<span class="w">                    </span><span class="n">split</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&#39;.sign&#39;</span><span class="p">)</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="nf">facet_grid</span><span class="p">(</span><span class="n">.</span><span class="w"> </span><span class="o">~</span><span class="w"> </span><span class="n">.sign</span><span class="p">)</span>
 
 <span class="c1"># Select only 2 out of the significant gene sets:</span>
-<span class="n">ego_selection</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">GO_enrich</span><span class="p">[</span><span class="n">GO_enrich</span><span class="o">@</span><span class="n">result</span><span class="o">$</span><span class="n">ID</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="s">&quot;GO:0042287&quot;</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="n">GO_enrich</span><span class="o">@</span><span class="n">result</span><span class="o">$</span><span class="n">ID</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="s">&quot;GO:0004713&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">asis</span><span class="o">=</span><span class="bp">T</span><span class="p">]</span>
-<span class="nf">barplot</span><span class="p">(</span><span class="n">ego_selection</span><span class="p">)</span>
+<span class="n">ego_selection</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">GO_NK_Th</span><span class="p">[</span><span class="n">GO_NK_Th</span><span class="o">@</span><span class="n">result</span><span class="o">$</span><span class="n">ID</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="s">&quot;GO:0002181&quot;</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="n">GO_NK_Th</span><span class="o">@</span><span class="n">result</span><span class="o">$</span><span class="n">ID</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="s">&quot;GO:0002228&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">asis</span><span class="o">=</span><span class="bp">T</span><span class="p">]</span>
+<span class="nf">dotplot</span><span class="p">(</span><span class="n">ego_selection</span><span class="p">,</span><span class="w"> </span><span class="n">x</span><span class="o">=</span><span class="s">&quot;NES&quot;</span><span class="p">)</span>
+<span class="nf">dotplot</span><span class="p">(</span><span class="n">ego_selection</span><span class="p">,</span><span class="w"> </span><span class="n">x</span><span class="o">=</span><span class="s">&quot;p.adjust&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">size</span><span class="o">=</span><span class="s">&quot;NES&quot;</span><span class="p">)</span><span class="w">                  </span>
 </code></pre></div>
-<p>Here, we used the barplot function of the graphics package, but you can of course use ggplot2 functions. Please see the <a href="https://sib-swiss.github.io/enrichment-analysis-training/bonus_code/#code-for-barplots-with-ggplot2">Bonus code</a> page for examples of barplots with ggplot2 (and tidyverse) functions. </p>
-<p>A common way to represent the enrichment score of a single gene set after GSEA is the barcode plot (i.e gsea plot), with the <code>gseaplot()</code> function that can be used directly on objects of class <code>gseaResult</code> (i.e. output by clusterProfiler functions). </p>
-<div class="highlight"><pre><span></span><code><span class="c1"># Barcode plot</span>
+<figure>
+  <img src="../assets/images/enrichplot1.png" width="700"/>
+  </figure>
+
+<p>A common way to represent the enrichment score of a single gene set after GSEA is the barcode plot (i.e gsea plot), 
+with the <code>gseaplot()</code> function that can be used directly on objects of class <code>gseaResult</code> (i.e. output by clusterProfiler functions). </p>
+<div class="highlight"><pre><span></span><code><span class="c1"># Barcode plot (i.e. gsea plot)</span>
 <span class="c1"># You need the ID of the GO gene set to plot:</span>
-<span class="n">GO_NK_Th</span><span class="o">@</span><span class="n">result</span><span class="p">[</span><span class="m">1</span><span class="o">:</span><span class="m">10</span><span class="p">,</span><span class="m">1</span><span class="o">:</span><span class="m">6</span><span class="p">]</span>
+<span class="c1"># GSEA plot for 1 gene set of interest, we need the info of the &quot;ID&quot; column</span>
+<span class="n">res</span><span class="w"> </span><span class="o">|&gt;</span><span class="w"> </span><span class="nf">filter</span><span class="p">(</span><span class="n">Description</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="s">&quot;cytoplasmic translation&quot;</span><span class="p">)</span><span class="w"> </span><span class="o">|&gt;</span><span class="w"> </span>
+<span class="w">  </span><span class="n">dplyr</span><span class="o">::</span><span class="nf">select</span><span class="p">(</span><span class="n">columns</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nf">c</span><span class="p">(</span><span class="s">&quot;ID&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;Description&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;NES&quot;</span><span class="p">))</span>
 
 <span class="c1"># For a gene set that is down-regulated in NK cells:</span>
 <span class="nf">gseaplot</span><span class="p">(</span><span class="n">GO_NK_Th</span><span class="p">,</span><span class="w"> </span><span class="n">geneSetID</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;GO:0002181&quot;</span><span class="p">,</span>
@@ -888,6 +925,21 @@ The first option is a barplot. It can be a barplot of p-values of top over-repre
 <span class="c1"># And one that is up-regulated in NK cells</span>
 <span class="nf">gseaplot</span><span class="p">(</span><span class="n">GO_NK_Th</span><span class="p">,</span><span class="w"> </span><span class="n">geneSetID</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;GO:0002443&quot;</span><span class="p">,</span>
 <span class="w">         </span><span class="n">title</span><span class="o">=</span><span class="s">&quot;GO:0002443 - leukocyte mediated immunity&quot;</span><span class="p">)</span>
+
+<span class="c1"># customize second plot:</span>
+<span class="n">p</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="nf">gseaplot</span><span class="p">(</span><span class="n">GO_NK_Th</span><span class="p">,</span><span class="w"> </span><span class="n">geneSetID</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;GO:0002443&quot;</span><span class="p">,</span>
+<span class="w">              </span><span class="n">title</span><span class="o">=</span><span class="s">&quot;GO:0002443 - leukocyte mediated immunity&quot;</span><span class="p">)</span><span class="w"> </span>
+<span class="n">p</span><span class="p">[[</span><span class="m">2</span><span class="p">]]</span><span class="w"> </span><span class="c1"># default bottom plot </span>
+<span class="n">p</span><span class="p">[[</span><span class="m">2</span><span class="p">]]</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="nf">theme_minimal</span><span class="p">()</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="nf">ggtitle</span><span class="p">(</span><span class="s">&quot;My pathway&quot;</span><span class="p">)</span><span class="w"> </span><span class="c1"># customized bottom plot </span>
+
+<span class="c1"># replace the bottom plot by my custom plot: </span>
+<span class="n">p</span><span class="p">[[</span><span class="m">2</span><span class="p">]]</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">p</span><span class="p">[[</span><span class="m">2</span><span class="p">]]</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="nf">theme_minimal</span><span class="p">()</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="nf">ggtitle</span><span class="p">(</span><span class="s">&quot;My pathway&quot;</span><span class="p">)</span><span class="w"> </span><span class="o">+</span><span class="w"> </span>
+<span class="w">  </span><span class="nf">xlab</span><span class="p">(</span><span class="s">&quot;Ranked list&quot;</span><span class="p">)</span>
+<span class="n">p</span><span class="w"> </span>
+
+<span class="c1"># One that has a less strong NES (1.3)</span>
+<span class="nf">gseaplot</span><span class="p">(</span><span class="n">GO_NK_Th</span><span class="p">,</span><span class="w"> </span><span class="n">geneSetID</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;GO:0032870&quot;</span><span class="p">,</span>
+<span class="w">         </span><span class="n">title</span><span class="o">=</span><span class="s">&quot;GO:0032870 - cellular response to hormone stimulus&quot;</span><span class="p">)</span>
 </code></pre></div>
 <figure>
   <img src="../assets/images/gseaplot1.png" width="700"/>
@@ -897,20 +949,68 @@ The first option is a barplot. It can be a barplot of p-values of top over-repre
   <img src="../assets/images/gseaplot2.png" width="700"/>
   </figure>
 
-<p>Finally, clusterProfiler provides several visualization methods that can be used directly on objects of class &ldquo;gseaResult&rdquo; or &ldquo;enrichResult. These functions are implemented in the enrichplot package that was developped to go with clusterProfiler. Examples are the dotplot, the gene-concept network (cnetplot), the enrichment map (emapplot) and the ridge plots.
-Feel free to consult the <a href="http://yulab-smu.top/biomedical-knowledge-mining-book/enrichplot.html">chapter on visualization of the nice clusterProfiler book</a> to see all the possible options and test others than the ones listed here!</p>
-<p><div class="highlight"><pre><span></span><code><span class="c1"># Dotplot on enrichResult and gseaResult objects:</span>
-<span class="n">enrichplot</span><span class="o">::</span><span class="nf">dotplot</span><span class="p">(</span><span class="n">GO_enrich</span><span class="p">,</span><span class="w"> </span><span class="n">orderBy</span><span class="o">=</span><span class="s">&quot;p.adjust&quot;</span><span class="p">)</span>
-<span class="n">enrichplot</span><span class="o">::</span><span class="nf">dotplot</span><span class="p">(</span><span class="n">GO_NK_Th</span><span class="p">,</span><span class="w"> </span><span class="n">orderBy</span><span class="o">=</span><span class="s">&quot;p.adjust&quot;</span><span class="p">)</span>
+<p>Because the <code>@result</code> slot is a data.frame, we can use base R graphics functions to create a barplot of p-values of top enriched GO terms. 
+P-values are usually -log<sub>10</sub>-transformed, so that the very small p-values are emphasized compared to p-values that are closer to 0.05. The barplot() function comes from the graphics package. </p>
+<div class="highlight"><pre><span></span><code><span class="c1"># Using base R to create a barplot of the values in @result</span>
+<span class="c1"># Barplot of -log10 p-values of top 10 GO gene sets:</span>
+<span class="nf">par</span><span class="p">(</span><span class="n">mar</span><span class="o">=</span><span class="nf">c</span><span class="p">(</span><span class="m">5</span><span class="p">,</span><span class="m">15</span><span class="p">,</span><span class="m">3</span><span class="p">,</span><span class="m">3</span><span class="p">))</span>
+<span class="n">graphics</span><span class="o">::</span><span class="nf">barplot</span><span class="p">(</span><span class="nf">rev</span><span class="p">(</span><span class="o">-</span><span class="nf">log10</span><span class="p">(</span><span class="n">GO_NK_Th</span><span class="o">@</span><span class="n">result</span><span class="o">$</span><span class="n">p.adjust</span><span class="p">[</span><span class="m">1</span><span class="o">:</span><span class="m">10</span><span class="p">])),</span>
+<span class="w">                  </span><span class="n">horiz</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="bp">T</span><span class="p">,</span><span class="w"> </span>
+<span class="w">                  </span><span class="n">names</span><span class="o">=</span><span class="nf">rev</span><span class="p">(</span><span class="n">GO_NK_Th</span><span class="o">@</span><span class="n">result</span><span class="o">$</span><span class="n">Description</span><span class="p">[</span><span class="m">1</span><span class="o">:</span><span class="m">10</span><span class="p">]),</span>
+<span class="w">                  </span><span class="n">las</span><span class="o">=</span><span class="m">2</span><span class="p">,</span><span class="w"> </span><span class="n">xlab</span><span class="o">=</span><span class="s">&quot;-log10(adj.p-value)&quot;</span><span class="p">,</span>
+<span class="w">                  </span><span class="n">cex.names</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">0.7</span><span class="p">,</span>
+<span class="w">                  </span><span class="n">col</span><span class="o">=</span><span class="s">&quot;lightgreen&quot;</span><span class="p">)</span><span class="w"> </span>
+<span class="nf">abline</span><span class="p">(</span><span class="n">v</span><span class="o">=-</span><span class="nf">log10</span><span class="p">(</span><span class="m">0.05</span><span class="p">))</span>
 </code></pre></div>
-<br />
 <figure>
-  <img src="../assets/images/enrichplot1.png" width="700"/>
+  <img src="../assets/images/barplot1.png" width="700"/>
   </figure>
-</p>
+
+<p>With results of an over-representation analysis, 
+where the output is of class <code>enrichResult</code>, 
+the <code>graphics::barplot()</code> function can be used directly. You can either show the significant gene sets, or a custom selection of them.</p>
+<div class="highlight"><pre><span></span><code><span class="c1"># barplot() can be directly used on enrichResult objects: but not on gseaResult objects</span>
+<span class="n">graphics</span><span class="o">::</span><span class="nf">barplot</span><span class="p">(</span><span class="n">ora3</span><span class="p">)</span>
+<span class="n">graphics</span><span class="o">::</span><span class="nf">barplot</span><span class="p">(</span><span class="n">ora3</span><span class="p">,</span><span class="w"> </span><span class="n">color</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;qvalue&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">x</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;GeneRatio&quot;</span><span class="p">)</span>
+
+<span class="n">graphics</span><span class="o">::</span><span class="nf">barplot</span><span class="p">(</span><span class="n">GO_NK_Th</span><span class="p">)</span><span class="w"> </span><span class="c1"># this is a gseaResult object</span>
+<span class="c1"># Error in barplot.default(GO_NK_Th) : </span>
+<span class="c1"># &#39;height&#39; must be a vector or a matrix</span>
+</code></pre></div>
+<p>In publications, we often see barplots of normalized enrichment scores (NES), showing which gene sets are up-regulated and which are down-regulated.</p>
+<p>Now that you know how to use the <code>graphics::barplot()</code> function, how would you create a barplot of NES of the top 10 up-regulated and the top 10 down-regulated genes sets,
+ with red bars for the down-regulated gene sets and blue bars for the up-regulated gene sets?</p>
+<details class="done">
+<summary>Answer</summary>
+<p><div class="highlight"><pre><span></span><code><span class="w">    </span><span class="c1"># Barplot of NES of the top GO gene sets, with different color for up- or down-reg gene sets:</span>
+<span class="w">    </span><span class="c1"># Create a df with the top 10 up- and down-reg pathways, and set color code:</span>
+<span class="w">    </span><span class="n">sorted_GO_NK_Th</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">GO_NK_Th</span><span class="o">@</span><span class="n">result</span><span class="w"> </span><span class="o">%&gt;%</span>
+<span class="w">        </span><span class="nf">arrange</span><span class="p">(</span><span class="n">NES</span><span class="p">)</span><span class="w"> </span><span class="o">%&gt;%</span>
+<span class="w">        </span><span class="nf">mutate</span><span class="p">(</span><span class="n">color</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nf">if_else</span><span class="p">(</span><span class="n">NES</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="m">0</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;red&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;darkblue&quot;</span><span class="p">))</span><span class="w"> </span><span class="o">%&gt;%</span>
+<span class="w">        </span><span class="nf">slice</span><span class="p">(</span><span class="nf">c</span><span class="p">(</span><span class="m">1</span><span class="o">:</span><span class="m">10</span><span class="p">,</span><span class="w"> </span><span class="p">(</span><span class="nf">n</span><span class="p">()</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="m">9</span><span class="p">)</span><span class="o">:</span><span class="nf">n</span><span class="p">()))</span>
+
+<span class="w">    </span><span class="nf">par</span><span class="p">(</span><span class="n">mar</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nf">c</span><span class="p">(</span><span class="m">5</span><span class="p">,</span><span class="w"> </span><span class="m">20</span><span class="p">,</span><span class="w"> </span><span class="m">3</span><span class="p">,</span><span class="w"> </span><span class="m">3</span><span class="p">))</span>
+<span class="w">    </span><span class="nf">barplot</span><span class="p">(</span><span class="n">sorted_GO_NK_Th</span><span class="o">$</span><span class="n">NES</span><span class="p">,</span>
+<span class="w">            </span><span class="n">horiz</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="bp">T</span><span class="p">,</span><span class="w"> </span>
+<span class="w">            </span><span class="n">names</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">sorted_GO_NK_Th</span><span class="o">$</span><span class="n">Description</span><span class="p">,</span>
+<span class="w">            </span><span class="n">las</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">2</span><span class="p">,</span><span class="w"> </span><span class="n">xlab</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;NES&quot;</span><span class="p">,</span>
+<span class="w">            </span><span class="n">cex.names</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">0.7</span><span class="p">,</span>
+<span class="w">            </span><span class="n">col</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">sorted_GO_NK_Th</span><span class="o">$</span><span class="n">color</span><span class="p">)</span>
+<span class="w">    </span><span class="nf">abline</span><span class="p">(</span><span class="n">v</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">0</span><span class="p">)</span>
+</code></pre></div>
+  <figure>
+<img src="../assets/images/barplot2.png" width="700"/>
+</figure></p>
+</details>
+<p>Here, we used the barplot function of the graphics package, but you can of course use ggplot2 functions. Please see the <a href="https://sib-swiss.github.io/enrichment-analysis-training/bonus_code/#code-for-barplots-with-ggplot2">Bonus code</a> page for examples of barplots with ggplot2 (and tidyverse) functions. </p>
+<p>As we have seen, clusterProfiler provides several visualization methods that can be used directly on objects of class &ldquo;gseaResult&rdquo; or &ldquo;enrichResult. These functions are implemented in the enrichplot package that was developped to go with clusterProfiler. Examples we have seen are
+the dotplot and the gseaplot, but there is also the gene-concept network (cnetplot), the enrichment map (emapplot) and the ridge plots.
+Feel free to consult the <a href="http://yulab-smu.top/biomedical-knowledge-mining-book/enrichplot.html">chapter on visualization of the nice clusterProfiler book</a> to see all the possible options and test others than the ones listed here!</p>
 <div class="highlight"><pre><span></span><code><span class="c1"># Gene concept network:</span>
-<span class="nf">cnetplot</span><span class="p">(</span><span class="n">GO_enrich</span><span class="p">,</span><span class="w"> </span><span class="n">categorySize</span><span class="o">=</span><span class="s">&quot;pvalue&quot;</span><span class="p">)</span>
+<span class="nf">cnetplot</span><span class="p">(</span><span class="n">ora3</span><span class="p">,</span><span class="w"> </span><span class="n">categorySize</span><span class="o">=</span><span class="s">&quot;pvalue&quot;</span><span class="p">)</span>
 <span class="nf">cnetplot</span><span class="p">(</span><span class="n">GO_NK_Th</span><span class="p">,</span><span class="w"> </span><span class="n">showCategory</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">3</span><span class="p">)</span>
+<span class="c1"># For a gseaResult object, we can overlay fold change for each gene:</span>
+<span class="nf">cnetplot</span><span class="p">(</span><span class="n">GO_NK_Th</span><span class="p">,</span><span class="w"> </span><span class="n">showCategory</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">3</span><span class="p">,</span><span class="w"> </span><span class="n">foldChange</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">gl</span><span class="p">)</span>
 </code></pre></div>
 <figure>
   <img src="../assets/images/cnetplot1.png" width="700"/>
@@ -923,8 +1023,6 @@ Feel free to consult the <a href="http://yulab-smu.top/biomedical-knowledge-mini
 <span class="c1"># The ridge plots:</span>
 <span class="c1"># Distribution of t-statistic for genes included in significant gene sets or in selected gene sets:</span>
 <span class="nf">ridgeplot</span><span class="p">(</span><span class="n">GO_NK_Th</span><span class="p">)</span>
-<span class="c1"># What is the difference with core_enrichment =F?</span>
-<span class="nf">ridgeplot</span><span class="p">(</span><span class="n">GO_NK_Th</span><span class="p">,</span><span class="w"> </span><span class="n">core_enrichment</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="bp">F</span><span class="p">)</span>
 
 <span class="c1"># Select which GO terms to show in the ridge plot:</span>
 <span class="n">GO_NK_Th_selection</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">GO_NK_Th</span><span class="p">[</span><span class="n">GO_NK_Th</span><span class="o">$</span><span class="n">ID</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="s">&quot;GO:0002181&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">asis</span><span class="o">=</span><span class="bp">T</span><span class="p">]</span>
@@ -936,6 +1034,9 @@ Feel free to consult the <a href="http://yulab-smu.top/biomedical-knowledge-mini
 <span class="c1"># Terms that contain the keyword &quot;leukocyte&quot;</span>
 <span class="n">GO_NK_Th_selection</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">GO_NK_Th</span><span class="p">[</span><span class="nf">grep</span><span class="p">(</span><span class="s">&quot;leukocyte&quot;</span><span class="p">,</span><span class="n">GO_NK_Th</span><span class="o">@</span><span class="n">result</span><span class="o">$</span><span class="n">Description</span><span class="p">),</span><span class="w"> </span><span class="n">asis</span><span class="o">=</span><span class="bp">T</span><span class="p">]</span>
 <span class="nf">ridgeplot</span><span class="p">(</span><span class="n">GO_NK_Th_selection</span><span class="p">)</span>
+
+<span class="c1"># What if you want to show all of the selected leukocyte terms with a dotplot?</span>
+<span class="nf">dotplot</span><span class="p">(</span><span class="n">GO_NK_Th_selection</span><span class="p">,</span><span class="w"> </span><span class="n">showCategory</span><span class="o">=</span><span class="kc">Inf</span><span class="p">)</span><span class="w"> </span><span class="c1"># default is to plot 10</span>
 </code></pre></div>
 <figure>
   <img src="../assets/images/ridgeplot1.png" width="700"/>
@@ -943,33 +1044,84 @@ Feel free to consult the <a href="http://yulab-smu.top/biomedical-knowledge-mini
 
 <p>Please see the <a href="https://sib-swiss.github.io/enrichment-analysis-training/bonus_code/#code-for-a-lollipop-plot-with-ggplot2">Bonus code</a> page for an example of a lollipop plot with ggplot2. </p>
 <h2 id="exercise-4-the-last-one-enrichment-of-other-collections-of-gene-sets">Exercise 4 (the last one!) - Enrichment of other collections of gene sets</h2>
-<p>We will now perform GSEA of other collections of gene sets, such as KEGG or Hallmark.
-For GSEA of the KEGG gene sets, the gene IDs have to be NCBI Entrez gene IDs. ClusterProfiler provides the bitr() function to convert gene label types.</p>
-<div class="highlight"><pre><span></span><code><span class="nf">keytypes</span><span class="p">(</span><span class="n">org.Hs.eg.db</span><span class="p">)</span>
+<p>We will now perform GSEA of other collections of gene sets, such as KEGG or Hallmark, or a custom list of gene sets.
+Indeed, very often, researchers have their own gene sets in mind, either that they compiled from the literature, or that they defined from previous experiments. If this is the case for your experiment, you can generate an Excel file that contains one gene set per row, the 2 first columns contain the gene set ID and the gene set description, and the genes that belong to each gene set are listed in the next columns. To have an idea of
+the structure of this file, open the .gmt file that we provided using Excel or a Text editor (NotePad, TextWrangler, BBEdit, etc).</p>
+<p>In this exercise, we will first perform a GSEA of the 50 hallmark gene sets that can be downloaded from <a href="http://www.gsea-msigdb.org/gsea/downloads.jsp">MSigDB</a>, which we could import using <code>clusterProfiler::read.gmt()</code>. 
+Alternatively, we can import the Hallmark gene sets using <code>msigdbr</code>. What is the format of the object that is created? Use the GSEA() function, by providing the named and sorted
+vector of t-statistics we used above with gseGO().</p>
+<div class="highlight"><pre><span></span><code><span class="c1"># Hallmark sets use gene symbols, so we can reuse `gl` without any </span>
+<span class="c1"># conversion. Check the arguments against your installed msigdbr version </span>
+<span class="c1"># (`?msigdbr`, `msigdbr_collections()`).</span>
+
+<span class="c1"># What species and gene set collections are available via msigdbr?</span>
+<span class="nf">msigdbr_species</span><span class="p">()</span><span class="w">  </span><span class="c1"># Note that other species&#39; symbols are orthology-mapped from human genes</span>
+
+<span class="nf">msigdbr_collections</span><span class="p">()</span>
+
+<span class="c1"># Import hallmark, convert to term2gene and run GSEA:</span>
+<span class="n">term2gene_h</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="nf">msigdbr</span><span class="p">(</span><span class="n">species</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&#39;Homo sapiens&#39;</span><span class="p">,</span><span class="w"> </span><span class="n">collection</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&#39;H&#39;</span><span class="p">)</span>
+<span class="c1"># Or alternatively:</span>
+<span class="c1"># term2gene_h&lt;-read.gmt(&quot;data/h.all.v2023.2.Hs.symbols.gmt&quot;)</span>
+
+<span class="nf">head</span><span class="p">(</span><span class="n">term2gene_h</span><span class="p">)</span>
+<span class="nf">length</span><span class="p">(</span><span class="nf">unique</span><span class="p">(</span><span class="n">term2gene_h</span><span class="o">$</span><span class="n">gs_name</span><span class="p">))</span><span class="w"> </span><span class="c1"># 50</span>
+
+<span class="c1"># Run GSEA with the function that allows to use custom gene sets, </span>
+<span class="c1"># provide the named vector of t statistics</span>
+<span class="n">h_NK_vs_Th</span><span class="o">&lt;-</span><span class="nf">GSEA</span><span class="p">(</span><span class="n">gl</span><span class="p">,</span><span class="w"> </span>
+<span class="w">                 </span><span class="n">TERM2GENE</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">term2gene_h</span><span class="p">[,</span><span class="nf">c</span><span class="p">(</span><span class="s">&quot;gs_name&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;gene_symbol&quot;</span><span class="p">)],</span>
+<span class="w">                 </span><span class="n">eps</span><span class="o">=</span><span class="m">0</span><span class="p">,</span>
+<span class="w">                 </span><span class="n">seed</span><span class="o">=</span><span class="bp">T</span><span class="p">)</span>
+<span class="nf">View</span><span class="p">(</span><span class="n">h_NK_vs_Th</span><span class="o">@</span><span class="n">result</span><span class="p">)</span><span class="w"> </span><span class="c1"># 4</span>
+</code></pre></div>
+<p>Finally, we can easily visualize the results:</p>
+<div class="highlight"><pre><span></span><code><span class="c1"># A dotplot with GeneRatio or NES on the x-axis:</span>
+<span class="nf">dotplot</span><span class="p">(</span><span class="n">h_NK_vs_Th</span><span class="p">)</span>
+<span class="nf">dotplot</span><span class="p">(</span><span class="n">h_NK_vs_Th</span><span class="p">,</span><span class="w"> </span><span class="n">x</span><span class="o">=</span><span class="s">&quot;NES&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">orderBy</span><span class="o">=</span><span class="s">&quot;p.adjust&quot;</span><span class="p">)</span>
+
+<span class="c1"># A barcode plot:</span>
+<span class="nf">gseaplot2</span><span class="p">(</span><span class="n">h_NK_vs_Th</span><span class="p">,</span><span class="w"> </span><span class="n">geneSetID</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;HALLMARK_MTORC1_SIGNALING&quot;</span><span class="p">,</span>
+<span class="w">           </span><span class="n">title</span><span class="o">=</span><span class="s">&quot;HALLMARK_MTORC1_SIGNALING&quot;</span><span class="p">)</span>
+</code></pre></div>
+<figure>
+  <img src="../assets/images/dotplot_hallmark.png" width="700"/>
+  </figure>
+
+<figure>
+  <img src="../assets/images/gseaplot2_hallmark.png" width="700"/>
+  </figure>
+
+<p>For GSEA of the KEGG gene sets, the gene IDs have to be NCBI Entrez gene IDs. ClusterProfiler provides the bitr() function to convert gene label types.</p>
+<div class="highlight"><pre><span></span><code><span class="c1"># Check allowed gene ID types:</span>
+<span class="o">?</span><span class="n">gseKEGG</span>
+<span class="nf">keytypes</span><span class="p">(</span><span class="n">org.Hs.eg.db</span><span class="p">)</span><span class="w"> </span><span class="c1"># same as idType()</span>
+
 <span class="c1"># convert from= &quot;ENSEMBL&quot; to &quot;SYMBOL&quot; and &quot;ENTREZID&quot;</span>
+
 <span class="n">gene_convert</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="nf">bitr</span><span class="p">(</span><span class="nf">as.character</span><span class="p">(</span><span class="n">NK_vs_Th</span><span class="o">$</span><span class="n">ensembl_gene_id</span><span class="p">),</span><span class="w"> </span>
 <span class="w">                     </span><span class="n">fromType</span><span class="o">=</span><span class="s">&quot;ENSEMBL&quot;</span><span class="p">,</span><span class="w"> </span>
-<span class="w">                     </span><span class="n">toType</span><span class="o">=</span><span class="nf">c</span><span class="p">(</span><span class="s">&quot;SYMBOL&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;ENTREZID&quot;</span><span class="p">),</span><span class="w"> </span><span class="n">OrgDb</span><span class="o">=</span><span class="s">&quot;org.Hs.eg.db&quot;</span><span class="p">)</span>
+<span class="w">                     </span><span class="n">toType</span><span class="o">=</span><span class="nf">c</span><span class="p">(</span><span class="s">&quot;SYMBOL&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;ENTREZID&quot;</span><span class="p">),</span><span class="w"> </span><span class="n">OrgDb</span><span class="o">=</span><span class="s">&quot;org.Hs.eg.db&quot;</span><span class="p">,</span>
+<span class="w">                     </span><span class="n">drop</span><span class="o">=</span><span class="kc">TRUE</span><span class="p">)</span>
+<span class="c1"># Warning message:</span>
+<span class="c1"># In bitr(NK_vs_Th$ensembl_gene_id, fromType = &quot;ENSEMBL&quot;, toType = &quot;ENTREZID&quot;,  :</span>
+<span class="c1">#           18.28% of input gene IDs are fail to map...</span>
 
-<span class="c1"># Check the format of the data frame obtained after conversion:                     </span>
 <span class="nf">head</span><span class="p">(</span><span class="n">gene_convert</span><span class="p">)</span>
 <span class="nf">dim</span><span class="p">(</span><span class="n">gene_convert</span><span class="p">)</span>
 </code></pre></div>
 <p>Similarly to the gseGO() function, we need to provide a named and sorted vector of t-statistics, the difference is that the names will be Entrez gene IDs.</p>
-<div class="highlight"><pre><span></span><code><span class="c1"># Create a vector of genes that are coded with the EntrezID:</span>
-<span class="c1"># use the sorted gene list gl previously created:</span>
-<span class="n">gl_kegg</span><span class="o">&lt;-</span><span class="nf">cbind</span><span class="p">(</span><span class="n">SYMBOL</span><span class="o">=</span><span class="nf">names</span><span class="p">(</span><span class="n">gl</span><span class="p">),</span><span class="w"> </span><span class="n">t</span><span class="o">=</span><span class="n">gl</span><span class="p">)</span>
+<div class="highlight"><pre><span></span><code><span class="c1"># GSEA of KEGG: create a vector of genes that are coded with the EntrezID:</span>
+<span class="n">ranked_entrez</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">NK_vs_Th</span><span class="w"> </span><span class="o">|&gt;</span>
+<span class="w">  </span><span class="nf">inner_join</span><span class="p">(</span><span class="n">gene_convert</span><span class="p">,</span><span class="w"> </span><span class="n">by</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nf">c</span><span class="p">(</span><span class="s">&#39;ensembl_gene_id&#39;</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&#39;ENSEMBL&#39;</span><span class="p">))</span><span class="w"> </span><span class="o">|&gt;</span>
+<span class="w">  </span><span class="nf">group_by</span><span class="p">(</span><span class="n">ENTREZID</span><span class="p">)</span><span class="w"> </span><span class="o">|&gt;</span>
+<span class="w">  </span><span class="nf">slice_max</span><span class="p">(</span><span class="nf">abs</span><span class="p">(</span><span class="n">t</span><span class="p">),</span><span class="w"> </span><span class="n">n</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">1</span><span class="p">,</span><span class="w"> </span><span class="n">with_ties</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">FALSE</span><span class="p">)</span><span class="w"> </span><span class="o">|&gt;</span>
+<span class="w">  </span><span class="nf">ungroup</span><span class="p">()</span><span class="w"> </span><span class="o">|&gt;</span>
+<span class="w">  </span><span class="nf">arrange</span><span class="p">(</span><span class="nf">desc</span><span class="p">(</span><span class="n">t</span><span class="p">))</span>
+<span class="n">gl_kegg_list</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="nf">setNames</span><span class="p">(</span><span class="n">ranked_entrez</span><span class="o">$</span><span class="n">t</span><span class="p">,</span><span class="w"> </span><span class="n">ranked_entrez</span><span class="o">$</span><span class="n">ENTREZID</span><span class="p">)</span>
 
-<span class="c1"># merge with converted gene symbols to combine both:</span>
-<span class="c1"># by default the data frames are merged on the columns with names they both have</span>
-<span class="n">gl_kegg</span><span class="o">&lt;-</span><span class="nf">merge</span><span class="p">(</span><span class="n">gl_kegg</span><span class="p">,</span><span class="w"> </span><span class="n">gene_convert</span><span class="p">)</span>
-<span class="nf">head</span><span class="p">(</span><span class="n">gl_kegg</span><span class="p">)</span>
 
-<span class="n">gl_kegg_list</span><span class="o">&lt;-</span><span class="nf">as.numeric</span><span class="p">(</span><span class="nf">as.character</span><span class="p">(</span><span class="n">gl_kegg</span><span class="o">$</span><span class="n">t</span><span class="p">))</span>
-<span class="nf">names</span><span class="p">(</span><span class="n">gl_kegg_list</span><span class="p">)</span><span class="o">&lt;-</span><span class="nf">as.character</span><span class="p">(</span><span class="n">gl_kegg</span><span class="o">$</span><span class="n">ENTREZID</span><span class="p">)</span>
-<span class="n">gl_kegg_list</span><span class="o">&lt;-</span><span class="nf">sort</span><span class="p">(</span><span class="n">gl_kegg_list</span><span class="p">,</span><span class="w"> </span><span class="n">decreasing</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="bp">T</span><span class="p">)</span>
-
-<span class="c1"># run GSEA of KEGG (please note that requires internet connection to download the KEGG annotations from http)</span>
+<span class="c1"># run GSEA of KEGG (please note that it requires internet connection to download the KEGG annotations from http)</span>
 <span class="n">KEGG_NK_Th</span><span class="o">&lt;-</span><span class="nf">gseKEGG</span><span class="p">(</span><span class="n">gl_kegg_list</span><span class="p">,</span><span class="w"> </span><span class="n">organism</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;hsa&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;ncbi-geneid&quot;</span><span class="p">,</span>
 <span class="w">                    </span><span class="n">minGSSize</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">30</span><span class="p">,</span>
 <span class="w">                    </span><span class="n">eps</span><span class="o">=</span><span class="m">0</span><span class="p">,</span>
@@ -987,19 +1139,22 @@ Because we had NK cells in our dataset, is the <a href="https://www.genome.jp/pa
 KEGG gene sets and how can you view the genes included in a particular gene set?</p>
 <details class="done">
 <summary>Answer</summary>
-<div class="highlight"><pre><span></span><code><span class="w">    </span><span class="nf">str</span><span class="p">(</span><span class="n">KEGG_NK_Th</span><span class="p">)</span>
+<div class="highlight"><pre><span></span><code><span class="w">    </span><span class="c1"># Explore the object:</span>
+<span class="w">    </span><span class="nf">class</span><span class="p">(</span><span class="n">KEGG_NK_Th</span><span class="p">)</span>
+<span class="w">    </span><span class="nf">str</span><span class="p">(</span><span class="n">KEGG_NK_Th</span><span class="p">)</span>
 <span class="w">    </span><span class="nf">View</span><span class="p">(</span><span class="n">KEGG_NK_Th</span><span class="o">@</span><span class="n">result</span><span class="p">)</span>
 
 <span class="w">    </span><span class="c1"># Up-regulated gene sets:</span>
 <span class="w">    </span><span class="nf">summary</span><span class="p">(</span><span class="n">KEGG_NK_Th</span><span class="o">@</span><span class="n">result</span><span class="o">$</span><span class="n">NES</span><span class="o">&gt;</span><span class="m">0</span><span class="p">)</span>
+<span class="w">    </span><span class="c1">#    Mode   FALSE    TRUE </span>
+<span class="w">    </span><span class="c1"># logical      7      21</span>
 
-<span class="w">    </span><span class="n">KEGG_NK_Th</span><span class="o">@</span><span class="n">result</span><span class="p">[</span><span class="nf">grep</span><span class="p">(</span><span class="s">&quot;immune&quot;</span><span class="p">,</span><span class="n">KEGG_NK_Th</span><span class="o">@</span><span class="n">result</span><span class="o">$</span><span class="n">Description</span><span class="p">),</span><span class="w"> </span><span class="p">]</span>
+<span class="w">    </span><span class="n">KEGG_NK_Th</span><span class="o">@</span><span class="n">result</span><span class="w"> </span><span class="o">|&gt;</span><span class="w"> </span><span class="nf">filter</span><span class="p">(</span><span class="nf">grepl</span><span class="p">(</span><span class="s">&quot;immune&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">Description</span><span class="p">))</span>
 
-<span class="w">    </span><span class="n">KEGG_NK_Th</span><span class="o">@</span><span class="n">result</span><span class="p">[</span><span class="nf">grep</span><span class="p">(</span><span class="s">&quot;Natural killer&quot;</span><span class="p">,</span><span class="n">KEGG_NK_Th</span><span class="o">@</span><span class="n">result</span><span class="o">$</span><span class="n">Description</span><span class="p">),</span><span class="w"> </span><span class="p">]</span>
+<span class="w">    </span><span class="n">KEGG_NK_Th</span><span class="o">@</span><span class="n">result</span><span class="w"> </span><span class="o">|&gt;</span><span class="w"> </span><span class="nf">filter</span><span class="p">(</span><span class="nf">grepl</span><span class="p">(</span><span class="s">&quot;Natural killer&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">Description</span><span class="p">))</span>
 
 <span class="w">    </span><span class="c1"># How many built-in KEGG pathways are there?</span>
 <span class="w">    </span><span class="nf">length</span><span class="p">(</span><span class="n">KEGG_NK_Th</span><span class="o">@</span><span class="n">geneSets</span><span class="p">)</span>
-
 <span class="w">    </span><span class="c1"># Genes involved in Natural killer cell mediated cytotoxicity (hsa04650)</span>
 <span class="w">    </span><span class="n">KEGG_NK_Th</span><span class="o">@</span><span class="n">geneSets</span><span class="o">$</span><span class="n">hsa04650</span><span class="w"> </span><span class="c1"># coded as Entrez Gene ID...</span>
 </code></pre></div>
@@ -1007,7 +1162,8 @@ KEGG gene sets and how can you view the genes included in a particular gene set?
 <p>Once you have performed a GSEA of the KEGG pathways, it is possible to overlay the fold change values of your genes on top of the
 KEGG pathway maps available online. For this, create a named vector of fold change values, where the non-significant genes will be grey, while the up- and down-
 regulated genes will be colored in the KEGG pathway map. The pathview() function comes from the pathview package (surprisingly&hellip;)</p>
-<div class="highlight"><pre><span></span><code><span class="nf">library</span><span class="p">(</span><span class="n">pathview</span><span class="p">)</span>
+<div class="highlight"><pre><span></span><code><span class="c1"># Overlay of fold change value on KEGG pathway figure:</span>
+<span class="nf">library</span><span class="p">(</span><span class="n">pathview</span><span class="p">)</span>
 
 <span class="c1"># pathview map with non-significant genes in grey:</span>
 <span class="c1"># set log fold change of non-significant genes to 0:</span>
@@ -1018,6 +1174,7 @@ regulated genes will be colored in the KEGG pathway map. The pathview() function
 <span class="nf">names</span><span class="p">(</span><span class="n">genePW</span><span class="p">)</span><span class="o">&lt;-</span><span class="n">NK_vs_Th</span><span class="o">$</span><span class="n">symbol</span>
 
 <span class="c1"># Create pathview map for Ribosome = hsa03010</span>
+<span class="o">?</span><span class="n">pathview</span>
 <span class="nf">pathview</span><span class="p">(</span><span class="n">gene.data</span><span class="w">  </span><span class="o">=</span><span class="w"> </span><span class="n">genePW</span><span class="p">,</span>
 <span class="w">         </span><span class="n">pathway.id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;hsa03010&quot;</span><span class="p">,</span>
 <span class="w">         </span><span class="n">species</span><span class="w">    </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;hsa&quot;</span><span class="p">,</span>
@@ -1027,53 +1184,16 @@ regulated genes will be colored in the KEGG pathway map. The pathview() function
 <span class="nf">pathview</span><span class="p">(</span><span class="n">gene.data</span><span class="w">  </span><span class="o">=</span><span class="w"> </span><span class="n">genePW</span><span class="p">,</span>
 <span class="w">         </span><span class="n">pathway.id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;hsa04650&quot;</span><span class="p">,</span>
 <span class="w">         </span><span class="n">species</span><span class="w">    </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;hsa&quot;</span><span class="p">,</span>
-<span class="w">         </span><span class="n">gene.idtype</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;SYMBOL&quot;</span><span class="p">)</span>
+<span class="w">         </span><span class="n">gene.idtype</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;SYMBOL&quot;</span><span class="p">,</span>
+<span class="w">         </span><span class="n">low</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nf">list</span><span class="p">(</span><span class="n">gene</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;lightblue&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">cpd</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;magenta&quot;</span><span class="p">),</span><span class="w"> </span>
+<span class="w">         </span><span class="n">mid</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nf">list</span><span class="p">(</span><span class="n">gene</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;gray&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">cpd</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;gray&quot;</span><span class="p">),</span><span class="w"> </span>
+<span class="w">         </span><span class="n">high</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nf">list</span><span class="p">(</span><span class="n">gene</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;red&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">cpd</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;yellow&quot;</span><span class="p">))</span>
 </code></pre></div>
 <figure>
   <img src="../assets/images/hsa04650.pathview.png" width="700"/>
   </figure>
 
-<p>Very often, researchers have their own gene sets in mind, either that they compiled from the literature, or that they defined from previous experiments. If this is the case for your experiment, you can generate an Excel file that contains one gene set per row, the 2 first columns contain the gene set ID and the gene set description, and the genes that belong to each gene set are listed in the next columns. To have an idea of
-the structure of this file, open the .gmt file that we provided using Excel or a Text editor (NotePad, TextWrangler, BBEdit, etc).</p>
-<p>In this exercise, we will perform a GSEA of the 50 hallmark gene sets that can be downloaded from <a href="http://www.gsea-msigdb.org/gsea/downloads.jsp">MSigDB</a>, which we can import using <code>clusterProfiler::read.gmt()</code>. 
-Alternatively, we can import the Hallmark gene sets using <code>msigdbr</code>. What is the format of the object that is created? Use the GSEA() function, by providing the named and sorted
-vector of t-statistics we used above with gseGO(). Why do we use this one and not the one created for gseKEGG()?</p>
-<div class="highlight"><pre><span></span><code><span class="c1"># Import hallmark, convert to term2gene and run GSEA:</span>
-<span class="n">term2gene_h</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="nf">msigdbr</span><span class="p">(</span><span class="n">species</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;Homo sapiens&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">collection</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;H&quot;</span><span class="p">)</span>
-<span class="c1"># Or alternatively:</span>
-<span class="c1"># term2gene_h&lt;-read.gmt(&quot;h.all.v2023.2.Hs.symbols.gmt&quot;)</span>
-
-<span class="nf">head</span><span class="p">(</span><span class="n">term2gene_h</span><span class="p">)</span>
-<span class="nf">length</span><span class="p">(</span><span class="nf">unique</span><span class="p">(</span><span class="n">term2gene_h</span><span class="o">$</span><span class="n">gs_name</span><span class="p">))</span><span class="w"> </span><span class="c1"># 50</span>
-
-<span class="c1"># Run GSEA with the function that allows to use custom gene sets, </span>
-<span class="c1"># provide the named vector of t statistics</span>
-<span class="n">h_NK_vs_Th</span><span class="o">&lt;-</span><span class="nf">GSEA</span><span class="p">(</span><span class="n">gl</span><span class="p">,</span><span class="w"> </span><span class="n">TERM2GENE</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">term2gene_h</span><span class="p">[,</span><span class="nf">c</span><span class="p">(</span><span class="s">&quot;gs_name&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;gene_symbol&quot;</span><span class="p">)],</span>
-<span class="w">                 </span><span class="n">eps</span><span class="o">=</span><span class="m">0</span><span class="p">,</span>
-<span class="w">                 </span><span class="n">seed</span><span class="o">=</span><span class="bp">T</span><span class="p">)</span>
-
-<span class="nf">View</span><span class="p">(</span><span class="n">h_NK_vs_Th</span><span class="o">@</span><span class="n">result</span><span class="p">)</span>
-
-<span class="c1"># Number of significant gene sets:</span>
-<span class="nf">length</span><span class="p">(</span><span class="nf">which</span><span class="p">(</span><span class="n">h_NK_vs_Th</span><span class="o">@</span><span class="n">result</span><span class="o">$</span><span class="n">p.adjust</span><span class="o">&lt;=</span><span class="m">0.05</span><span class="p">))</span><span class="w"> </span>
-</code></pre></div>
-<p>Finally, we can easily visualize the results:</p>
-<div class="highlight"><pre><span></span><code><span class="c1"># A dotplot with geneRatio or NES on the x-axis:</span>
-<span class="nf">dotplot</span><span class="p">(</span><span class="n">h_NK_vs_Th</span><span class="p">)</span>
-<span class="nf">dotplot</span><span class="p">(</span><span class="n">h_NK_vs_Th</span><span class="p">,</span><span class="w"> </span><span class="n">x</span><span class="o">=</span><span class="s">&quot;NES&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">orderBy</span><span class="o">=</span><span class="s">&quot;p.adjust&quot;</span><span class="p">)</span>
-
-<span class="c1"># A barcode plot:</span>
-<span class="nf">gseaplot2</span><span class="p">(</span><span class="n">h_NK_vs_Th</span><span class="p">,</span><span class="w"> </span><span class="n">geneSetID</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;HALLMARK_MTORC1_SIGNALING&quot;</span><span class="p">,</span>
-<span class="w">           </span><span class="n">title</span><span class="o">=</span><span class="s">&quot;HALLMARK_MTORC1_SIGNALING&quot;</span><span class="p">)</span>
-</code></pre></div>
-<figure>
-  <img src="../assets/images/dotplot_hallmark.png" width="700"/>
-  </figure>
-
-<figure>
-  <img src="../assets/images/gseaplot2_hallmark.png" width="700"/>
-  </figure>
-
+<p><strong>The End</strong></p>
 <h2 id="feedback">Feedback</h2>
 <p>Thanks for attending this course! Don&rsquo;t forget to give honest feedback via the link sent by the course organizer.</p>
 <h2 id="extra-exercise-for-ects-credits">Extra exercise for ECTS credits</h2>
