@@ -686,9 +686,17 @@ description, biotype, or the symbols of mouse homologs of human genes, etc.</p>
 <p>We can also use the msigdbr package to download the KEGG collection, in case the <code>gseKEGG()</code> function of the clusterProfiler package is blocked by firewall issues.</p>
 <div class="highlight"><pre><span></span><code><span class="c1">### ---- KEGG with msigdbr download:</span>
 <span class="nf">msigdbr_collections</span><span class="p">()</span><span class="w"> </span><span class="c1"># </span>
-<span class="c1"># C2     &quot;CP:KEGG&quot;      </span>
-<span class="n">kegg_pw</span><span class="o">&lt;-</span><span class="nf">msigdbr</span><span class="p">(</span><span class="n">species</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;human&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">collection</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;C2&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">subcollection</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;CP:KEGG&quot;</span><span class="p">)</span>
+<span class="c1"># 5   2026.1.Hs            C2   CP:KEGG_LEGACY                 KEGG Legacy Pathways          186</span>
+<span class="c1"># 6   2026.1.Hs            C2  CP:KEGG_MEDICUS                KEGG Medicus Pathways          658</span>
+<span class="c1"># KEGG Legacy and KEGG Medicus are two distinct pathway collections available</span>
+<span class="c1"># in resources like MSigDB. KEGG Legacy contains older canonical pathways </span>
+<span class="c1"># (typically ~186 gene sets) that have not been updated since KEGG restricted </span>
+<span class="c1"># usage terms around 2011. KEGG Medicus is a newer, expanded collection </span>
+<span class="c1"># (~600+ pathways depending on the release) that integrates KEGG&#39;s health, </span>
+<span class="c1"># disease, and drug information with drug labels.</span>
 
+<span class="c1"># kegg_pw&lt;-msigdbr(species = &quot;human&quot;, collection = &quot;C2&quot;, subcollection = &quot;CP:KEGG&quot;) # for older versions of msigdbr</span>
+<span class="n">kegg_pw</span><span class="o">&lt;-</span><span class="nf">msigdbr</span><span class="p">(</span><span class="n">species</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;human&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">collection</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;C2&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">subcollection</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;CP:KEGG_LEGACY&quot;</span><span class="p">)</span><span class="w"> </span><span class="c1"># for more recent versions of msigdbr</span>
 <span class="nf">head</span><span class="p">(</span><span class="n">kegg_pw</span><span class="p">[,</span><span class="nf">c</span><span class="p">(</span><span class="s">&quot;gs_name&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;gene_symbol&quot;</span><span class="p">)])</span>
 <span class="c1"># # A tibble: 6 × 2</span>
 <span class="c1"># gs_name               gene_symbol</span>
