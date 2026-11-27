@@ -170,9 +170,17 @@ We can also use the msigdbr package to download the KEGG collection, in case the
 ```r
 ### ---- KEGG with msigdbr download:
 msigdbr_collections() # 
-# C2     "CP:KEGG"      
-kegg_pw<-msigdbr(species = "human", collection = "C2", subcollection = "CP:KEGG")
+# 5   2026.1.Hs            C2   CP:KEGG_LEGACY                 KEGG Legacy Pathways          186
+# 6   2026.1.Hs            C2  CP:KEGG_MEDICUS                KEGG Medicus Pathways          658
+# KEGG Legacy and KEGG Medicus are two distinct pathway collections available
+# in resources like MSigDB. KEGG Legacy contains older canonical pathways 
+# (typically ~186 gene sets) that have not been updated since KEGG restricted 
+# usage terms around 2011. KEGG Medicus is a newer, expanded collection 
+# (~600+ pathways depending on the release) that integrates KEGG's health, 
+# disease, and drug information with drug labels.
 
+# kegg_pw<-msigdbr(species = "human", collection = "C2", subcollection = "CP:KEGG") # for older versions of msigdbr
+kegg_pw<-msigdbr(species = "human", collection = "C2", subcollection = "CP:KEGG_LEGACY") # for more recent versions of msigdbr
 head(kegg_pw[,c("gs_name", "gene_symbol")])
 # # A tibble: 6 × 2
 # gs_name               gene_symbol
